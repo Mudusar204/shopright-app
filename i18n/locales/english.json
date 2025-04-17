@@ -1,0 +1,52 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "ok": "Ok",
+    "save": "Save",
+    "delete": "Delete",
+    "add": "Add",
+    "edit": "Edit",
+    "search": "Search",
+    "clear": "Clear",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "retry": "Retry",
+    "retry_again": "Retry again",
+    "retry_later": "Retry later",
+    "open_settings": "Open Settings"
+  },
+  "alert": {
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "ome": {
+      "title": "Oops!",
+      "message": "Something went wrong",
+      "ok": "Ok"
+    },
+    "no_internet": "No Internet",
+    "no_internet_message": "Please check your internet connection and try again",
+    "ok": "Ok"
+  },
+ 
+  "onboarding": {
+    "skip": "Skip",
+    "splash_title_1": "Rorem ipsum dolor sit amet, consectetur.",
+    "splash_subtitle_1": "Jorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "splash_title_2": "Rorem ipsum dolor sit amet, consectetur.",
+    "splash_subtitle_2": "Jorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "splash_title_3": "Rorem ipsum dolor sit amet, consectetur.",
+    "splash_subtitle_3": "Jorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "next": "Next",
+    "lets_start": "Let's Start"
+  },
+  "home": {
+    "welcome_back": "Welcome Back!"
+  }
+ 
+}

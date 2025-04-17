@@ -1,0 +1,9 @@
+{
+  "infraEnvConfig": [
+    {
+      "deploymentEnv": "dev",
+      "easAccessToken": "d2wonehu5qkj4r",
+      "easEnvironment": "d2wonehu5qkj4r.amplifyapp.com"
+    }
+  ]
+}
