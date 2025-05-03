@@ -32,6 +32,7 @@ type ButtonOtherProps = {
   icon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   textColor?: string;
+  disabled?: boolean;
   onPress?: () => void;
 };
 
@@ -151,6 +152,7 @@ export function Button({
     icon,
     variant = "primary",
     textColor,
+    disabled,
   } = props;
 
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -256,7 +258,7 @@ export function Button({
     <DefaultTouchableOpacity
       activeOpacity={0.8}
       onPress={onPress}
-      disabled={variant === "disabled" || isLoading}
+      disabled={disabled || variant === "disabled" || isLoading}
       style={[getVariantStyle(), getSizeStyle(), style]}
     >
       {isLoading ? (

@@ -1,27 +1,27 @@
-import React from 'react';
-import { Text, View } from '@/components/Themed';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import i18n from '@/i18n';
-import Feather from '@expo/vector-icons/Feather';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Image, Platform, Pressable, StyleSheet, Switch } from 'react-native';
-import { router } from 'expo-router';
-import { useLocationStore } from '@/store/location.store';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import MenuHandler from '@/components/MenuHandler';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useColorScheme } from '@/components/useColorScheme';
-import Colors from '@/constants/Colors';
-import LocationIcon from '@/assets/images/svgs/Location';
-import BrightnessIcon from '@/assets/images/svgs/Brightness';
-import InfoIcon from '@/assets/images/svgs/Info';
-import LockIcon from '@/assets/images/svgs/Lock';
-import BagIcon from '@/assets/images/svgs/Bag';
-import HeartIcon from '@/assets/images/svgs/Heart';
-import UserSettingIcon from '@/assets/images/svgs/UserSettings';
-import LogoutIcon from '@/assets/images/svgs/Logout';
-import { useThemStore } from '@/store/theme.store';
-import { useAuthStore } from '@/store/auth.store';
+import React from "react";
+import { Text, View } from "@/components/Themed";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import i18n from "@/i18n";
+import Feather from "@expo/vector-icons/Feather";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Image, Platform, Pressable, StyleSheet, Switch } from "react-native";
+import { router } from "expo-router";
+import { useLocationStore } from "@/store/location.store";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
+import MenuHandler from "@/components/MenuHandler";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
+import LocationIcon from "@/assets/images/svgs/Location";
+import BrightnessIcon from "@/assets/images/svgs/Brightness";
+import InfoIcon from "@/assets/images/svgs/Info";
+import LockIcon from "@/assets/images/svgs/Lock";
+import BagIcon from "@/assets/images/svgs/Bag";
+import HeartIcon from "@/assets/images/svgs/Heart";
+import UserSettingIcon from "@/assets/images/svgs/UserSettings";
+import LogoutIcon from "@/assets/images/svgs/Logout";
+import { useThemStore } from "@/store/theme.store";
+import { useAuthStore } from "@/store/auth.store";
 const TitleWithImage = ({
   Icon,
   title,
@@ -37,9 +37,7 @@ const TitleWithImage = ({
     <Pressable onPress={onPress}>
       <View style={styles.titleContainer}>
         {Icon}
-        <Text style={[styles.titleText, titleStyle]}>
-          {title}
-        </Text>
+        <Text style={[styles.titleText, titleStyle]}>{title}</Text>
       </View>
     </Pressable>
   );
@@ -51,14 +49,14 @@ const DrawerScreen = () => {
   const toggleTheme = useThemStore((state: any) => state.toggleTheme);
   // const { address } = useLocationStore();
   const navigation: any = useNavigation();
-  const colorTheme = useColorScheme() as 'light' | 'dark';
-  const {setIsLoggedIn} = useAuthStore((state: any) => state);
+  const colorTheme = useColorScheme() as "light" | "dark";
+  const { setIsLoggedIn, user, clear } = useAuthStore();
   return (
     <View
       style={[
         styles.container,
         {
-          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 20,
+          paddingBottom: Platform.OS === "ios" ? insets.bottom : 20,
         },
       ]}
     >
@@ -66,28 +64,32 @@ const DrawerScreen = () => {
         <View style={styles.menuHandlerContainer}>
           <MenuHandler />
         </View>
-        <Pressable >
-
-        <View style={styles.profileContainer}>
-          <Image
-            source={require('@/assets/images/profileImg.png')}
-            style={styles.profileImage}
-          />
-          <View style={styles.profileTextContainer}>
-            <Text style={styles.profileNameText}>
-              John Doe
-            </Text>
-            <View style={[styles.locationRow,]}>
-              <LocationIcon color={Colors[colorTheme].primary_color} />
-              <Text style={[styles.profileLocationText, { color: Colors[colorTheme].primary_color }]}>Faisalabad, Pakistan</Text>
+        <Pressable>
+          <View style={styles.profileContainer}>
+            <Image
+              source={require("@/assets/images/profileImg.png")}
+              style={styles.profileImage}
+            />
+            <View style={styles.profileTextContainer}>
+              <Text style={styles.profileNameText}>
+                {user?.name || "John Doe"}
+              </Text>
+              <View style={[styles.locationRow]}>
+                <LocationIcon color={Colors[colorTheme].primary_color} />
+                <Text
+                  style={[
+                    styles.profileLocationText,
+                    { color: Colors[colorTheme].primary_color },
+                  ]}
+                >
+                  Faisalabad, Pakistan
+                </Text>
+              </View>
             </View>
           </View>
-
-        </View>
         </Pressable>
 
         <View style={styles.darkModeContainer}>
-
           <TitleWithImage
             Icon={<BrightnessIcon color={Colors[colorTheme].icon_color} />}
             title="Dark Mode"
@@ -97,50 +99,47 @@ const DrawerScreen = () => {
             }}
           />
 
-          <Switch value={theme === 'dark'} onValueChange={() => toggleTheme(theme === 'dark' ? 'light' : 'dark')} style={{ marginTop: 30 }}
+          <Switch
+            value={theme === "dark"}
+            onValueChange={() =>
+              toggleTheme(theme === "dark" ? "light" : "dark")
+            }
+            style={{ marginTop: 30 }}
           />
         </View>
         <TitleWithImage
           Icon={<InfoIcon color={Colors[colorTheme].icon_color} />}
           title="Account Information"
-          onPress={() => {
-
-          }}
+          onPress={() => {}}
         />
         <TitleWithImage
           Icon={<LockIcon color={Colors[colorTheme].icon_color} />}
           title="Password"
           onPress={() => {
-            router.push('/(public)/newPassword')
+            router.push("/(public)/newPassword");
           }}
         />
         <TitleWithImage
           Icon={<BagIcon color={Colors[colorTheme].icon_color} />}
           title="My Orders"
-          onPress={() => {
-
-          }}
+          onPress={() => {}}
         />
         <TitleWithImage
           Icon={<HeartIcon color={Colors[colorTheme].icon_color} />}
           title="Wishlist"
-          onPress={() => {
-
-          }}
+          onPress={() => {}}
         />
         <TitleWithImage
           Icon={<UserSettingIcon color={Colors[colorTheme].icon_color} />}
           title="Settings"
           onPress={() => {
-            router.push('/(auth)/settings')
+            router.push("/(auth)/settings");
           }}
         />
-         <TitleWithImage
+        <TitleWithImage
           Icon={<InfoIcon color={Colors[colorTheme].icon_color} />}
           title="FAQs"
-          onPress={() => {
-
-          }}
+          onPress={() => {}}
         />
       </View>
 
@@ -149,8 +148,8 @@ const DrawerScreen = () => {
         title="Logout"
         titleStyle={{ color: "#FF5757" }}
         onPress={() => {
-          setIsLoggedIn(false);
-          router.push('/login');
+          clear();
+          router.push("/login");
         }}
       />
     </View>
@@ -160,23 +159,23 @@ const DrawerScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     padding: 20,
   },
 
   menuHandlerContainer: {
-    transform: [{ rotate: '90deg' }],
-    backgroundColor: 'transparent',
-    overflow: 'visible',
-    alignSelf: 'flex-start',
+    transform: [{ rotate: "90deg" }],
+    backgroundColor: "transparent",
+    overflow: "visible",
+    alignSelf: "flex-start",
   },
 
   menuContainer: {
     marginBottom: 200,
   },
   profileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
     marginTop: 30,
     marginBottom: 10,
@@ -191,35 +190,34 @@ const styles = StyleSheet.create({
   },
   profileNameText: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 5,
-    marginTop: 5
+    marginTop: 5,
   },
   profileLocationText: {
     fontSize: 10,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   darkModeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 30,
     gap: 10,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   titleText: {
     fontSize: 16,
-    fontWeight: '400',
+    fontWeight: "400",
   },
-
 });
 
 export default DrawerScreen;

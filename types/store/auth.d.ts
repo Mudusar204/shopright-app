@@ -22,11 +22,8 @@ interface User {
   name: string;
   email: string;
   iso_code?: string;
-  phone_number?: string;
-  counntry_code?: string;
-  followers?: any[];
-  following?: any[];
-  posts?: any[];
+  phoneNumber?: string;
+  country_code?: string;
   profile_image?: string;
   location?: any;
   alerts?: boolean;

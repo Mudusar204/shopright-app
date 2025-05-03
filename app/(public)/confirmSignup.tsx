@@ -1,50 +1,25 @@
-import { StyleSheet, Alert } from 'react-native'
-import { Button, Text, View } from '@/components/Themed'
-import React, { useState } from 'react'
-import Header from '@/components/Header'
-import { useColorScheme } from '@/components/useColorScheme';
-import Colors from '@/constants/Colors';
-import { router, useLocalSearchParams } from 'expo-router';
-import InputHandler from '@/components/InputHandler';
-import { useAuthStore } from '@/store/auth.store';
-
- const ConfirmSignUp = () => {
-  const colorScheme = useColorScheme() as 'light' | 'dark';
+import { StyleSheet, Alert } from "react-native";
+import { Button, Text, View } from "@/components/Themed";
+import React, { useState } from "react";
+import Header from "@/components/Header";
+import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
+import { router, useLocalSearchParams } from "expo-router";
+import InputHandler from "@/components/InputHandler";
+import { useAuthStore } from "@/store/auth.store";
+import useOtpScreen from "@/customHooks/auth/useOtpScreen";
+const ConfirmSignUp = () => {
+  const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const { username } = useLocalSearchParams();
-  const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const {setIsLoggedIn} = useAuthStore((state: any) => state);
-  const handleConfirmation = async () => {
-    if (loading || !code) return;
-
-    try {
-      setLoading(true);
-      if (true) {
-        setIsLoggedIn(true);
-        Alert.alert('Success', 'Account confirmed successfully!', [
-          {
-            text: 'OK',
-            onPress: () => router.push('/(auth)/(tabs)'),
-          },
-        ]);
-      }
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'An error occurred during confirmation');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    try {
-      if (true) {
-        Alert.alert('Success', 'Verification code resent successfully');
-      }
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to resend code');
-    }
-  };
+  const {
+    otp,
+    setOtp,
+    handleOtpVerification,
+    isLoading,
+    handleResendCode,
+    isLoadingResendOtp,
+  } = useOtpScreen();
 
   return (
     <View style={styles.container}>
@@ -54,31 +29,32 @@ import { useAuthStore } from '@/store/auth.store';
         Please enter the verification code sent to your email
       </Text>
       <InputHandler
-        placeholder='Verification Code'
-        value={code}
-        onChangeText={setCode}
+        placeholder="Verification Code"
+        value={otp}
+        onChangeText={setOtp}
       />
       <Button
         style={styles.button}
-        variant='primary'
-        size='large'
-        title={loading ? "Verifying..." : "Verify"}
-        onPress={handleConfirmation}
-        // disabled={loading || !code}
+        variant="primary"
+        size="large"
+        title={isLoading ? "Verifying..." : "Verify"}
+        onPress={handleOtpVerification}
+        disabled={isLoading}
       />
       <Button
-      textColor={Colors[colorScheme].text_white}
+        textColor={Colors[colorScheme].text_white}
         style={styles.resendButton}
-        variant='secondary'
-        size='large'
-        title="Resend Code"
+        variant="secondary"
+        size="large"
+        title={isLoadingResendOtp ? "Resending..." : "Resend Code"}
         onPress={handleResendCode}
+        disabled={isLoadingResendOtp}
       />
     </View>
   );
-}
-export default ConfirmSignUp
-const createStyles = (theme: 'light' | 'dark') =>
+};
+export default ConfirmSignUp;
+const createStyles = (theme: "light" | "dark") =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -87,13 +63,13 @@ const createStyles = (theme: 'light' | 'dark') =>
     },
     title: {
       fontSize: 24,
-      textAlign: 'center',
+      textAlign: "center",
       marginTop: 10,
     },
     subtitle: {
       fontSize: 16,
       color: Colors[theme].text_secondary,
-      textAlign: 'center',
+      textAlign: "center",
       marginTop: 5,
       marginBottom: 15,
     },
