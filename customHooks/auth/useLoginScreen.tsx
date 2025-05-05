@@ -3,13 +3,13 @@ import { useLogin } from "@/hooks/mutations/auth.mutation";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import axios from "axios";
-
+import { useAuthStore } from "@/store/auth.store";
 export default function useLoginScreen() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const { mutateAsync, error, isPending, isSuccess } = useLogin();
   const [isLoading, setIsLoading] = useState(isPending);
-
+  const { setIsLoggedIn, setUser, setToken } = useAuthStore();
   // const { refetch, loading } = useLocation();
   const handleLogin = async () => {
     try {
@@ -46,13 +46,16 @@ export default function useLoginScreen() {
       Toast.show({
         type: "success",
         position: "top",
-        text1: response?.message || "OTP Sent Success",
+        text1: response?.message || "Login Success",
         text2: "Welcome to the app",
         visibilityTime: 3000,
         autoHide: true,
       });
-
-      router.push("/(public)/confirmSignup");
+      console.log("login >", response, "<response");
+      setIsLoggedIn(true);
+      setUser(response?.user);
+      setToken(response?.token);
+      router.push("/(auth)/(tabs)");
     } catch (err: any) {
       setIsLoading(false);
       console.log(err.response.data, "error in useLoginScreen");
