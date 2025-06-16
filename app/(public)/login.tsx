@@ -13,8 +13,14 @@ import useLoginScreen from "@/customHooks/auth/useLoginScreen";
 const Login = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const { phone, setPhone, password, setPassword, handleLogin, isLoading } =
-    useLoginScreen();
+  const {
+    identifier,
+    setIdentifier,
+    password,
+    setPassword,
+    handleLogin,
+    isLoading,
+  } = useLoginScreen();
 
   return (
     <View style={styles.container}>
@@ -25,9 +31,9 @@ const Login = () => {
       </Text>
       <InputHandler
         leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-        placeholder="Phone Number"
-        value={phone}
-        onChangeText={setPhone}
+        placeholder="Email or Phone Number"
+        value={identifier}
+        onChangeText={setIdentifier}
         textContentType="telephoneNumber"
       />
       <InputHandler
@@ -41,7 +47,7 @@ const Login = () => {
       <Button
         textColor={Colors[colorScheme].text_white}
         style={styles.button}
-        variant={isLoading || !phone || !password ? "primary" : "primary"}
+        variant={isLoading || !identifier || !password ? "primary" : "primary"}
         size="large"
         title={isLoading ? "Logging in..." : "Login"}
         onPress={handleLogin}

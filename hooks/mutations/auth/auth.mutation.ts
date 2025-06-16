@@ -27,23 +27,6 @@ const useLogin = () => {
   });
 };
 
-const useRegister = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: any) => {
-      return register(payload);
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["register"],
-      });
-    },
-    onError(error) {
-      console.error("register", error);
-    },
-  });
-};
-
 const useOtpVerification = () => {
   return useMutation({
     mutationFn: (payload: any) => {
@@ -77,4 +60,4 @@ const useLogout = () => {
   });
 };
 
-export { useLogin, useRegister, useLogout, useOtpVerification, useResendOtp };
+export { useLogin, useLogout, useOtpVerification, useResendOtp };

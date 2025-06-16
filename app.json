@@ -15,7 +15,10 @@
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
-      "bundleIdentifier": "com.anonymous.mobile"
+      "bundleIdentifier": "com.anonymous.mobile",
+      "config": {
+        "googleMapsApiKey": "AIzaSyAKmwq_hiM8N93ukg6pe1OvuLPV57_Eo8U"
+      }
     },
     "android": {
       "userInterfaceStyle": "automatic",
@@ -26,7 +29,12 @@
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.mobile"
+      "package": "com.anonymous.mobile",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAKmwq_hiM8N93ukg6pe1OvuLPV57_Eo8U"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -28,7 +28,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
 
   return (
     <View style={styles.container}>
-      <Image source={item.image} style={styles.image} />
+      <Image source={{ uri: item.image }} style={styles.image} />
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.price}>${item.price}</Text>

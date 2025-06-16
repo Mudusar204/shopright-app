@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <View style={styles.imageContainer}>
           <Image
             resizeMode="cover"
-            source={require("@/assets/images/productImg.jpg")}
+            source={{ uri: image }}
             style={styles.image}
           />
         </View>

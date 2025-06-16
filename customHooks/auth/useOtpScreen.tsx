@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   useOtpVerification,
   useResendOtp,
-} from "@/hooks/mutations/auth.mutation";
+} from "@/hooks/mutations/auth/auth.mutation";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import axios from "axios";

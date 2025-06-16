@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView } from "react-native";
+import { StyleSheet, ScrollView, FlatList } from "react-native";
 import React from "react";
 import Header from "@/components/Header";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -43,11 +43,13 @@ const MyCart = () => {
       <View style={styles.headerContainer}>
         <Header title={"My Cart"} />
       </View>
-      <ScrollView style={styles.scrollView}>
-        {cartItems.map((item) => (
-          <CartItem key={item.id} item={item} />
-        ))}
-      </ScrollView>
+      <FlatList
+        data={cartItems}
+        renderItem={({ item }) => <CartItem item={item} />}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      />
       <View style={styles.footer}>
         <View style={styles.totalContainer}>
           <Text style={styles.totalLabel}>Total:</Text>

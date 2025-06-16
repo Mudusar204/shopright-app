@@ -22,11 +22,15 @@
     "@tanstack/zod-form-adapter": "^0.42.1",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "expo": "^52.0.19",
     "expo-constants": "~17.0.3",
+    "expo-device": "~7.0.3",
     "expo-image-picker": "~16.0.3",
     "expo-linking": "~7.0.3",
     "expo-localization": "~16.0.0",
+    "expo-location": "~18.0.10",
+    "expo-notifications": "~0.29.14",
     "expo-router": "~4.0.13",
     "expo-splash-screen": "^0.29.18",
     "expo-status-bar": "~2.0.0",
@@ -42,10 +46,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-svg": "15.8.0",
     "react-native-toast-message": "^2.3.0",
-    "zustand": "^5.0.2",
-    "expo-location": "~18.0.10",
-    "expo-notifications": "~0.29.14",
-    "expo-device": "~7.0.3"
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

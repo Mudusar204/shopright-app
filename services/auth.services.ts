@@ -7,7 +7,7 @@ export const login = async (data: any) => {
 };
 
 export const register = async (data: any) => {
-  const response = await apiClient.post(API_ROUTES.AUTH["REGISTER"], data);
+  const response = await apiClient.post(API_ROUTES.USER["REGISTER"], data);
   return response.data;
 };
 

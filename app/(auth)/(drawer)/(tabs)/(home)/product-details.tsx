@@ -15,7 +15,6 @@ import InputBatch from "@/components/InputBatch";
 import RelatedProductCard from "@/components/RelatedProductCard";
 import PhoneIcon from "@/assets/images/svgs/Phone";
 import LocationIcon from "@/assets/images/svgs/Location";
-import AddPostModal from "@/components/AddPostModal";
 import Feather from "@expo/vector-icons/Feather";
 import { useMyCartStore } from "@/store/myCart.store";
 
@@ -141,7 +140,6 @@ const ProductDetails = () => {
           </ScrollView>
         </View>
       )}
-      <AddPostModal />
     </ScrollView>
   );
 };

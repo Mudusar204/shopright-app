@@ -3,7 +3,7 @@ import { useLocationStore } from "@/store/location.store";
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://0.0.0.0:3000/api",
+  baseURL: "http://0.0.0.0:3000",
   // baseURL: 'http://192.168.0.104:3000/api/v1',
 });
 

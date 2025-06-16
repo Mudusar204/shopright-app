@@ -6,7 +6,7 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import { Button } from "@/components/Themed";
@@ -14,11 +14,18 @@ import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "@/components/Header";
+import { useGetUserAddresses } from "@/hooks/queries/user/user.query";
+import { useAddUserAddress } from "@/hooks/mutations/user/user.mutation";
+import AddAddressBottomSheet from "@/components/BottomSheets/AddAddressBottomSheet";
+import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
+  const { data: userAddresses } = useGetUserAddresses();
+  const { mutate: addUserAddress } = useAddUserAddress();
+  console.log(userAddresses, "userAddresses");
   const [deliveryDetails, setDeliveryDetails] = useState({
     name: "",
     phone: "",
@@ -27,7 +34,8 @@ const Checkout = () => {
     zipCode: "",
   });
   const [selectedPayment, setSelectedPayment] = useState("card");
-
+  const bottomSheetRef = useRef<BottomSheetScrollHandle>(null);
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const handleCheckout = () => {
     // Here you would typically:
     // 1. Validate delivery details
@@ -108,7 +116,12 @@ const Checkout = () => {
             </View>
           </View>
         </View>
-
+        <Button
+          variant="primary"
+          size="large"
+          title="Add New Address"
+          onPress={() => bottomSheetRef.current?.handleBottomSheet()}
+        />
         {/* Payment Method */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment Method</Text>
@@ -187,6 +200,11 @@ const Checkout = () => {
           onPress={handleCheckout}
         />
       </View>
+      <AddAddressBottomSheet
+        bottomSheetRef={bottomSheetRef}
+        selectedAddress={selectedAddress}
+        setSelectedAddress={setSelectedAddress}
+      />
     </View>
   );
 };

@@ -17,16 +17,14 @@ import InputBatch from "@/components/InputBatch";
 import DropdownFilter from "@/components/DropdownFilter";
 import FilterHandler from "@/components/FilterHandler";
 import MapComponent from "@/components/MapComponent";
-import ProductBottomSheet from "@/components/ProductBottomSheet";
-import BottomSheet, { BottomSheetModal } from "@gorhom/bottom-sheet";
 import FilterModal from "@/components/FilterModal";
 import ProductCard from "@/components/ProductCard";
 import MenuHandler from "@/components/MenuHandler";
-import AddPostModal from "@/components/AddPostModal";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
+import { useGetAllProducts } from "@/hooks/queries/products/products.query";
 type FilterItem = {
   all?: boolean;
   category?: string;
@@ -52,202 +50,96 @@ export default function HomeScreen() {
   ]);
   const [userId, setUserId] = useState("");
   const { addToCart, cartItems, removeFromCart } = useMyCartStore();
-
-  const PRODUCTS = [
-    {
-      id: "1",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-      relatedItems: [
-        {
-          id: "1",
-          image: require("@/assets/images/markerAddImage.png"),
-          title: "Corn Cream Soup",
-          location: "Los Angeles",
-          price: "100",
-          phoneNumber: "1234567890",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          tags: ["Tag 1", "Tag 2", "Tag 3"],
-        },
-        {
-          id: "2",
-          image: require("@/assets/images/markerAddImage.png"),
-          title: "Corn Cream Soup",
-          location: "Los Angeles",
-          price: "100",
-          phoneNumber: "1234567890",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          tags: ["Tag 1", "Tag 2", "Tag 3"],
-        },
-        {
-          id: "3",
-          image: require("@/assets/images/markerAddImage.png"),
-          title: "Corn Cream Soup",
-          location: "Los Angeles",
-          price: "100",
-          phoneNumber: "1234567890",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          tags: ["Tag 1", "Tag 2", "Tag 3"],
-        },
-      ],
-    },
-    {
-      id: "2",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-      relatedItems: [
-        {
-          id: "1",
-          image: require("@/assets/images/markerAddImage.png"),
-          title: "Green Product",
-          location: "Los Angeles",
-          price: "100",
-          phoneNumber: "1234567890",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          tags: ["Tag 1", "Tag 2", "Tag 3"],
-        },
-        {
-          id: "2",
-          image: require("@/assets/images/markerAddImage.png"),
-          title: "Corn Cream Soup",
-          location: "Los Angeles",
-          price: "100",
-          phoneNumber: "1234567890",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          tags: ["Tag 1", "Tag 2", "Tag 3"],
-        },
-      ],
-    },
-    {
-      id: "3",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-      relatedItems: [
-        {
-          id: "1",
-          image: require("@/assets/images/markerAddImage.png"),
-          title: "Corn Cream Soup",
-          location: "Los Angeles",
-          price: "100",
-          phoneNumber: "1234567890",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          tags: ["Tag 1", "Tag 2", "Tag 3"],
-        },
-        {
-          id: "2",
-          image: require("@/assets/images/markerAddImage.png"),
-          title: "Corn Cream Soup",
-          location: "Los Angeles",
-          price: "100",
-          phoneNumber: "1234567890",
-          description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          tags: ["Tag 1", "Tag 2", "Tag 3"],
-        },
-      ],
-    },
-    {
-      id: "4",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-    },
-    {
-      id: "5",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-    },
-    {
-      id: "6",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-    },
-    {
-      id: "7",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-    },
-    {
-      id: "8",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-    },
-    {
-      id: "9",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-    },
-    {
-      id: "10",
-      image: require("@/assets/images/markerAddImage.png"),
-      title: "Corn Cream Soup",
-      location: "Los Angeles, United states",
-      price: "100",
-      phoneNumber: "1234567890",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      tags: ["Tag 1", "Tag 2", "Tag 3"],
-    },
-  ];
+  const { data, isLoading, isError } = useGetAllProducts();
+  console.log("API Response:", data);
+  console.log("Is Loading:", isLoading);
+  console.log("Is Error:", isError);
+  // const PRODUCTS = [
+  //   {
+  //     id: 1,
+  //     title: "Smartphone X",
+  //     description: "Latest smartphone with advanced features",
+  //     listPrice: "999.99",
+  //     discountedPrice: "899.99",
+  //     availableQuantity: 50,
+  //     barcode: "123456789012",
+  //     brand: "TechBrand",
+  //     category: {
+  //       id: 1,
+  //       name: "Electronics",
+  //       description: "Electronic devices and accessories",
+  //     },
+  //     images: [
+  //       "https://cdn.shopify.com/s/files/1/0777/0954/1664/files/0967774925055_6dd7450b-f1e2-40c0-9807-b9f9fd489142.jpg?v=1742640659",
+  //     ],
+  //     isAvailable: true,
+  //     sku: "SPX-001",
+  //     tags: [
+  //       { id: 3, name: "New Arrival" },
+  //       { id: 2, name: "Sale" },
+  //     ],
+  //     variants: [
+  //       {
+  //         id: 1,
+  //         variantName: "Storage",
+  //         variantValue: "128GB",
+  //         additionalPrice: "0.00",
+  //         stock: 25,
+  //       },
+  //       {
+  //         id: 2,
+  //         variantName: "Storage",
+  //         variantValue: "256GB",
+  //         additionalPrice: "100.00",
+  //         stock: 25,
+  //       },
+  //     ],
+  //     createdAt: "2025-06-15T15:37:09.054Z",
+  //     updatedAt: "2025-06-15T15:37:09.054Z",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Smartphone Y",
+  //     description: "Premium smartphone with cutting-edge technology",
+  //     listPrice: "1299.99",
+  //     discountedPrice: "1199.99",
+  //     availableQuantity: 30,
+  //     barcode: "123456789013",
+  //     brand: "TechBrand",
+  //     category: {
+  //       id: 1,
+  //       name: "Electronics",
+  //       description: "Electronic devices and accessories",
+  //     },
+  //     images: [
+  //       "https://cdn.shopify.com/s/files/1/0777/0954/1664/files/0967774925055_6dd7450b-f1e2-40c0-9807-b9f9fd489142.jpg?v=1742640659",
+  //     ],
+  //     isAvailable: true,
+  //     sku: "SPY-001",
+  //     tags: [
+  //       { id: 3, name: "New Arrival" },
+  //       { id: 2, name: "Sale" },
+  //     ],
+  //     variants: [
+  //       {
+  //         id: 3,
+  //         variantName: "Storage",
+  //         variantValue: "256GB",
+  //         additionalPrice: "0.00",
+  //         stock: 15,
+  //       },
+  //       {
+  //         id: 4,
+  //         variantName: "Storage",
+  //         variantValue: "512GB",
+  //         additionalPrice: "200.00",
+  //         stock: 15,
+  //       },
+  //     ],
+  //     createdAt: "2025-06-15T15:37:09.054Z",
+  //     updatedAt: "2025-06-15T15:37:09.054Z",
+  //   },
+  // ];
 
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
@@ -325,26 +217,42 @@ export default function HomeScreen() {
           <MapComponent />
         </View>
         <View style={styles.productContainer}>
-          <FlatList
-            data={PRODUCTS}
-            renderItem={({ item }) => (
-              <ProductCard
-                id={item.id}
-                image={item.image}
-                title={item.title}
-                location={item.location}
-                price={item.price}
-                phoneNumber={item.phoneNumber}
-                description={item.description}
-                relatedItems={item.relatedItems}
-                tags={item.tags}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            numColumns={3}
-            contentContainerStyle={{ marginHorizontal: 10 }}
-          />
+          {isLoading ? (
+            <Text>Loading...</Text>
+          ) : isError ? (
+            <Text>Error loading products</Text>
+          ) : (
+            <FlatList
+              data={Array.isArray(data) ? data : [data]}
+              renderItem={({ item }) => (
+                <ProductCard
+                  id={item.id.toString()}
+                  image={item.images[0]}
+                  title={item.title}
+                  location={item.category.name}
+                  price={item.listPrice}
+                  phoneNumber={item.brand}
+                  description={item.description}
+                  tags={item.tags.map((tag: any) => tag.name)}
+                  relatedItems={item.variants.map((variant: any) => ({
+                    image: item.images[0],
+                    title: `${item.title} - ${variant.variantValue}`,
+                    price: (
+                      parseFloat(item.listPrice) +
+                      parseFloat(variant.additionalPrice)
+                    ).toString(),
+                    location: item.category.name,
+                    phoneNumber: item.brand,
+                    description: item.description,
+                  }))}
+                />
+              )}
+              keyExtractor={(item) => item.id.toString()}
+              showsVerticalScrollIndicator={false}
+              numColumns={3}
+              contentContainerStyle={{ marginHorizontal: 10 }}
+            />
+          )}
         </View>
       </View>
 
@@ -354,7 +262,6 @@ export default function HomeScreen() {
         filter={filter}
         setFilter={setFilter}
       />
-      <AddPostModal />
     </SafeAreaView>
   );
 }

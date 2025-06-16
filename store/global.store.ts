@@ -1,22 +1,22 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface GlobalStore {
-  isModalVisible: boolean;
-  setIsModalVisible: (value: boolean) => void;
+  isBottomSheetOpen: boolean;
+  setIsBottomSheetOpen: (value: boolean) => void;
   clear: () => void;
 }
 
 export const useGlobalStore = create<GlobalStore>()(
   persist(
     (set) => ({
-      isModalVisible: false,
-      setIsModalVisible: (value) => set({ isModalVisible: value }),
-      clear: () => set({ isModalVisible: false }),
+      isBottomSheetOpen: false,
+      setIsBottomSheetOpen: (value) => set({ isBottomSheetOpen: value }),
+      clear: () => set({ isBottomSheetOpen: false }),
     }),
     {
-      name: 'global-storage',
+      name: "global-storage",
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

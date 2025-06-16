@@ -19,15 +19,15 @@ interface AuthStoreActions {
 
 interface User {
   _id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  nickName: string;
   email: string;
-  iso_code?: string;
+  isEmailVerified: boolean;
+  isPhoneVerified: boolean;
   phoneNumber?: string;
-  country_code?: string;
   profile_image?: string;
   location?: any;
-  alerts?: boolean;
-  notifications?: boolean;
 }
 
 export { AuthStoreState, AuthStoreActions, User };

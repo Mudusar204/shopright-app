@@ -72,7 +72,7 @@ const DrawerScreen = () => {
             />
             <View style={styles.profileTextContainer}>
               <Text style={styles.profileNameText}>
-                {user?.name || "John Doe"}
+                {user?.nickName || "John Doe"}
               </Text>
               <View style={[styles.locationRow]}>
                 <LocationIcon color={Colors[colorTheme].primary_color} />

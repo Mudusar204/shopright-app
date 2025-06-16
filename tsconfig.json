@@ -16,6 +16,6 @@
     "contexts/**/*",
     "components/**/*",
     "utils/**/*"
-  ],
+, "services/.services.ts"  ],
 
 }
