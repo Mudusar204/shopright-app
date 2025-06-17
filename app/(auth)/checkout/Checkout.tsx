@@ -19,19 +19,61 @@ import Header from "@/components/Header";
 import { useGetUserAddresses } from "@/hooks/queries/user/user.query";
 import AddAddressBottomSheet from "@/components/BottomSheets/AddAddressBottomSheet";
 import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
+import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
+import Toast from "react-native-toast-message";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
   const { data: userAddresses } = useGetUserAddresses();
-
+  const { mutate: createOrder, isPending, isSuccess } = useCreateOrder();
   const [selectedPayment, setSelectedPayment] = useState("cash");
   const bottomSheetRef = useRef<BottomSheetScrollHandle>(null);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const handleCheckout = () => {
-    clearCart();
-    router.push("/(auth)/order-success");
+    if (!selectedAddress) {
+      Toast.show({
+        type: "error",
+        text1: "Please select an address",
+      });
+      return;
+    }
+    if (cartItems.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "Please add items to your cart",
+      });
+      return;
+    }
+    createOrder(
+      {
+        addressId: selectedAddress?.id,
+        paymentMethod: selectedPayment,
+        customerNote: selectedAddress?.instructions,
+        totalAmount: getTotalPrice(),
+        items: cartItems.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+        })),
+      },
+      {
+        onSuccess: () => {
+          clearCart();
+          router.push("/(auth)/order-success");
+          Toast.show({
+            type: "success",
+            text1: "Order placed successfully",
+          });
+        },
+        onError: (error) => {
+          Toast.show({
+            type: "error",
+            text1: error.message,
+          });
+        },
+      }
+    );
   };
 
   return (
