@@ -5,7 +5,9 @@ import {
   ScrollView,
   TextInput,
   Pressable,
+  FlatList,
 } from "react-native";
+import Checkbox from "expo-checkbox";
 import React, { useRef, useState } from "react";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
@@ -15,7 +17,6 @@ import { useMyCartStore } from "@/store/myCart.store";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "@/components/Header";
 import { useGetUserAddresses } from "@/hooks/queries/user/user.query";
-import { useAddUserAddress } from "@/hooks/mutations/user/user.mutation";
 import AddAddressBottomSheet from "@/components/BottomSheets/AddAddressBottomSheet";
 import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 
@@ -24,25 +25,11 @@ const Checkout = () => {
   const styles = createStyles(colorScheme);
   const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
   const { data: userAddresses } = useGetUserAddresses();
-  const { mutate: addUserAddress } = useAddUserAddress();
-  console.log(userAddresses, "userAddresses");
-  const [deliveryDetails, setDeliveryDetails] = useState({
-    name: "",
-    phone: "",
-    address: "",
-    city: "",
-    zipCode: "",
-  });
-  const [selectedPayment, setSelectedPayment] = useState("card");
+
+  const [selectedPayment, setSelectedPayment] = useState("cash");
   const bottomSheetRef = useRef<BottomSheetScrollHandle>(null);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const handleCheckout = () => {
-    // Here you would typically:
-    // 1. Validate delivery details
-    // 2. Process payment
-    // 3. Create order
-    // 4. Clear cart
-    // 5. Navigate to success screen
     clearCart();
     router.push("/(auth)/order-success");
   };
@@ -52,76 +39,30 @@ const Checkout = () => {
       <View style={styles.headerContainer}>
         <Header title="Checkout" />
       </View>
-      <ScrollView style={styles.scrollView}>
-        {/* Delivery Details */}
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+      >
+        {/* Order Summary */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Delivery Details</Text>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your full name"
-              value={deliveryDetails.name}
-              onChangeText={(text) =>
-                setDeliveryDetails({ ...deliveryDetails, name: text })
-              }
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Phone Number</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your phone number"
-              keyboardType="phone-pad"
-              value={deliveryDetails.phone}
-              onChangeText={(text) =>
-                setDeliveryDetails({ ...deliveryDetails, phone: text })
-              }
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your address"
-              value={deliveryDetails.address}
-              onChangeText={(text) =>
-                setDeliveryDetails({ ...deliveryDetails, address: text })
-              }
-            />
-          </View>
-          <View style={styles.row}>
-            <View style={[styles.inputContainer, { flex: 1, marginRight: 10 }]}>
-              <Text style={styles.label}>City</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter city"
-                value={deliveryDetails.city}
-                onChangeText={(text) =>
-                  setDeliveryDetails({ ...deliveryDetails, city: text })
-                }
-              />
+          <Text style={styles.sectionTitle}>Order Summary</Text>
+          {cartItems.map((item) => (
+            <View key={item.id} style={styles.orderItem}>
+              <Text style={styles.orderItemName}>
+                {item.title} x {item.quantity}
+              </Text>
+              <Text style={styles.orderItemPrice}>
+                ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+              </Text>
             </View>
-            <View style={[styles.inputContainer, { flex: 1 }]}>
-              <Text style={styles.label}>ZIP Code</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter ZIP code"
-                keyboardType="number-pad"
-                value={deliveryDetails.zipCode}
-                onChangeText={(text) =>
-                  setDeliveryDetails({ ...deliveryDetails, zipCode: text })
-                }
-              />
-            </View>
+          ))}
+          <View style={styles.totalContainer}>
+            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalPrice}>${getTotalPrice().toFixed(2)}</Text>
           </View>
         </View>
-        <Button
-          variant="primary"
-          size="large"
-          title="Add New Address"
-          onPress={() => bottomSheetRef.current?.handleBottomSheet()}
-        />
+
         {/* Payment Method */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment Method</Text>
@@ -171,23 +112,57 @@ const Checkout = () => {
           </Pressable>
         </View>
 
-        {/* Order Summary */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Order Summary</Text>
-          {cartItems.map((item) => (
-            <View key={item.id} style={styles.orderItem}>
-              <Text style={styles.orderItemName}>
-                {item.title} x {item.quantity}
-              </Text>
-              <Text style={styles.orderItemPrice}>
-                ${(parseFloat(item.price) * item.quantity).toFixed(2)}
-              </Text>
-            </View>
-          ))}
-          <View style={styles.totalContainer}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalPrice}>${getTotalPrice().toFixed(2)}</Text>
+          <View style={styles.row}>
+            <Text style={styles.sectionTitle}>Select Address</Text>
+            <Button
+              variant="primary"
+              size="small"
+              title="+ Address"
+              onPress={() => bottomSheetRef.current?.handleBottomSheet()}
+              style={{ marginBottom: 15 }}
+            />
           </View>
+          <FlatList
+            data={userAddresses}
+            renderItem={({ item }) => (
+              <Pressable
+                style={styles.addressItem}
+                onPress={() => setSelectedAddress(item)}
+              >
+                <Checkbox
+                  color={Colors[colorScheme].primary_color}
+                  style={styles.checkbox}
+                  value={selectedAddress?.id === item.id}
+                  onValueChange={() => setSelectedAddress(item)}
+                />
+                <Text style={styles.addressItemText}>
+                  {item?.fullName} {item?.area} {item?.streetAddress}{" "}
+                  {item?.city} {item?.state} {item?.country}
+                </Text>
+              </Pressable>
+            )}
+            keyExtractor={(item) => item?.id}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View style={styles.emptyAddressContainer}>
+                <Text style={styles.emptyAddressText}>No addresses found</Text>
+              </View>
+            }
+          />
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Special Instructions</Text>
+          <TextInput
+            multiline
+            numberOfLines={4}
+            placeholder="Enter your instructions"
+            value={selectedAddress?.instructions}
+            onChangeText={(text) =>
+              setSelectedAddress({ ...selectedAddress, instructions: text })
+            }
+            style={[styles.input, { height: 100, textAlignVertical: "top" }]}
+          />
         </View>
       </ScrollView>
 
@@ -251,6 +226,8 @@ const createStyles = (theme: "light" | "dark") =>
     },
     row: {
       flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     paymentOption: {
       flexDirection: "row",
@@ -309,6 +286,39 @@ const createStyles = (theme: "light" | "dark") =>
       padding: 15,
       borderTopWidth: 1,
       borderTopColor: Colors[theme].text_light,
+    },
+    addressItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      // justifyContent: "space-between",
+      padding: 10,
+      backgroundColor: Colors[theme].background,
+      borderRadius: 8,
+      marginBottom: 10,
+    },
+    addressItemText: {
+      fontSize: 16,
+      color: Colors[theme].text,
+    },
+    checkbox: {
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: Colors[theme].primary_color,
+      width: 20,
+      height: 20,
+      marginRight: 10,
+    },
+    emptyAddressContainer: {
+      padding: 15,
+      backgroundColor: Colors[theme].background,
+      borderRadius: 8,
+      marginBottom: 10,
+    },
+    emptyAddressText: {
+      fontSize: 16,
+      color: Colors[theme].text,
+      textAlign: "center",
     },
   });
 
