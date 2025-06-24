@@ -6,6 +6,7 @@ import {
   logout,
   otpVerification,
   resendOtp,
+  getOdooUser,
 } from "@/services/auth.services";
 
 const useLogin = () => {

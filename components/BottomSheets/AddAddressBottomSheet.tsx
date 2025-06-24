@@ -107,8 +107,16 @@ const AddAddressBottomSheet = ({
               enablePoweredByContainer={false}
               fetchDetails={false}
               keyboardShouldPersistTaps="handled"
+              minLength={2}
+              debounce={300}
+              onFail={(error) =>
+                console.log("GooglePlacesAutocomplete failed:", error)
+              }
+              onNotFound={() =>
+                console.log("GooglePlacesAutocomplete not found")
+              }
               query={{
-                key: "AIzaSyAKmwq_hiM8N93ukg6pe1OvuLPV57_Eo8U",
+                key: "AIzaSyAsQaw80JUEAI_a82j_1bp366sei7GibWY",
                 language: "en",
               }}
               styles={{
@@ -364,7 +372,7 @@ const styles = (theme: "light" | "dark") =>
       left: 0,
       right: 0,
       paddingHorizontal: 15,
-      zIndex: 1,
+      zIndex: 1000,
       backgroundColor: "transparent",
     },
 
@@ -387,7 +395,8 @@ const styles = (theme: "light" | "dark") =>
       alignSelf: "center",
     },
     autocompleteContainer: {
-      flex: 0,
+      flex: 1,
+      zIndex: 1000,
     },
     searchInput: {
       height: 50,
@@ -397,24 +406,36 @@ const styles = (theme: "light" | "dark") =>
       borderRadius: 10,
       borderWidth: 1,
       borderColor: Colors[theme].border,
+      backgroundColor: Colors[theme].background,
     },
     listView: {
       position: "absolute",
-      top: 50,
-      left: 15,
-      right: 15,
+      top: 60,
+      left: 0,
+      right: 0,
       backgroundColor: Colors[theme].background_light,
       borderRadius: 10,
       borderWidth: 1,
       borderColor: Colors[theme].border,
-      zIndex: 1000,
+      zIndex: 1001,
+      maxHeight: 200,
+      elevation: 3,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
     },
     row: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       gap: 10,
-      backgroundColor: "transparent",
+      backgroundColor: Colors[theme].background_light,
+      paddingHorizontal: 15,
+      paddingVertical: 12,
     },
     description: {
       color: Colors[theme].text,

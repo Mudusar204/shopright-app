@@ -1,33 +1,43 @@
 interface AuthStoreState {
   isLoggedIn: boolean;
   isLoading: boolean;
-  token: string | null;
-  user?: User | null;
+  odooUser?: OdooUser | null;
+  odooAdmin?: OdooAdmin | null;
+  odooUserAuth?: OdooUserAuth | null;
   isOnboarded: boolean;
-  searchedUsers: User[];
 }
 
 interface AuthStoreActions {
   setIsLoggedIn: (isLoggedIn: boolean) => void;
-  setUser: (user: User | null) => void;
-  setToken: (token: string) => void;
+  setOdooUser: (user: OdooUser | null) => void;
+  setOdooUserAuth: (userAuth: OdooUserAuth | null) => void;
+  setOdooAdmin: (admin: OdooAdmin | null) => void;
   setIsLoading: (isLoading: boolean) => void;
   setOnboarded: (isOnboarded: boolean) => void;
-  setSearchedUsers: (searchedUsers: any[]) => void;
   clear: () => void;
 }
 
-interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  nickName: string;
+interface OdooUser {
+  id: string;
+  name: string;
+  login: string;
+  password: string;
   email: string;
-  isEmailVerified: boolean;
-  isPhoneVerified: boolean;
-  phoneNumber?: string;
   profile_image?: string;
   location?: any;
 }
 
-export { AuthStoreState, AuthStoreActions, User };
+interface OdooUserAuth {
+  api_key: string;
+  login: string;
+  password: string;
+  db: string;
+}
+
+interface OdooAdmin {
+  api_key: string;
+  login: string;
+  password: string;
+  db: string;
+}
+export { AuthStoreState, AuthStoreActions, OdooUser, OdooUserAuth, OdooAdmin };

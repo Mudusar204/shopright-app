@@ -9,11 +9,11 @@ export default function useLoginScreen() {
   const [password, setPassword] = useState("");
   const { mutateAsync, error, isPending, isSuccess } = useLogin();
   const [isLoading, setIsLoading] = useState(isPending);
-  const { setIsLoggedIn, setUser, setToken } = useAuthStore();
+  const { setIsLoggedIn, setOdooUser, setOdooUserAuth } = useAuthStore();
   // const { refetch, loading } = useLocation();
   const handleLogin = async () => {
     try {
-      if (identifier.length < 9) {
+      if (identifier.length < 4) {
         Toast.show({
           type: "error",
           position: "top",
@@ -30,7 +30,7 @@ export default function useLoginScreen() {
         password: password,
       });
 
-      if (response?.error) {
+      if (!response?.User) {
         setIsLoading(false);
         Toast.show({
           type: "error",
@@ -53,8 +53,12 @@ export default function useLoginScreen() {
       });
       console.log("login >", response, "<response");
       setIsLoggedIn(true);
-      setUser(response?.user);
-      setToken(response?.token);
+      setOdooUserAuth({
+        api_key: response?.["api-key"],
+        login: identifier,
+        password: password,
+        db: "Testing",
+      });
       router.push("/(auth)/(tabs)");
     } catch (err: any) {
       setIsLoading(false);

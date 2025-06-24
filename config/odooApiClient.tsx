@@ -2,16 +2,20 @@ import { useAuthStore } from "@/store/auth.store";
 import { useLocationStore } from "@/store/location.store";
 import axios from "axios";
 
-const apiClient = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+const odooApiClient = axios.create({
+  baseURL: process.env.EXPO_PUBLIC_ODOO_API_URL,
   // baseURL: 'http://192.168.0.104:3000/api/v1',
 });
 
-apiClient.interceptors.request.use(
+odooApiClient.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const odooUserAuth = useAuthStore.getState().odooUserAuth;
+    console.log("odooUserAuth", odooUserAuth);
+    if (odooUserAuth) {
+      config.headers["api-key"] = odooUserAuth.api_key;
+      config.headers["login"] = odooUserAuth.login;
+      config.headers["password"] = odooUserAuth.password;
+      config.headers["db"] = odooUserAuth.db;
     }
     return config;
   },
@@ -20,12 +24,12 @@ apiClient.interceptors.request.use(
   }
 );
 
-apiClient.interceptors.response.use(
+odooApiClient.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    console.log(error.message, "error in apiClient");
+    console.log(error, "error in apiClient");
     if (error.response && error.response.status === 401) {
       const { clear: clearAuth } = useAuthStore.getState();
       clearAuth();
@@ -36,4 +40,4 @@ apiClient.interceptors.response.use(
   }
 );
 
-export default apiClient;
+export default odooApiClient;

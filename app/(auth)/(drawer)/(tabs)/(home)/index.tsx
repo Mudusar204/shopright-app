@@ -25,6 +25,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
 import { useGetAllProducts } from "@/hooks/queries/products/products.query";
+import { useGetOdooUser } from "@/hooks/queries/auth/auth.query";
 type FilterItem = {
   all?: boolean;
   category?: string;
@@ -37,6 +38,13 @@ type FilterItem = {
 export default function HomeScreen() {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
+  const {
+    data: odooUser,
+    isLoading: odooUserLoading,
+    isError: odooUserError,
+    error: odooUserErrorData,
+  } = useGetOdooUser();
+  console.log("odooUser", odooUser, odooUserErrorData, odooUserError);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,95 +59,6 @@ export default function HomeScreen() {
   const [userId, setUserId] = useState("");
   const { addToCart, cartItems, removeFromCart } = useMyCartStore();
   const { data, isLoading, isError } = useGetAllProducts();
-  console.log("API Response:", data);
-  console.log("Is Loading:", isLoading);
-  console.log("Is Error:", isError);
-  // const PRODUCTS = [
-  //   {
-  //     id: 1,
-  //     title: "Smartphone X",
-  //     description: "Latest smartphone with advanced features",
-  //     listPrice: "999.99",
-  //     discountedPrice: "899.99",
-  //     availableQuantity: 50,
-  //     barcode: "123456789012",
-  //     brand: "TechBrand",
-  //     category: {
-  //       id: 1,
-  //       name: "Electronics",
-  //       description: "Electronic devices and accessories",
-  //     },
-  //     images: [
-  //       "https://cdn.shopify.com/s/files/1/0777/0954/1664/files/0967774925055_6dd7450b-f1e2-40c0-9807-b9f9fd489142.jpg?v=1742640659",
-  //     ],
-  //     isAvailable: true,
-  //     sku: "SPX-001",
-  //     tags: [
-  //       { id: 3, name: "New Arrival" },
-  //       { id: 2, name: "Sale" },
-  //     ],
-  //     variants: [
-  //       {
-  //         id: 1,
-  //         variantName: "Storage",
-  //         variantValue: "128GB",
-  //         additionalPrice: "0.00",
-  //         stock: 25,
-  //       },
-  //       {
-  //         id: 2,
-  //         variantName: "Storage",
-  //         variantValue: "256GB",
-  //         additionalPrice: "100.00",
-  //         stock: 25,
-  //       },
-  //     ],
-  //     createdAt: "2025-06-15T15:37:09.054Z",
-  //     updatedAt: "2025-06-15T15:37:09.054Z",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Smartphone Y",
-  //     description: "Premium smartphone with cutting-edge technology",
-  //     listPrice: "1299.99",
-  //     discountedPrice: "1199.99",
-  //     availableQuantity: 30,
-  //     barcode: "123456789013",
-  //     brand: "TechBrand",
-  //     category: {
-  //       id: 1,
-  //       name: "Electronics",
-  //       description: "Electronic devices and accessories",
-  //     },
-  //     images: [
-  //       "https://cdn.shopify.com/s/files/1/0777/0954/1664/files/0967774925055_6dd7450b-f1e2-40c0-9807-b9f9fd489142.jpg?v=1742640659",
-  //     ],
-  //     isAvailable: true,
-  //     sku: "SPY-001",
-  //     tags: [
-  //       { id: 3, name: "New Arrival" },
-  //       { id: 2, name: "Sale" },
-  //     ],
-  //     variants: [
-  //       {
-  //         id: 3,
-  //         variantName: "Storage",
-  //         variantValue: "256GB",
-  //         additionalPrice: "0.00",
-  //         stock: 15,
-  //       },
-  //       {
-  //         id: 4,
-  //         variantName: "Storage",
-  //         variantValue: "512GB",
-  //         additionalPrice: "200.00",
-  //         stock: 15,
-  //       },
-  //     ],
-  //     createdAt: "2025-06-15T15:37:09.054Z",
-  //     updatedAt: "2025-06-15T15:37:09.054Z",
-  //   },
-  // ];
 
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
