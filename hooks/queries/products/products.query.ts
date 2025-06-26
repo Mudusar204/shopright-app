@@ -1,14 +1,14 @@
-import { getAllProducts } from "@/services/products.services";
+import { getProducts } from "@/services/products.services";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetAllProducts = () => {
+const useGetProducts = () => {
   return useQuery({
     queryKey: ["all-products"],
     queryFn: () => {
-      return getAllProducts();
+      return getProducts();
     },
     // staleTime: 60 * 5000, //5 minutes
   });
 };
 
-export { useGetAllProducts };
+export { useGetProducts };

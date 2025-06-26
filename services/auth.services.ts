@@ -22,9 +22,10 @@ export const getOdooUser = async () => {
   if (!odooUserAuth) {
     throw new Error("Odoo user auth not found");
   }
+  console.log(odooUserAuth, "odooUserAuth");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=res.users&fields=name,email`,
+      `http://69.62.120.81:8088/send_request?model=res.users&Id=2`,
       {
         headers: {
           "Content-Type": "application/json",

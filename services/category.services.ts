@@ -2,7 +2,7 @@ import apiClient from "@/config/apiClient";
 import { API_ROUTES } from "@/constants/api.routes";
 import { useAuthStore } from "@/store/auth.store";
 import axios from "axios";
-export const getProducts = async () => {
+export const getCategories = async () => {
   const odooUserAuth = useAuthStore.getState().odooUserAuth;
   if (!odooUserAuth) {
     throw new Error("Odoo user auth not found");
@@ -10,7 +10,7 @@ export const getProducts = async () => {
   console.log(odooUserAuth, "odooUserAuth");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=product.template&fields=id,description_ecommerce,display_name,list_price,barcode,categ_id,currency_id,image_1920`,
+      "http://69.62.120.81:8088/send_request?model=product.public.category",
       {
         headers: {
           "Content-Type": "application/json",
@@ -23,9 +23,9 @@ export const getProducts = async () => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response, "getProducts response");
+    console.log(response, "getCategories response");
     return response.data;
   } catch (error) {
-    console.log(error, "error in getProducts");
+    console.log(error, "error in getCategories");
   }
 };

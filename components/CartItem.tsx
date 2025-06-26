@@ -31,7 +31,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
       <Image source={{ uri: item.image }} style={styles.image} />
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.price}>${item.price}</Text>
+        <Text style={styles.price}>{`Rs.${item.price}`}</Text>
         <View style={styles.quantityContainer}>
           <Button
             variant="outline"

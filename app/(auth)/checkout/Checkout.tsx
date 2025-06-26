@@ -32,13 +32,13 @@ const Checkout = () => {
   const bottomSheetRef = useRef<BottomSheetScrollHandle>(null);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const handleCheckout = () => {
-    if (!selectedAddress) {
-      Toast.show({
-        type: "error",
-        text1: "Please select an address",
-      });
-      return;
-    }
+    // if (!selectedAddress) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Please select an address",
+    //   });
+    //   return;
+    // }
     if (cartItems.length === 0) {
       Toast.show({
         type: "error",
@@ -59,8 +59,8 @@ const Checkout = () => {
       },
       {
         onSuccess: () => {
-          clearCart();
-          router.push("/(auth)/order-success");
+          // clearCart();
+          // router.push("/(auth)/order-success");
           Toast.show({
             type: "success",
             text1: "Order placed successfully",

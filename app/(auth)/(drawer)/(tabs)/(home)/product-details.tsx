@@ -77,7 +77,7 @@ const ProductDetails = () => {
         <View style={styles.titleRow}>
           <View style={styles.phoneRow}>
             <Text style={styles.title}>{title}</Text>
-            <Button
+            {/* <Button
               style={{
                 paddingHorizontal: 2,
                 paddingVertical: 5,
@@ -87,13 +87,9 @@ const ProductDetails = () => {
               variant="outline"
               size="small"
               onPress={() => {}}
-            />
+            /> */}
           </View>
           <Text style={styles.price}>{`Rs.${price}`}</Text>
-        </View>
-        <View style={styles.locationRow}>
-          <LocationIcon color="#007AFF" />
-          <Text style={styles.locationText}>{location}</Text>
         </View>
 
         <Text style={styles.sectionTitle}>Description</Text>

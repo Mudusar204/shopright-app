@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { StyleSheet, Image, Dimensions, Pressable } from "react-native";
 import { useColorScheme } from "./useColorScheme";
 import Colors from "@/constants/Colors";
@@ -12,9 +12,7 @@ interface ProductCardProps {
   id: string;
   image: string;
   title: string;
-  location: string;
   price: string;
-  phoneNumber: string;
   description: string;
   relatedItems?: Array<
     | {
@@ -30,81 +28,84 @@ interface ProductCardProps {
   tags?: Array<string>;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({
-  id,
-  image,
-  title,
-  location,
-  price,
-  phoneNumber,
-  description,
-  relatedItems,
-  tags,
-}) => {
-  const { addToCart, cartItems, removeFromCart } = useMyCartStore();
+const ProductCard: React.FC<ProductCardProps> = React.memo(
+  ({ id, image, title, price, description, relatedItems, tags }) => {
+    const { addToCart, cartItems, removeFromCart } = useMyCartStore();
 
-  const colorTheme = useColorScheme() as "light" | "dark";
-  const styles = createStyles(colorTheme);
-  const { width } = Dimensions.get("window");
-  return (
-    <View style={[styles.container, { width: width / 3 - 16 }]}>
-      <Pressable
-        style={styles.pressableContainer}
-        onPress={() =>
-          router.push({
-            pathname: "/(auth)/(tabs)/(home)/product-details",
-            params: {
-              id,
-              image,
-              title,
-              location,
-              price,
-              phoneNumber,
-              description,
-              tags: JSON.stringify(tags),
-              relatedItems: JSON.stringify(relatedItems),
-            },
-          })
-        }
-      >
-        {/* Image */}
-        <View style={styles.imageContainer}>
-          <Image
-            resizeMode="cover"
-            source={{ uri: image }}
-            style={styles.image}
-          />
-        </View>
+    const colorTheme = useColorScheme() as "light" | "dark";
+    const styles = createStyles(colorTheme);
+    const { width } = Dimensions.get("window");
 
-        {/* Content */}
-        <View style={[styles.content, { backgroundColor: "transparent" }]}>
-          <Text style={styles.title}>{title}</Text>
-          <View style={styles.priceContainer}>
-            <Text style={styles.title}>1 kg</Text>
-            <Text style={styles.title}>Rs.{price}</Text>
+    // Memoize the card width
+    const cardWidth = useMemo(() => width / 3 - 16, [width]);
+
+    // Memoize cart item check
+    const isInCart = useMemo(
+      () => cartItems.find((item) => item.id === id),
+      [cartItems, id]
+    );
+
+    // Memoize navigation handler
+    const handlePress = useCallback(() => {
+      router.push({
+        pathname: "/(auth)/(tabs)/(home)/product-details",
+        params: {
+          id,
+          image,
+          title,
+          price,
+          description,
+          tags: JSON.stringify(tags),
+          relatedItems: JSON.stringify(relatedItems),
+        },
+      });
+    }, [id, image, title, price, description, tags, relatedItems]);
+
+    // Memoize cart action handler
+    const handleCartAction = useCallback(() => {
+      if (isInCart) {
+        removeFromCart(id);
+      } else {
+        addToCart({ id, image, title, price });
+      }
+    }, [isInCart, removeFromCart, addToCart, id, image, title, price]);
+
+    return (
+      <View style={[styles.container, { width: cardWidth }]}>
+        <Pressable style={styles.pressableContainer} onPress={handlePress}>
+          {/* Image */}
+          <View style={styles.imageContainer}>
+            <Image
+              resizeMode="cover"
+              source={{ uri: image }}
+              style={styles.image}
+            />
           </View>
 
-          <Pressable
-            style={styles.addToCartButton}
-            onPress={() => {
-              if (cartItems.find((item) => item.id === id)) {
-                removeFromCart(id);
-              } else {
-                addToCart({ id, image, title, price });
-              }
-            }}
-          >
-            <Text style={styles.addToCart}>
-              {cartItems.find((item) => item.id === id)
-                ? "Remove Item"
-                : "Add To Cart"}
-            </Text>
-          </Pressable>
-        </View>
-      </Pressable>
-    </View>
-  );
-};
+          {/* Content */}
+          <View style={[styles.content, { backgroundColor: "transparent" }]}>
+            <Text style={styles.title}>{title}</Text>
+            <View style={styles.priceContainer}>
+              <Text style={styles.title}>1 kg</Text>
+              <Text style={styles.title}>Rs.{price}</Text>
+            </View>
+
+            <Pressable
+              style={styles.addToCartButton}
+              onPress={handleCartAction}
+            >
+              <Text style={styles.addToCart}>
+                {isInCart ? "Remove Item" : "Add To Cart"}
+              </Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </View>
+    );
+  }
+);
+
+ProductCard.displayName = "ProductCard";
 
 const createStyles = (colorTheme: "light" | "dark") =>
   StyleSheet.create({

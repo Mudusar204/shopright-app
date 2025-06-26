@@ -1,265 +1,382 @@
-import React, { useState, useMemo } from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView, Modal, Animated, TouchableWithoutFeedback, StatusBar } from 'react-native';
-import { View, Text, Button } from '@/components/Themed';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from './useColorScheme';
-import { AntDesign } from '@expo/vector-icons';
-import SelectButton from './SelectButton';
-import Slider from '@react-native-community/slider';
-const categories = ["Fruits & Vegetables", "Dairy & Eggs", "Meat & Seafood", "Bakery & Snacks", "Household Essentials"];
-const brands = ["Nestle","Pepsi", "PeakFreeze","Candy"];
-
+import React, { useState, useMemo, useCallback } from "react";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Modal,
+  Animated,
+  TouchableWithoutFeedback,
+  StatusBar,
+  FlatList,
+} from "react-native";
+import { View, Text, Button } from "@/components/Themed";
+import Colors from "@/constants/Colors";
+import { useColorScheme } from "./useColorScheme";
+import { AntDesign } from "@expo/vector-icons";
+import SelectButton from "./SelectButton";
+import Slider from "@react-native-community/slider";
+import { useGetCategories } from "@/hooks/queries/categories/categories.query";
+// const categories = [
+//   "Fruits & Vegetables",
+//   "Dairy & Eggs",
+//   "Meat & Seafood",
+//   "Bakery & Snacks",
+//   "Household Essentials",
+// ];
+const brands = ["Nestle", "Pepsi", "PeakFreeze", "Candy"];
 
 interface FilterModalProps {
-    visible: boolean;
-    onClose: () => void;
-    filter: any;
-    setFilter: (filters: any) => void;
+  visible: boolean;
+  onClose: () => void;
+  filter: any;
+  setFilter: (filters: any) => void;
 }
 
-const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, filter, setFilter }) => {
+// Memoized category item component
+const CategoryItem = React.memo(
+  ({ item, selectedCategory, setSelectedCategory }: any) => (
+    <SelectButton
+      key={item.id}
+      item={item.name}
+      selectedItem={selectedCategory}
+      setSelectedItem={setSelectedCategory}
+    />
+  )
+);
 
-    const colorScheme = useColorScheme() as 'light' | 'dark';
-    const styles = createStyles(colorScheme);
+// Memoized brand item component
+const BrandItem = React.memo(
+  ({ brand, selectedBrand, setSelectedBrand }: any) => (
+    <SelectButton
+      key={brand}
+      item={brand}
+      selectedItem={selectedBrand}
+      setSelectedItem={setSelectedBrand}
+    />
+  )
+);
 
-    // Animation value
-    const [animation] = useState(new Animated.Value(0));
+const FilterModal: React.FC<FilterModalProps> = ({
+  visible,
+  onClose,
+  filter,
+  setFilter,
+}) => {
+  const colorScheme = useColorScheme() as "light" | "dark";
+  const styles = createStyles(colorScheme);
 
-    // State for filters
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedBrand, setSelectedBrand] = useState('');
-    const [selectedSort, setSelectedSort] = useState('');
-    const [priceRange, setPriceRange] = useState([1, 10000]);
+  // Animation value
+  const [animation] = useState(new Animated.Value(0));
 
+  // State for filters
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedSort, setSelectedSort] = useState("");
+  const [priceRange, setPriceRange] = useState([1, 10000]);
 
+  const {
+    data: categories,
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+  } = useGetCategories();
+  console.log("categories", categories);
 
-    // Animate modal when visibility changes
-    React.useEffect(() => {
-        Animated.timing(animation, {
-            toValue: visible ? 1 : 0,
-            duration: 300,
-            useNativeDriver: true,
-        }).start();
-    }, [visible]);
+  // Memoize categories data to prevent unnecessary re-renders
+  const categoriesData = useMemo(() => {
+    return categories?.records || [];
+  }, [categories?.records]);
 
-    const translateY = animation.interpolate({
-        inputRange: [0, 1],
-        outputRange: [-300, 0], // Adjust this value based on your modal height
-    });
+  // Memoize the category render item function
+  const renderCategoryItem = useCallback(
+    ({ item }: { item: any }) => (
+      <CategoryItem
+        item={item}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
+    ),
+    [selectedCategory]
+  );
 
-    return (
-        <Modal
-            visible={visible}
-            transparent
-            animationType="fade"
-            onRequestClose={onClose}
-        >
-            <StatusBar hidden={true} />
-            <TouchableWithoutFeedback onPress={onClose}>
-                <View style={styles.overlay}>
-                    <TouchableWithoutFeedback>
-                        <Animated.View
-                            style={[
-                                styles.modalContainer,
-                                {
-                                    transform: [{ translateY }]
-                                }
-                            ]}
-                        >
-                            <ScrollView style={styles.content}>
-                                <View style={styles.headerContainer}>
-                                    <Text style={styles.header}>Filter</Text>
-                                    <AntDesign
-                                        name="closecircleo"
-                                        size={22}
-                                        color={Colors[colorScheme].icon_color}
-                                        onPress={onClose}
-                                    />
-                                </View>
+  // Memoize the brand render item function
+  const renderBrandItem = useCallback(
+    ({ item }: { item: any }) => (
+      <BrandItem
+        brand={item}
+        selectedBrand={selectedBrand}
+        setSelectedBrand={setSelectedBrand}
+      />
+    ),
+    [selectedBrand]
+  );
 
-                                {/* Categories */}
-                                <Text style={styles.sectionTitle}>Category</Text>
-                                <View style={styles.row}>
-                                    {categories.map((cat) => (
-                                        <SelectButton
-                                            key={cat}
-                                            item={cat}
-                                            selectedItem={selectedCategory}
-                                            setSelectedItem={setSelectedCategory}
-                                        />
-                                    ))}
-                                </View>
-                                {/* Categories */}
-                                <Text style={styles.sectionTitle}>Brands</Text>
-                                <View style={styles.row}>
-                                    {brands.map((brand) => (
-                                        <SelectButton
-                                            key={brand}
-                                            item={brand}
-                                            selectedItem={selectedBrand}
-                                            setSelectedItem={setSelectedBrand}
-                                        />
-                                    ))}
-                                </View>
-                                {/* Languages */}
+  // Memoize key extractors
+  const categoryKeyExtractor = useCallback(
+    (item: any) => item.id.toString(),
+    []
+  );
+  const brandKeyExtractor = useCallback((item: string) => item, []);
 
+  // Animate modal when visibility changes
+  React.useEffect(() => {
+    Animated.timing(animation, {
+      toValue: visible ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [visible]);
 
-                                {/* Price Range */}
-                                <Text style={styles.sectionTitle}>Price</Text>
-                                <Text style={styles.priceLabel}>
-                                    Rs.{priceRange[0]} - {priceRange[1]}
-                                </Text>
-                                <Slider
-                                    style={{ width: '100%', height: 20 }}
-                                    minimumValue={1}
-                                    maximumValue={10000}
-                                    lowerLimit={1}
-                                    upperLimit={10000}
-                                    step={1}
-                                    value={priceRange[1]}
-                                    onValueChange={(value) => setPriceRange([1, value])}
-                                    minimumTrackTintColor={Colors[colorScheme].primary_color}
-                                    thumbTintColor={Colors[colorScheme].primary_color}
-                                />
+  const translateY = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-300, 0], // Adjust this value based on your modal height
+  });
 
-                                <Text style={styles.sectionTitle}>Sort By</Text>
-                                <View style={styles.row}>
-                                    {["Price", "Categories"].map((sort) => (
-                                        <SelectButton
-                                            key={sort}
-                                            item={sort}
-                                            selectedItem={selectedSort}
-                                            setSelectedItem={setSelectedSort}
-                                        />
-                                    ))}
-                                </View>
-                                {/* Action Buttons */}
-                                <View style={styles.footer}>
-                                    <Button
-                                        title="Reset"
-                                        variant="secondary"
-                                        size="medium"
-                                        onPress={() => {
-                                            setSelectedCategory('');
-                                            setSelectedBrand('');
-                                            setPriceRange([1, 10000]);
-                                            setSelectedSort('');
-                                            setFilter([{ all: true }, { category: "" }, { brand: "" }, { priceRange: [1, 10000] }, { sort: "" }]);
-                                            onClose();
-                                        }}
-                                    />
-                                    <Button
-                                        title="Apply"
-                                        variant="primary"
-                                        size="medium"
-                                        onPress={() => {
+  // Memoize reset function
+  const handleReset = useCallback(() => {
+    setSelectedCategory("");
+    setSelectedBrand("");
+    setPriceRange([1, 10000]);
+    setSelectedSort("");
+    setFilter([
+      { all: true },
+      { category: "" },
+      { brand: "" },
+      { priceRange: [1, 10000] },
+      { sort: "" },
+    ]);
+    onClose();
+  }, [setFilter, onClose]);
 
-                                            setFilter([{ all: false }, { category: selectedCategory }, { brand: selectedBrand }, { priceRange: priceRange }, { sort: selectedSort }]);
-                                            onClose();
-                                        }}
-                                    />
-                                </View>
-                            </ScrollView>
-                        </Animated.View>
-                    </TouchableWithoutFeedback>
+  // Memoize apply function
+  const handleApply = useCallback(() => {
+    setFilter([
+      { all: false },
+      { category: selectedCategory },
+      { brand: selectedBrand },
+      { priceRange: priceRange },
+      { sort: selectedSort },
+    ]);
+    onClose();
+  }, [
+    selectedCategory,
+    selectedBrand,
+    priceRange,
+    selectedSort,
+    setFilter,
+    onClose,
+  ]);
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <StatusBar hidden={true} />
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.overlay}>
+          <TouchableWithoutFeedback>
+            <Animated.View
+              style={[
+                styles.modalContainer,
+                {
+                  transform: [{ translateY }],
+                },
+              ]}
+            >
+              <ScrollView
+                style={styles.content}
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={styles.headerContainer}>
+                  <Text style={styles.header}>Filter</Text>
+                  <AntDesign
+                    name="closecircleo"
+                    size={22}
+                    color={Colors[colorScheme].icon_color}
+                    onPress={onClose}
+                  />
                 </View>
-            </TouchableWithoutFeedback>
-        </Modal>
-    );
+
+                {/* Categories */}
+                <Text style={styles.sectionTitle}>Category</Text>
+                {categoriesLoading ? (
+                  <Text>Loading categories...</Text>
+                ) : categoriesError ? (
+                  <Text>Error loading categories</Text>
+                ) : (
+                  <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={categoriesData}
+                    renderItem={renderCategoryItem}
+                    keyExtractor={categoryKeyExtractor}
+                    contentContainerStyle={{ gap: 12 }}
+                    removeClippedSubviews={true}
+                    maxToRenderPerBatch={10}
+                    windowSize={10}
+                    initialNumToRender={5}
+                  />
+                )}
+
+                {/* Brands */}
+                <Text style={styles.sectionTitle}>Brands</Text>
+                <View style={styles.row}>
+                  {brands.map((brand) => (
+                    <BrandItem
+                      key={brand}
+                      brand={brand}
+                      selectedBrand={selectedBrand}
+                      setSelectedBrand={setSelectedBrand}
+                    />
+                  ))}
+                </View>
+                {/* Languages */}
+
+                {/* Price Range */}
+                <Text style={styles.sectionTitle}>Price</Text>
+                <Text style={styles.priceLabel}>
+                  Rs.{priceRange[0]} - {priceRange[1]}
+                </Text>
+                <Slider
+                  style={{ width: "100%", height: 20 }}
+                  minimumValue={1}
+                  maximumValue={10000}
+                  lowerLimit={1}
+                  upperLimit={10000}
+                  step={1}
+                  value={priceRange[1]}
+                  onValueChange={(value) => setPriceRange([1, value])}
+                  minimumTrackTintColor={Colors[colorScheme].primary_color}
+                  thumbTintColor={Colors[colorScheme].primary_color}
+                />
+
+                <Text style={styles.sectionTitle}>Sort By</Text>
+                <View style={styles.row}>
+                  {["Price", "Categories"].map((sort) => (
+                    <SelectButton
+                      key={sort}
+                      item={sort}
+                      selectedItem={selectedSort}
+                      setSelectedItem={setSelectedSort}
+                    />
+                  ))}
+                </View>
+                {/* Action Buttons */}
+                <View style={styles.footer}>
+                  <Button
+                    title="Reset"
+                    variant="secondary"
+                    size="medium"
+                    onPress={handleReset}
+                  />
+                  <Button
+                    title="Apply"
+                    variant="primary"
+                    size="medium"
+                    onPress={handleApply}
+                  />
+                </View>
+              </ScrollView>
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
+  );
 };
 
-const createStyles = (colorTheme: 'light' | 'dark') => StyleSheet.create({
+const createStyles = (colorTheme: "light" | "dark") =>
+  StyleSheet.create({
     overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent backdrop
-        justifyContent: 'flex-start',
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.3)", // Semi-transparent backdrop
+      justifyContent: "flex-start",
     },
     modalContainer: {
-        height: '60%',
-        backgroundColor: Colors[colorTheme].background,
-        borderRadius: 15,
-        overflow: 'hidden',
-        // shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
+      height: "65%",
+      backgroundColor: Colors[colorTheme].background,
+      borderRadius: 15,
+      overflow: "hidden",
+      // shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
     content: {
-        flex: 1,
-        padding: 25,
-        marginTop: 20,
-
+      flex: 1,
+      padding: 25,
+      marginTop: 20,
     },
     header: {
-        fontSize: 20,
-        fontWeight: '600',
-        marginBottom: 12,
+      fontSize: 20,
+      fontWeight: "600",
+      marginBottom: 12,
     },
     headerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12,
     },
     sectionTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginVertical: 20,
+      fontSize: 14,
+      fontWeight: "600",
+      marginVertical: 20,
     },
     row: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 12,
-        marginBottom: 10,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      marginBottom: 10,
     },
     languageContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 12,
-        // marginVertical: 15,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      // marginVertical: 15,
     },
     button: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: '#C0C0C0',
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: "#C0C0C0",
     },
     buttonSmall: {
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#C0C0C0',
+      paddingHorizontal: 8,
+      paddingVertical: 6,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: "#C0C0C0",
     },
     buttonSelected: {
-        backgroundColor: '#007AFF',
-        borderColor: '#007AFF',
+      backgroundColor: "#007AFF",
+      borderColor: "#007AFF",
     },
     buttonText: {
-        fontSize: 14,
-        color: '#000',
+      fontSize: 14,
+      color: "#000",
     },
     buttonTextSelected: {
-        color: '#FFF',
+      color: "#FFF",
     },
     priceLabel: {
-        marginBottom: 8,
-        fontSize: 14,
-        color: Colors[colorTheme].primary_color,
+      marginBottom: 8,
+      fontSize: 14,
+      color: Colors[colorTheme].primary_color,
     },
     footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingBottom: 20,
-        marginTop: 16,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingBottom: 20,
+      marginTop: 16,
     },
-
-
-});
+  });
 
 export default FilterModal;

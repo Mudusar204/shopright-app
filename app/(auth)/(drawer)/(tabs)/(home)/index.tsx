@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState, useMemo } from "react";
 import {
   Button,
   FlatList,
@@ -24,8 +24,10 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
-import { useGetAllProducts } from "@/hooks/queries/products/products.query";
+import { useGetProducts } from "@/hooks/queries/products/products.query";
 import { useGetOdooUser } from "@/hooks/queries/auth/auth.query";
+import { useGetCategories } from "@/hooks/queries/categories/categories.query";
+
 type FilterItem = {
   all?: boolean;
   category?: string;
@@ -35,16 +37,13 @@ type FilterItem = {
   status?: string;
 };
 
+// Memoized ProductCard component
+const MemoizedProductCard = React.memo(ProductCard);
+
 export default function HomeScreen() {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const {
-    data: odooUser,
-    isLoading: odooUserLoading,
-    isError: odooUserError,
-    error: odooUserErrorData,
-  } = useGetOdooUser();
-  console.log("odooUser", odooUser, odooUserErrorData, odooUserError);
+
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,11 +57,84 @@ export default function HomeScreen() {
   ]);
   const [userId, setUserId] = useState("");
   const { addToCart, cartItems, removeFromCart } = useMyCartStore();
-  const { data, isLoading, isError } = useGetAllProducts();
+  const { data, isLoading, isError } = useGetProducts();
+
+  // Memoize filtered data to prevent recalculation on every render
+  const filteredData = useMemo(() => {
+    if (!data?.records) return [];
+
+    return data.records.filter((item: any) => {
+      // If "all" is selected, show all items
+      if (filter[0].all) return true;
+
+      // Filter by category
+      if (
+        filter[1].category &&
+        !item.categ_id[1].includes(filter[1].category)
+      ) {
+        return false;
+      }
+
+      // Filter by brand (if implemented)
+      if (filter[2].brand && item.brand !== filter[2].brand) {
+        return false;
+      }
+
+      // Filter by price range
+      if (filter[3].priceRange) {
+        const [minPrice, maxPrice] = filter[3].priceRange;
+        const itemPrice = item.list_price || 0;
+        if (itemPrice < minPrice || itemPrice > maxPrice) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [data?.records, filter]);
 
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);
+
+  // Memoize the render item function for FlatList
+  const renderProductItem = useCallback(
+    ({ item }: { item: any }) => (
+      <MemoizedProductCard
+        id={item?.id}
+        image={item?.image_1920}
+        title={item?.display_name}
+        price={item?.list_price}
+        description={item?.description_ecommerce}
+        tags={item?.categ_id}
+      />
+    ),
+    []
+  );
+
+  // Memoize key extractor
+  const keyExtractor = useCallback((item: any) => item.id.toString(), []);
+
+  // Memoize dropdown filter data
+  const dropdownFilterData = useMemo(
+    () => [
+      filter[1].category != "" ? filter[1].category : "Category",
+      filter[2].brand != "" ? filter[2].brand : "Brands",
+      filter[3].priceRange?.[1] !== 25
+        ? filter[3].priceRange?.[0] + " - " + filter[3].priceRange?.[1]
+        : "Price",
+      filter[4].sort !== "" ? filter[4].sort : "Payment & Offers",
+    ],
+    [filter]
+  );
+
+  // Memoize dropdown render item
+  const renderDropdownItem = useCallback(
+    ({ item }: { item: any }) => (
+      <DropdownFilter label={item} onClose={handleFilterPress} />
+    ),
+    [handleFilterPress]
+  );
 
   return (
     <SafeAreaView style={styles.safeAreaView}>
@@ -110,22 +182,8 @@ export default function HomeScreen() {
             <FilterHandler />
           </Pressable>
           <FlatList
-            data={[
-              filter[1].category != "" ? filter[1].category : "Category",
-              filter[2].brand != "" ? filter[2].brand : "Brands",
-              filter[3].priceRange?.[1] !== 25
-                ? filter[3].priceRange?.[0] + " - " + filter[3].priceRange?.[1]
-                : "Price",
-              filter[4].sort !== "" ? filter[4].sort : "Payment & Offers",
-            ]}
-            renderItem={({ item }: { item: any }) => (
-              <DropdownFilter
-                label={item}
-                onClose={() => {
-                  handleFilterPress();
-                }}
-              />
-            )}
+            data={dropdownFilterData}
+            renderItem={renderDropdownItem}
             keyExtractor={(item, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -142,34 +200,28 @@ export default function HomeScreen() {
             <Text>Error loading products</Text>
           ) : (
             <FlatList
-              data={Array.isArray(data) ? data : [data]}
-              renderItem={({ item }) => (
-                <ProductCard
-                  id={item.id.toString()}
-                  image={item.images[0]}
-                  title={item.title}
-                  location={item.category.name}
-                  price={item.listPrice}
-                  phoneNumber={item.brand}
-                  description={item.description}
-                  tags={item.tags.map((tag: any) => tag.name)}
-                  relatedItems={item.variants.map((variant: any) => ({
-                    image: item.images[0],
-                    title: `${item.title} - ${variant.variantValue}`,
-                    price: (
-                      parseFloat(item.listPrice) +
-                      parseFloat(variant.additionalPrice)
-                    ).toString(),
-                    location: item.category.name,
-                    phoneNumber: item.brand,
-                    description: item.description,
-                  }))}
-                />
-              )}
-              keyExtractor={(item) => item.id.toString()}
+              data={filteredData}
+              renderItem={renderProductItem}
+              keyExtractor={keyExtractor}
               showsVerticalScrollIndicator={false}
               numColumns={3}
               contentContainerStyle={{ marginHorizontal: 10 }}
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={6}
+              windowSize={10}
+              initialNumToRender={9}
+              ListEmptyComponent={
+                <View
+                  style={{
+                    flex: 1,
+                    marginTop: 150,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text>No products found</Text>
+                </View>
+              }
             />
           )}
         </View>
