@@ -18,21 +18,22 @@ export const login = async (data: any) => {
 };
 
 export const getOdooUser = async () => {
-  const odooUserAuth = useAuthStore.getState().odooUserAuth;
-  if (!odooUserAuth) {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+
+  if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooUserAuth, "odooUserAuth");
+  console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       `http://69.62.120.81:8088/send_request?model=res.users&Id=2`,
       {
         headers: {
           "Content-Type": "application/json",
-          "api-key": odooUserAuth.api_key,
-          login: odooUserAuth.login,
-          password: odooUserAuth.password,
-          db: odooUserAuth.db,
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
         },
       }
     );
@@ -44,11 +45,42 @@ export const getOdooUser = async () => {
     console.log(error, "error in getOdooUser");
   }
 };
-export const register = async (data: any) => {
-  const response = await apiClient.post(API_ROUTES.USER["REGISTER"], data);
-  return response.data;
-};
 
+export const register = async (data: any) => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(odooAdmin, "odooAdmin in create user");
+  try {
+    const response = await axios.post(
+      `http://69.62.120.81:8088/send_request?model=res.users`,
+      {
+        fields: ["login", "name", "password"],
+        values: {
+          login: data.login,
+          name: data.name,
+          password: data.password,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+
+    // const response = await odooApiClient.get(`/send_request?model=res.users`);
+    console.log(response, "getOdooUser response");
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in getOdooUser");
+  }
+};
 export const otpVerification = async (data: any) => {
   const response = await apiClient.post(
     API_ROUTES.AUTH["OTP_VERIFICATION"],

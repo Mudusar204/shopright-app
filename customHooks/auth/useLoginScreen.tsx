@@ -54,6 +54,8 @@ export default function useLoginScreen() {
       console.log("login >", response, "<response");
       setIsLoggedIn(true);
       setOdooUserAuth({
+        id: response?.["Id"],
+        partner_id: response?.["Partner Id"],
         api_key: response?.["api-key"],
         login: identifier,
         password: password,

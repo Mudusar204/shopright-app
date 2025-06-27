@@ -30,7 +30,7 @@ import { useGetCategories } from "@/hooks/queries/categories/categories.query";
 
 type FilterItem = {
   all?: boolean;
-  category?: string;
+  category?: any | null;
   brand?: string;
   priceRange?: [number, number];
   sort?: string;
@@ -45,18 +45,14 @@ export default function HomeScreen() {
   const styles = createStyles(colorScheme);
 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [catalogItems, setCatalogItems] = useState<any[]>([]);
   const [filter, setFilter] = useState<FilterItem[]>([
     { all: true },
-    { category: "" },
+    { category: null },
     { brand: "" },
-    { priceRange: [5, 25] },
+    { priceRange: [1, 20000] },
     { sort: "" },
   ]);
-  const [userId, setUserId] = useState("");
-  const { addToCart, cartItems, removeFromCart } = useMyCartStore();
+  const { cartItems } = useMyCartStore();
   const { data, isLoading, isError } = useGetProducts();
 
   // Memoize filtered data to prevent recalculation on every render
@@ -68,11 +64,12 @@ export default function HomeScreen() {
       if (filter[0].all) return true;
 
       // Filter by category
-      if (
-        filter[1].category &&
-        !item.categ_id[1].includes(filter[1].category)
-      ) {
-        return false;
+      if (filter[1].category !== null) {
+        // Check if the product's category ID matches the selected category
+        const productCategoryIds = item.public_categ_ids || [];
+        if (!productCategoryIds.includes(filter[1].category.id)) {
+          return false;
+        }
       }
 
       // Filter by brand (if implemented)
@@ -118,9 +115,9 @@ export default function HomeScreen() {
   // Memoize dropdown filter data
   const dropdownFilterData = useMemo(
     () => [
-      filter[1].category != "" ? filter[1].category : "Category",
+      filter[1].category != null ? filter[1].category.name : "Category",
       filter[2].brand != "" ? filter[2].brand : "Brands",
-      filter[3].priceRange?.[1] !== 25
+      filter[3].priceRange?.[1] !== 20000
         ? filter[3].priceRange?.[0] + " - " + filter[3].priceRange?.[1]
         : "Price",
       filter[4].sort !== "" ? filter[4].sort : "Payment & Offers",

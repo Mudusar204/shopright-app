@@ -14,9 +14,10 @@ const initialState: AuthStoreState = {
   isLoading: false,
   isOnboarded: false,
   odooUser: null,
+  userLocations: [],
   odooUserAuth: null,
   odooAdmin: {
-    api_key: "b2b5c816-454d-429d-93d3-8150f7e43700",
+    api_key: "56d2a7b1-b839-4137-a3cc-7f974d91f5ea",
     login: "admin",
     password: "admin",
     db: "Testing",

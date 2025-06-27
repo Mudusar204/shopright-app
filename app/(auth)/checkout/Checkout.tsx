@@ -95,13 +95,15 @@ const Checkout = () => {
                 {item.title} x {item.quantity}
               </Text>
               <Text style={styles.orderItemPrice}>
-                ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                Rs.{(parseFloat(item.price) * item.quantity).toFixed(2)}
               </Text>
             </View>
           ))}
           <View style={styles.totalContainer}>
             <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalPrice}>${getTotalPrice().toFixed(2)}</Text>
+            <Text style={styles.totalPrice}>
+              Rs.{getTotalPrice().toFixed(2)}
+            </Text>
           </View>
         </View>
 

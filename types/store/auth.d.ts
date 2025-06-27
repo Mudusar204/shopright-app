@@ -2,6 +2,7 @@ interface AuthStoreState {
   isLoggedIn: boolean;
   isLoading: boolean;
   odooUser?: OdooUser | null;
+  userLocations?: any[] | null;
   odooAdmin?: OdooAdmin | null;
   odooUserAuth?: OdooUserAuth | null;
   isOnboarded: boolean;
@@ -28,6 +29,8 @@ interface OdooUser {
 }
 
 interface OdooUserAuth {
+  id: string;
+  partner_id: string;
   api_key: string;
   login: string;
   password: string;
@@ -40,4 +43,20 @@ interface OdooAdmin {
   password: string;
   db: string;
 }
-export { AuthStoreState, AuthStoreActions, OdooUser, OdooUserAuth, OdooAdmin };
+
+interface UserLocation {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+}
+
+export {
+  AuthStoreState,
+  AuthStoreActions,
+  OdooUser,
+  OdooUserAuth,
+  OdooAdmin,
+  UserLocation,
+};

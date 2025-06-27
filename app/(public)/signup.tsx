@@ -15,8 +15,6 @@ const Signup = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const {
-    phone,
-    setPhone,
     password,
     setPassword,
     confirmPassword,
@@ -47,14 +45,6 @@ const Signup = () => {
 
       <InputHandler
         leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-        placeholder="Phone Number"
-        value={phone}
-        onChangeText={setPhone}
-        textContentType="telephoneNumber"
-      />
-
-      <InputHandler
-        leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
@@ -80,7 +70,7 @@ const Signup = () => {
         textColor={Colors[colorScheme].text_white}
         style={{ marginTop: 12 }}
         variant={
-          isLoading || !name || !phone || !password || !confirmPassword
+          isLoading || !name || !email || !password || !confirmPassword
             ? "primary"
             : "primary"
         }

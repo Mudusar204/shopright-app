@@ -53,7 +53,7 @@ const MyCart = () => {
       <View style={styles.footer}>
         <View style={styles.totalContainer}>
           <Text style={styles.totalLabel}>Total:</Text>
-          <Text style={styles.totalPrice}>${getTotalPrice().toFixed(2)}</Text>
+          <Text style={styles.totalPrice}>Rs.{getTotalPrice().toFixed(2)}</Text>
         </View>
         <Button
           variant="primary"

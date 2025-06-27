@@ -16,13 +16,7 @@ import { AntDesign } from "@expo/vector-icons";
 import SelectButton from "./SelectButton";
 import Slider from "@react-native-community/slider";
 import { useGetCategories } from "@/hooks/queries/categories/categories.query";
-// const categories = [
-//   "Fruits & Vegetables",
-//   "Dairy & Eggs",
-//   "Meat & Seafood",
-//   "Bakery & Snacks",
-//   "Household Essentials",
-// ];
+
 const brands = ["Nestle", "Pepsi", "PeakFreeze", "Candy"];
 
 interface FilterModalProps {
@@ -37,9 +31,11 @@ const CategoryItem = React.memo(
   ({ item, selectedCategory, setSelectedCategory }: any) => (
     <SelectButton
       key={item.id}
-      item={item.name}
-      selectedItem={selectedCategory}
-      setSelectedItem={setSelectedCategory}
+      item={item}
+      selectedItem={selectedCategory?.id === item?.id ? item : null}
+      setSelectedItem={(selectedItem: any) => {
+        setSelectedCategory(selectedItem ? selectedItem : null);
+      }}
     />
   )
 );
@@ -68,18 +64,17 @@ const FilterModal: React.FC<FilterModalProps> = ({
   // Animation value
   const [animation] = useState(new Animated.Value(0));
 
-  // State for filters
-  const [selectedCategory, setSelectedCategory] = useState("");
+  // State for filters - use category ID instead of object
+  const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedSort, setSelectedSort] = useState("");
-  const [priceRange, setPriceRange] = useState([1, 10000]);
+  const [priceRange, setPriceRange] = useState([1, 1000]);
 
   const {
     data: categories,
     isLoading: categoriesLoading,
     isError: categoriesError,
   } = useGetCategories();
-  console.log("categories", categories);
 
   // Memoize categories data to prevent unnecessary re-renders
   const categoriesData = useMemo(() => {
@@ -133,15 +128,15 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
   // Memoize reset function
   const handleReset = useCallback(() => {
-    setSelectedCategory("");
+    setSelectedCategory(null);
     setSelectedBrand("");
-    setPriceRange([1, 10000]);
+    setPriceRange([1, 1000]);
     setSelectedSort("");
     setFilter([
       { all: true },
-      { category: "" },
+      { category: null },
       { brand: "" },
-      { priceRange: [1, 10000] },
+      { priceRange: [1, 20000] },
       { sort: "" },
     ]);
     onClose();
@@ -151,9 +146,14 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const handleApply = useCallback(() => {
     setFilter([
       { all: false },
-      { category: selectedCategory },
+      { category: selectedCategory ? selectedCategory : null },
       { brand: selectedBrand },
-      { priceRange: priceRange },
+      {
+        priceRange:
+          priceRange[0] === 1 && priceRange[1] === 1000
+            ? [1, 20000]
+            : priceRange,
+      },
       { sort: selectedSort },
     ]);
     onClose();
@@ -242,12 +242,14 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <Slider
                   style={{ width: "100%", height: 20 }}
                   minimumValue={1}
-                  maximumValue={10000}
+                  maximumValue={20000}
                   lowerLimit={1}
-                  upperLimit={10000}
+                  upperLimit={20000}
                   step={1}
                   value={priceRange[1]}
-                  onValueChange={(value) => setPriceRange([1, value])}
+                  onValueChange={(value) =>
+                    setPriceRange([priceRange[0], value])
+                  }
                   minimumTrackTintColor={Colors[colorScheme].primary_color}
                   thumbTintColor={Colors[colorScheme].primary_color}
                 />

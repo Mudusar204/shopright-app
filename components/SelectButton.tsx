@@ -5,9 +5,9 @@ import { useColorScheme } from "./useColorScheme";
 import Colors from "@/constants/Colors";
 
 interface SelectButtonProps {
-  item: string;
-  selectedItem: string;
-  setSelectedItem: (item: string) => void;
+  item: string | { id: number; name: string };
+  selectedItem: string | { id: number; name: string } | null;
+  setSelectedItem: (item: any) => void;
 }
 
 const SelectButton = React.memo(
@@ -19,7 +19,14 @@ const SelectButton = React.memo(
       setSelectedItem(item);
     }, [item, setSelectedItem]);
 
-    const isSelected = selectedItem === item;
+    // Compare by id if both are objects, otherwise by value
+    const isSelected =
+      typeof item === "object" &&
+      item !== null &&
+      typeof selectedItem === "object" &&
+      selectedItem !== null
+        ? item.id === selectedItem.id
+        : item === selectedItem;
 
     return (
       <View>
@@ -30,7 +37,9 @@ const SelectButton = React.memo(
           <Text
             style={[styles.buttonText, isSelected && styles.buttonTextSelected]}
           >
-            {item}
+            {typeof item === "object" && item !== null
+              ? item.name
+              : String(item)}
           </Text>
         </TouchableOpacity>
       </View>

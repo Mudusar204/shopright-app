@@ -5,12 +5,12 @@ import axios from "axios";
 
 export const createOrder = async (data: any) => {
   console.log("create order data", data);
-  const odooUserAuth = useAuthStore.getState().odooUserAuth;
+  const { odooAdmin } = useAuthStore();
   const user = useAuthStore.getState().odooUser;
-  if (!odooUserAuth) {
+  if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooUserAuth, "odooUserAuth", user, "user");
+  console.log(odooAdmin, "odooUserAuth", user, "user");
   try {
     const orderLine = data.items.map((item: any) => [
       0,
@@ -51,10 +51,10 @@ export const createOrder = async (data: any) => {
       {
         headers: {
           "Content-Type": "application/json",
-          "api-key": odooUserAuth.api_key,
-          login: odooUserAuth.login,
-          password: odooUserAuth.password,
-          db: odooUserAuth.db,
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
         },
       }
     );

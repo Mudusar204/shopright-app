@@ -3,21 +3,21 @@ import { API_ROUTES } from "@/constants/api.routes";
 import { useAuthStore } from "@/store/auth.store";
 import axios from "axios";
 export const getCategories = async () => {
-  const odooUserAuth = useAuthStore.getState().odooUserAuth;
-  if (!odooUserAuth) {
+  const { odooAdmin } = useAuthStore();
+  if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooUserAuth, "odooUserAuth");
+  console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       "http://69.62.120.81:8088/send_request?model=product.public.category",
       {
         headers: {
           "Content-Type": "application/json",
-          "api-key": odooUserAuth.api_key,
-          login: odooUserAuth.login,
-          password: odooUserAuth.password,
-          db: odooUserAuth.db,
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
         },
       }
     );
