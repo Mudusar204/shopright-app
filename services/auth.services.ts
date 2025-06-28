@@ -39,7 +39,7 @@ export const getOdooUser = async () => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response, "getOdooUser response");
+    // console.log(response, "getOdooUser response");
     return response.data;
   } catch (error) {
     console.log(error, "error in getOdooUser");
@@ -81,17 +81,70 @@ export const register = async (data: any) => {
     console.log(error, "error in getOdooUser");
   }
 };
-export const otpVerification = async (data: any) => {
-  const response = await apiClient.post(
-    API_ROUTES.AUTH["OTP_VERIFICATION"],
-    data
-  );
-  return response.data;
-};
 
-export const resendOtp = async (data: any) => {
-  const response = await apiClient.post(API_ROUTES.AUTH["RESEND_OTP"], data);
-  return response.data;
+export const addUserAddress = async (data: any) => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(odooAdmin, "odooAdmin in create user");
+  try {
+    const response = await axios.post(
+      `http://69.62.120.81:8088/send_request?model=res.users`,
+      {
+        fields: ["login", "name", "password"],
+        values: {
+          login: data.login,
+          name: data.name,
+          password: data.password,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+
+    // const response = await odooApiClient.get(`/send_request?model=res.users`);
+    console.log(response, "getOdooUser response");
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in getOdooUser");
+  }
+};
+export const getUserAddresses = async () => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  const user = useAuthStore.getState().odooUserAuth;
+  console.log(user, "user in getUserAddresses");
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(odooAdmin, "odooUserAddresses");
+  try {
+    const response = await axios.get(
+      `http://69.62.120.81:8088/send_request?model=res.partner&Id=${user?.partner_id}&fields=name,email,zip,street,street2,city,state_id,country_id,parent_id,type`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+
+    // const response = await odooApiClient.get(`/send_request?model=res.users`);
+    console.log(response.data, "getUserAddresses response");
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in getOdooUser");
+  }
 };
 
 export const logout = async (data: any) => {

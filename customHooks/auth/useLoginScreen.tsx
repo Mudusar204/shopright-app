@@ -9,7 +9,8 @@ export default function useLoginScreen() {
   const [password, setPassword] = useState("");
   const { mutateAsync, error, isPending, isSuccess } = useLogin();
   const [isLoading, setIsLoading] = useState(isPending);
-  const { setIsLoggedIn, setOdooUser, setOdooUserAuth } = useAuthStore();
+  const { setIsLoggedIn, setOdooUser, setOdooUserAuth, setOdooAdmin } =
+    useAuthStore();
   // const { refetch, loading } = useLocation();
   const handleLogin = async () => {
     try {
@@ -82,6 +83,7 @@ export default function useLoginScreen() {
     password,
     setPassword,
     handleLogin,
+    setOdooAdmin,
     isLoading: isLoading,
   };
 }

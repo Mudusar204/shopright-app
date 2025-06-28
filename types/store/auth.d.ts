@@ -12,7 +12,7 @@ interface AuthStoreActions {
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   setOdooUser: (user: OdooUser | null) => void;
   setOdooUserAuth: (userAuth: OdooUserAuth | null) => void;
-  setOdooAdmin: (admin: OdooAdmin | null) => void;
+  setOdooAdmin: () => void;
   setIsLoading: (isLoading: boolean) => void;
   setOnboarded: (isOnboarded: boolean) => void;
   clear: () => void;

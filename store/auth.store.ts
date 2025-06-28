@@ -33,7 +33,15 @@ export const useAuthStore = create(
       setOdooUser: (user: OdooUser | null) => set({ odooUser: user }),
       setOdooUserAuth: (userAuth: OdooUserAuth | null) =>
         set({ odooUserAuth: userAuth }),
-      setOdooAdmin: (admin: OdooAdmin | null) => set({ odooAdmin: admin }),
+      setOdooAdmin: () =>
+        set({
+          odooAdmin: {
+            api_key: "56d2a7b1-b839-4137-a3cc-7f974d91f5ea",
+            login: "admin",
+            password: "admin",
+            db: "Testing",
+          },
+        }),
       setIsLoading: (isLoading: boolean) => set({ isLoading }),
       setOnboarded: (isOnboarded: boolean) => set({ isOnboarded }),
       clear: () => {

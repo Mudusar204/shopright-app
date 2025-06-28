@@ -1,13 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getErrorMessage } from "@/utils";
-import {
-  login,
-  register,
-  logout,
-  otpVerification,
-  resendOtp,
-} from "@/services/auth.services";
-import { addUserAddress } from "@/services/user.services";
+import { login, register, logout } from "@/services/auth.services";
+import { addUserAddress } from "@/services/auth.services";
 
 const useRegister = () => {
   const queryClient = useQueryClient();

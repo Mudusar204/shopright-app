@@ -11,13 +11,15 @@ import BottomModal from "./BottomSheet";
 import { useColorScheme } from "../useColorScheme";
 import { Button, Text, TextInput, View } from "../Themed";
 import { useAddUserAddress } from "@/hooks/mutations/user/user.mutation";
-import { useGetUserAddresses } from "@/hooks/queries/user/user.query";
+import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Callout, Marker } from "react-native-maps";
 import LocationMarker from "@/assets/images/svgs/LocationMarker";
 import BackHandler from "../BackHandler";
 import Header from "../Header";
 import Toast from "react-native-toast-message";
+import { useLocation } from "@/hooks/useLocation";
+import MyLocationIcon from "@/assets/images/svgs/MyLocation";
 
 const AddAddressBottomSheet = ({
   bottomSheetRef,
@@ -29,7 +31,7 @@ const AddAddressBottomSheet = ({
   setSelectedAddress: (address: any) => void;
 }) => {
   const { mutate: addUserAddress, isPending, isSuccess } = useAddUserAddress();
-  const { data: userAddresses } = useGetUserAddresses();
+  const { locationData } = useLocation();
 
   const theme = useColorScheme() as "light" | "dark";
   const style = styles(theme);
@@ -133,26 +135,53 @@ const AddAddressBottomSheet = ({
           <View style={style.mapContainer}>
             <MapView
               ref={mapRef}
-              style={style.map}
+              style={{ flex: 1 }}
               initialRegion={region}
-              onRegionChangeComplete={setRegion}
+              showsUserLocation={true}
+              showsMyLocationButton={false}
             >
-              <Marker
-                coordinate={{
-                  latitude: region.latitude,
-                  longitude: region.longitude,
-                }}
-              >
-                <LocationMarker color={Colors[theme].text_secondary} />
-              </Marker>
+              {/* Rider's current location marker */}
+              {locationData.location && (
+                <Marker
+                  coordinate={{
+                    latitude: locationData.location.coords.latitude,
+                    longitude: locationData.location.coords.longitude,
+                  }}
+                  title="Your Location"
+                  description="You are here"
+                >
+                  <View
+                    style={{ alignItems: "center", justifyContent: "center" }}
+                  >
+                    <MyLocationIcon color={Colors[theme].primary_color} />
+                  </View>
+                  <Callout tooltip>
+                    <View style={style.calloutContainer}>
+                      <Text style={style.calloutTitle}>Your Location</Text>
+                      <Text style={style.calloutAddress}>
+                        {locationData.address
+                          ? `${locationData.address.street || ""} ${
+                              locationData.address.city || ""
+                            } ${locationData.address.region || ""}`.trim() ||
+                            "Current location"
+                          : "Current location"}
+                      </Text>
+                      <Text style={style.calloutCoordinates}>
+                        {locationData.location.coords.latitude.toFixed(6)},{" "}
+                        {locationData.location.coords.longitude.toFixed(6)}
+                      </Text>
+                    </View>
+                  </Callout>
+                </Marker>
+              )}
             </MapView>
             <View style={style.buttonContainer}>
-              <Button
+              {/* <Button
                 variant="secondary"
                 size="small"
                 title="+ Manually"
                 onPress={() => setAddManually(true)}
-              />
+              /> */}
               <Button
                 variant="secondary"
                 size="small"
@@ -483,5 +512,37 @@ const styles = (theme: "light" | "dark") =>
       borderWidth: 1,
       borderColor: Colors[theme].border,
       color: Colors[theme].text,
+    },
+    calloutContainer: {
+      width: 200,
+      backgroundColor: Colors[theme].background,
+      borderRadius: 10,
+      padding: 10,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    calloutTitle: {
+      fontWeight: "bold",
+      fontSize: 14,
+      marginBottom: 5,
+      color: Colors[theme].text,
+    },
+    calloutAddress: {
+      fontSize: 12,
+      textAlign: "center",
+      marginBottom: 5,
+      color: Colors[theme].text_secondary,
+    },
+    calloutCoordinates: {
+      fontSize: 10,
+      color: Colors[theme].text_secondary,
+      fontFamily: "monospace",
     },
   });

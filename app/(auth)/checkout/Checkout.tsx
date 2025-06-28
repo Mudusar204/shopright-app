@@ -16,7 +16,7 @@ import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "@/components/Header";
-import { useGetUserAddresses } from "@/hooks/queries/user/user.query";
+import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
 import AddAddressBottomSheet from "@/components/BottomSheets/AddAddressBottomSheet";
 import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
@@ -59,8 +59,8 @@ const Checkout = () => {
       },
       {
         onSuccess: () => {
-          // clearCart();
-          // router.push("/(auth)/order-success");
+          clearCart();
+          router.push("/(auth)/order-success");
           Toast.show({
             type: "success",
             text1: "Order placed successfully",
@@ -300,6 +300,7 @@ const createStyles = (theme: "light" | "dark") =>
       marginBottom: 10,
     },
     orderItemName: {
+      flex: 1,
       fontSize: 16,
       color: Colors[theme].text,
     },

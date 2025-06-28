@@ -5,8 +5,8 @@ import axios from "axios";
 
 export const createOrder = async (data: any) => {
   console.log("create order data", data);
-  const { odooAdmin } = useAuthStore();
-  const user = useAuthStore.getState().odooUser;
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  const user = useAuthStore.getState().odooUserAuth;
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
@@ -16,7 +16,7 @@ export const createOrder = async (data: any) => {
       0,
       0,
       {
-        product_id: parseInt(item.productId),
+        product_id: item.productId,
         product_uom_qty: item.quantity,
       },
     ]);
@@ -26,7 +26,7 @@ export const createOrder = async (data: any) => {
       {
         fields: ["partner_id", "order_line"],
         values: {
-          partner_id: 1,
+          partner_id: user?.partner_id,
           order_line: orderLine,
           // [
           //   [

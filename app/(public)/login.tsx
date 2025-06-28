@@ -1,4 +1,4 @@
-import { Alert, StyleSheet } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { Button, Text, TextInput, View } from "@/components/Themed";
 import React, { useState } from "react";
 import Header from "@/components/Header";
@@ -17,6 +17,7 @@ const Login = () => {
     identifier,
     setIdentifier,
     password,
+    setOdooAdmin,
     setPassword,
     handleLogin,
     isLoading,
@@ -53,11 +54,13 @@ const Login = () => {
         onPress={handleLogin}
       />
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          <Link style={styles.footerLink} href="/forgetPassword">
+        <TouchableOpacity onPress={() => setOdooAdmin()}>
+          <Text style={styles.footerText}>
+            {/* <Link style={styles.footerLink} href="/forgetPassword"> */}
             Forgot Password?
-          </Link>
-        </Text>
+            {/* </Link> */}
+          </Text>
+        </TouchableOpacity>
 
         <Text style={styles.footerText}>
           {" "}

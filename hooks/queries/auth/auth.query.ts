@@ -1,4 +1,4 @@
-import { getOdooUser } from "@/services/auth.services";
+import { getOdooUser, getUserAddresses } from "@/services/auth.services";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useGetOdooUser = () => {
@@ -9,5 +9,15 @@ export const useGetOdooUser = () => {
       return getOdooUser();
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useGetUserAddresses = () => {
+  return useQuery({
+    queryKey: ["user-addresses"],
+    queryFn: () => {
+      return getUserAddresses();
+    },
+    // staleTime: 60 * 5000, //5 minutes
   });
 };
