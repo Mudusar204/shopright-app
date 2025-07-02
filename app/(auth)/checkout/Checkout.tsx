@@ -21,12 +21,14 @@ import AddAddressBottomSheet from "@/components/BottomSheets/AddAddressBottomShe
 import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
 import Toast from "react-native-toast-message";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
   const { data: userAddresses } = useGetUserAddresses();
+  console.log(userAddresses, "userAddresses");
   const { mutate: createOrder, isPending, isSuccess } = useCreateOrder();
   const [selectedPayment, setSelectedPayment] = useState("cash");
   const bottomSheetRef = useRef<BottomSheetScrollHandle>(null);
@@ -167,7 +169,38 @@ const Checkout = () => {
               style={{ marginBottom: 15 }}
             />
           </View>
-          <FlatList
+          {userAddresses?.records?.length > 0 &&
+          (userAddresses?.records[0]?.street ||
+            userAddresses?.records[0]?.street2 ||
+            userAddresses?.records[0]?.city ||
+            userAddresses?.records[0]?.state_id ||
+            userAddresses?.records[0]?.country_id) ? (
+            <Pressable
+              style={styles.addressItem}
+              onPress={() => setSelectedAddress(userAddresses.records[0])}
+            >
+              {/* <Checkbox
+                color={Colors[colorScheme].primary_color}
+                style={styles.checkbox}
+                value={selectedAddress?.id === userAddresses.records[0].id}
+                onValueChange={() =>
+                  setSelectedAddress(userAddresses.records[0])
+                }
+              /> */}
+              <Text style={styles.addressItemText}>
+                {userAddresses.records[0]?.street}{" "}
+                {userAddresses.records[0]?.street2}{" "}
+                {userAddresses.records[0]?.city}{" "}
+                {userAddresses.records[0]?.state_id}{" "}
+                {userAddresses.records[0]?.country_id}
+              </Text>
+            </Pressable>
+          ) : (
+            <View style={styles.emptyAddressContainer}>
+              <Text style={styles.emptyAddressText}>No addresses found</Text>
+            </View>
+          )}
+          {/* <FlatList
             data={userAddresses}
             renderItem={({ item }) => (
               <Pressable
@@ -193,7 +226,7 @@ const Checkout = () => {
                 <Text style={styles.emptyAddressText}>No addresses found</Text>
               </View>
             }
-          />
+          /> */}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Special Instructions</Text>

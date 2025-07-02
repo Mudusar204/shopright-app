@@ -12,8 +12,17 @@ import { format } from "date-fns";
 const Orders = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const { data: myOrders, isLoading, isError } = useGetMyOrders();
-
+  const { data: myOrders, isLoading, isError, error } = useGetMyOrders();
+  console.log(
+    myOrders,
+    "myOrders",
+    isLoading,
+    "isLoading",
+    isError,
+    "isError",
+    error,
+    "error"
+  );
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":

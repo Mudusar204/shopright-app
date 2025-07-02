@@ -43,13 +43,7 @@ export default function Layout() {
   }, [fontsLoaded]);
   const { isLoggedIn, isOnboarded } = useAuthStore((state) => state);
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.replace(!isOnboarded ? "/login" : "/onboarding");
-    } else {
-      router.replace("/(tabs)");
-    }
-  }, [isLoggedIn, isOnboarded]); // Add isOnboarded as a dependency
+  // Add isOnboarded as a dependency
   const CustomStatusBar = ({
     backgroundColor,
     barStyle,
@@ -87,7 +81,10 @@ export default function Layout() {
                   : ("dark-content" as StatusBarStyle)
               }
             />
-            <Stack screenOptions={{ headerShown: false }} />
+            <Stack
+              initialRouteName="index"
+              screenOptions={{ headerShown: false }}
+            />
             <Toast />
           </SafeAreaProvider>
         </BottomSheetModalProvider>

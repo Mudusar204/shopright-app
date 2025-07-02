@@ -10,7 +10,7 @@ import {
 import BottomModal from "./BottomSheet";
 import { useColorScheme } from "../useColorScheme";
 import { Button, Text, TextInput, View } from "../Themed";
-import { useAddUserAddress } from "@/hooks/mutations/user/user.mutation";
+import { useAddUserAddress } from "@/hooks/mutations/auth/auth.mutation";
 import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import MapView, { Callout, Marker } from "react-native-maps";
@@ -44,14 +44,12 @@ const AddAddressBottomSheet = ({
     longitudeDelta: 0.0421,
   });
   const [deliveryDetails, setDeliveryDetails] = useState({
-    fullName: "",
-    area: "",
-    apartment: "",
-    streetAddress: "",
+    street: "",
+    street2: "",
     city: "",
-    state: "",
-    country: "",
-    postalCode: "",
+    state_id: "",
+    country_id: "",
+    zip: 0,
     longitude: 0,
     latitude: 0,
   });
@@ -60,14 +58,12 @@ const AddAddressBottomSheet = ({
       onSuccess: () => {
         bottomSheetRef.current?.handleClose();
         setDeliveryDetails({
-          fullName: "",
-          area: "",
-          apartment: "",
-          streetAddress: "",
+          street: "",
+          street2: "",
           city: "",
-          state: "",
-          country: "",
-          postalCode: "",
+          state_id: "",
+          country_id: "",
+          zip: 0,
           longitude: 0,
           latitude: 0,
         });
@@ -102,7 +98,7 @@ const AddAddressBottomSheet = ({
     <BottomModal ref={bottomSheetRef} scrollable={false} snapPoints={["100%"]}>
       {!addManually ? (
         <View style={style.container}>
-          <View style={style.searchContainer}>
+          {/* <View style={style.searchContainer}>
             <GooglePlacesAutocomplete
               placeholder="Search location"
               onPress={handleLocationSelect}
@@ -121,16 +117,16 @@ const AddAddressBottomSheet = ({
                 key: "AIzaSyAsQaw80JUEAI_a82j_1bp366sei7GibWY",
                 language: "en",
               }}
-              styles={{
-                container: style.autocompleteContainer,
-                textInput: style.searchInput,
-                listView: style.listView,
-                row: style.row,
-                description: style.description,
-                separator: style.separator,
-              }}
+              // styles={{
+              //   container: style.autocompleteContainer,
+              //   textInput: style.searchInput,
+              //   listView: style.listView,
+              //   row: style.row,
+              //   description: style.description,
+              //   separator: style.separator,
+              // }}
             />
-          </View>
+          </View> */}
 
           <View style={style.mapContainer}>
             <MapView
@@ -176,12 +172,12 @@ const AddAddressBottomSheet = ({
               )}
             </MapView>
             <View style={style.buttonContainer}>
-              {/* <Button
+              <Button
                 variant="secondary"
                 size="small"
                 title="+ Manually"
                 onPress={() => setAddManually(true)}
-              /> */}
+              />
               <Button
                 variant="secondary"
                 size="small"
@@ -216,115 +212,91 @@ const AddAddressBottomSheet = ({
                 onPress={() => setAddManually(false)}
               />
             </View>
-            <Text style={style.label}>Full Name</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={style.input}
-                placeholder="Enter your full name"
-                value={deliveryDetails.fullName}
-                onChangeText={(text) =>
-                  setDeliveryDetails({ ...deliveryDetails, fullName: text })
-                }
-              />
-            </View>
-            <Text style={style.label}>Area</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={style.input}
-                placeholder="Enter your area"
-                keyboardType="phone-pad"
-                value={deliveryDetails.area}
-                onChangeText={(text) =>
-                  setDeliveryDetails({ ...deliveryDetails, area: text })
-                }
-              />
-            </View>
             <Text style={style.label}>Street</Text>
             <View style={style.inputContainer}>
               <TextInput
                 style={style.input}
                 placeholder="Enter your street"
-                value={deliveryDetails.streetAddress}
+                value={deliveryDetails.street}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, street: text })
+                }
+              />
+            </View>
+            <Text style={style.label}>Address</Text>
+            <View style={style.inputContainer}>
+              <TextInput
+                style={style.input}
+                placeholder="Enter your address"
+                keyboardType="phone-pad"
+                value={deliveryDetails.street2}
+                onChangeText={(text) =>
+                  setDeliveryDetails({ ...deliveryDetails, street2: text })
+                }
+              />
+            </View>
+            <Text style={style.label}>City</Text>
+            <View style={style.inputContainer}>
+              <TextInput
+                style={style.input}
+                placeholder="Enter your city"
+                value={deliveryDetails.city}
                 onChangeText={(text) =>
                   setDeliveryDetails({
                     ...deliveryDetails,
-                    streetAddress: text,
+                    city: text,
                   })
                 }
               />
             </View>
-            <Text style={style.label}>Apartment</Text>
+
+            <Text style={style.label}>Zip</Text>
             <View style={style.inputContainer}>
               <TextInput
                 style={style.input}
-                placeholder="Enter your apartment (optional)"
-                value={deliveryDetails.apartment}
+                placeholder="Enter your zip"
+                value={deliveryDetails.zip.toString()}
                 onChangeText={(text) =>
-                  setDeliveryDetails({ ...deliveryDetails, apartment: text })
+                  setDeliveryDetails({
+                    ...deliveryDetails,
+                    zip: Number(text),
+                  })
                 }
               />
             </View>
             <View style={style.row}>
-              <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                <Text style={style.label}>City</Text>
-                <View style={[style.inputContainer]}>
-                  <TextInput
-                    style={style.input}
-                    placeholder="Enter city"
-                    value={deliveryDetails.city}
-                    onChangeText={(text) =>
-                      setDeliveryDetails({ ...deliveryDetails, city: text })
-                    }
-                  />
-                </View>
-              </View>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>State</Text>
                 <View style={[style.inputContainer]}>
                   <TextInput
                     style={style.input}
                     placeholder="Enter state"
-                    keyboardType="number-pad"
-                    value={deliveryDetails.state}
+                    value={deliveryDetails.state_id}
                     onChangeText={(text) =>
-                      setDeliveryDetails({ ...deliveryDetails, state: text })
+                      setDeliveryDetails({ ...deliveryDetails, state_id: text })
                     }
                   />
                 </View>
               </View>
-            </View>
-            <View style={style.row}>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>Country</Text>
                 <View style={[style.inputContainer]}>
                   <TextInput
                     style={style.input}
                     placeholder="Enter country"
-                    value={deliveryDetails.country}
-                    onChangeText={(text) =>
-                      setDeliveryDetails({ ...deliveryDetails, country: text })
-                    }
-                  />
-                </View>
-              </View>
-              <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                <Text style={style.label}>Postal Code</Text>
-                <View style={[style.inputContainer]}>
-                  <TextInput
-                    style={style.input}
-                    placeholder="Enter postal code"
                     keyboardType="number-pad"
-                    value={deliveryDetails.postalCode}
+                    value={deliveryDetails.country_id}
                     onChangeText={(text) =>
                       setDeliveryDetails({
                         ...deliveryDetails,
-                        postalCode: text,
+                        country_id: text,
                       })
                     }
                   />
                 </View>
               </View>
             </View>
+
             <View style={style.row}>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>Longitude</Text>
@@ -369,13 +341,12 @@ const AddAddressBottomSheet = ({
             isLoading={isPending}
             disabled={
               isPending ||
-              !deliveryDetails.fullName ||
-              !deliveryDetails.area ||
-              !deliveryDetails.streetAddress ||
+              !deliveryDetails.street ||
+              !deliveryDetails.street2 ||
               !deliveryDetails.city ||
-              !deliveryDetails.state ||
-              !deliveryDetails.country ||
-              !deliveryDetails.postalCode ||
+              !deliveryDetails.state_id ||
+              !deliveryDetails.country_id ||
+              !deliveryDetails.zip ||
               !deliveryDetails.longitude ||
               !deliveryDetails.latitude
             }
@@ -463,8 +434,8 @@ const styles = (theme: "light" | "dark") =>
       justifyContent: "space-between",
       gap: 10,
       backgroundColor: Colors[theme].background_light,
-      paddingHorizontal: 15,
-      paddingVertical: 12,
+      // paddingHorizontal: 15,
+      // paddingVertical: 12,
     },
     description: {
       color: Colors[theme].text,

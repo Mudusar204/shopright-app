@@ -4,9 +4,8 @@ import {
   login,
   register,
   logout,
-  otpVerification,
-  resendOtp,
   getOdooUser,
+  addUserAddress,
 } from "@/services/auth.services";
 
 const useLogin = () => {
@@ -28,21 +27,14 @@ const useLogin = () => {
   });
 };
 
-const useOtpVerification = () => {
+const useAddUserAddress = () => {
   return useMutation({
     mutationFn: (payload: any) => {
-      return otpVerification(payload);
+      return addUserAddress(payload);
     },
   });
 };
 
-const useResendOtp = () => {
-  return useMutation({
-    mutationFn: (payload: any) => {
-      return resendOtp(payload);
-    },
-  });
-};
 const useLogout = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -61,4 +53,4 @@ const useLogout = () => {
   });
 };
 
-export { useLogin, useLogout, useOtpVerification, useResendOtp };
+export { useLogin, useLogout, useAddUserAddress };

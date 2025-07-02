@@ -28,24 +28,6 @@ export const createOrder = async (data: any) => {
         values: {
           partner_id: user?.partner_id,
           order_line: orderLine,
-          // [
-          //   [
-          //     0,
-          //     0,
-          //     {
-          //       product_id: 1,
-          //       product_uom_qty: 5,
-          //     },
-          //   ],
-          //   [
-          //     0,
-          //     0,
-          //     {
-          //       product_id: 1,
-          //       product_uom_qty: 3,
-          //     },
-          //   ],
-          // ],
         },
       },
       {
@@ -68,14 +50,58 @@ export const createOrder = async (data: any) => {
 };
 
 export const getMyOrders = async () => {
-  const response = await apiClient.get(API_ROUTES.ORDERS["GET_MY_ORDERS"]);
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  const user = useAuthStore.getState().odooUserAuth;
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(odooAdmin, "odooUserAuth");
+  try {
+    const response = await axios.get(
+      "http://69.62.120.81:8088/send_request?model=sale.order",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
 
-  return response.data;
+    // const response = await odooApiClient.get(`/send_request?model=res.users`);
+    console.log(response, "getMyOrders response");
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in getMyOrders");
+  }
 };
 
 export const getOrderById = async (orderId: number) => {
-  const response = await apiClient.get(
-    API_ROUTES.ORDERS.GET_ORDER_BY_ID(orderId)
-  );
-  return response.data;
+  const { odooAdmin } = useAuthStore();
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(odooAdmin, "odooUserAuth");
+  try {
+    const response = await axios.get(
+      `http://69.62.120.81:8088/send_request?model=sale.order&Id=${orderId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+
+    // const response = await odooApiClient.get(`/send_request?model=res.users`);
+    console.log(response, "getOrderById response");
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in getOrderById");
+  }
 };

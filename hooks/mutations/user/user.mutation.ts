@@ -20,13 +20,4 @@ const useRegister = () => {
   });
 };
 
-const useAddUserAddress = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: any) => {
-      return addUserAddress(payload);
-    },
-  });
-};
-
-export { useRegister, useAddUserAddress };
+export { useRegister };

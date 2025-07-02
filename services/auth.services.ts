@@ -84,19 +84,23 @@ export const register = async (data: any) => {
 
 export const addUserAddress = async (data: any) => {
   const odooAdmin = useAuthStore.getState().odooAdmin;
+  const user = useAuthStore.getState().odooUserAuth;
+
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
   console.log(odooAdmin, "odooAdmin in create user");
   try {
-    const response = await axios.post(
-      `http://69.62.120.81:8088/send_request?model=res.users`,
+    const response = await axios.put(
+      `http://69.62.120.81:8088/send_request?model=res.partner&Id=${user?.partner_id}`,
       {
-        fields: ["login", "name", "password"],
+        fields: ["type", "zip", "street", "city"],
         values: {
-          login: data.login,
-          name: data.name,
-          password: data.password,
+          type: "other",
+          zip: data.zip,
+          street: data.street,
+
+          city: data.city,
         },
       },
       {
@@ -111,10 +115,10 @@ export const addUserAddress = async (data: any) => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response, "getOdooUser response");
+    console.log(response, "add user address response");
     return response.data;
   } catch (error) {
-    console.log(error, "error in getOdooUser");
+    console.log(error, "error in addUserAddress");
   }
 };
 export const getUserAddresses = async () => {
