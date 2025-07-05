@@ -14,7 +14,7 @@ const Orders = () => {
   const styles = createStyles(colorScheme);
   const { data: myOrders, isLoading, isError, error } = useGetMyOrders();
   console.log(
-    myOrders,
+    myOrders?.records[0],
     "myOrders",
     isLoading,
     "isLoading",
@@ -53,20 +53,18 @@ const Orders = () => {
     >
       <View style={styles.orderHeader}>
         <View style={styles.orderInfo}>
-          <Text style={styles.orderId}>Order #{item.id}</Text>
+          <Text style={styles.orderId}>Order #{item?.id}</Text>
           <Text style={styles.orderDate}>
-            {format(new Date(item.createdAt), "MMM dd, yyyy")}
+            {format(new Date(item?.date_order), "MMM dd, yyyy hh:mm a")}
           </Text>
         </View>
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: getStatusColor(item.orderStatus) },
+            { backgroundColor: getStatusColor(item?.state) },
           ]}
         >
-          <Text style={styles.statusText}>
-            {item.orderStatus.toUpperCase()}
-          </Text>
+          <Text style={styles.statusText}>{item?.state.toUpperCase()}</Text>
         </View>
       </View>
 
@@ -77,7 +75,9 @@ const Orders = () => {
             size={20}
             color={Colors[colorScheme].text}
           />
-          <Text style={styles.detailText}>{item.itemsCount} items</Text>
+          <Text style={styles.detailText}>
+            {item?.order_line?.length} items
+          </Text>
         </View>
         <View style={styles.detailRow}>
           <Ionicons
@@ -85,7 +85,7 @@ const Orders = () => {
             size={20}
             color={Colors[colorScheme].text}
           />
-          <Text style={styles.detailText}>Rs. {item.totalAmount}</Text>
+          <Text style={styles.detailText}>Rs. {item?.amount_total}</Text>
         </View>
         <View style={styles.detailRow}>
           <Ionicons
@@ -94,7 +94,7 @@ const Orders = () => {
             color={Colors[colorScheme].text}
           />
           <Text style={styles.detailText} numberOfLines={1}>
-            {item.pickupAddress}
+            {item?.partner_shipping_id[1]}
           </Text>
         </View>
       </View>
@@ -168,9 +168,9 @@ const Orders = () => {
         <Header title="My Orders" />
       </View>
       <FlatList
-        data={myOrders}
+        data={myOrders?.records}
         renderItem={renderOrderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
@@ -209,9 +209,11 @@ const createStyles = (theme: "light" | "dark") =>
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: 10,
+      backgroundColor: "transparent",
     },
     orderInfo: {
       flex: 1,
+      backgroundColor: "transparent",
     },
     orderId: {
       fontSize: 16,
@@ -235,11 +237,13 @@ const createStyles = (theme: "light" | "dark") =>
     },
     orderDetails: {
       marginTop: 10,
+      backgroundColor: "transparent",
     },
     detailRow: {
       flexDirection: "row",
       alignItems: "center",
       marginBottom: 8,
+      backgroundColor: "transparent",
     },
     detailText: {
       marginLeft: 8,

@@ -58,7 +58,7 @@ export const getMyOrders = async () => {
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      "http://69.62.120.81:8088/send_request?model=sale.order",
+      `http://69.62.120.81:8088/send_request?model=sale.order&partner_id=${user?.partner_id}&fields=id,name,order_line,date_order,state,delivery_status,amount_paid,amount_total,partner_shipping_id`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -79,14 +79,15 @@ export const getMyOrders = async () => {
 };
 
 export const getOrderById = async (orderId: number) => {
-  const { odooAdmin } = useAuthStore();
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  console.log(orderId, "orderId in getOrderById");
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=sale.order&Id=${orderId}`,
+      `http://69.62.120.81:8088/send_request?model=sale.order&Id=${orderId}&fields=id,name,order_line,date_order,state,delivery_status,amount_paid,amount_total,partner_shipping_id`,
       {
         headers: {
           "Content-Type": "application/json",

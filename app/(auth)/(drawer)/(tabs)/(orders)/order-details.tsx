@@ -20,7 +20,13 @@ const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const { orderId } = useLocalSearchParams();
-  const { data: order, isLoading } = useGetOrderById(Number(orderId));
+  const {
+    data: order,
+    isLoading,
+    isError,
+    error,
+  } = useGetOrderById(Number(orderId));
+  console.log(order, "order in order-details", orderId, isError, error);
 
   if (isLoading) {
     return (
@@ -90,7 +96,7 @@ const OrderDetails = () => {
   ];
 
   const currentStatusIndex = statuses.findIndex(
-    (status) => status.id === order.orderStatus
+    (status) => status.id === order?.records[0]?.state
   );
 
   return (
@@ -98,7 +104,10 @@ const OrderDetails = () => {
       <View style={styles.headerContainer}>
         <Header title="Order Details" />
       </View>
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1, marginBottom: 80 }}
+      >
         {/* Status Timeline */}
         <View style={styles.timelineContainer}>
           {statuses.map((status, index) => {
@@ -111,10 +120,10 @@ const OrderDetails = () => {
                     styles.statusIcon,
                     {
                       backgroundColor: isCompleted
-                        ? getStatusColor(order.orderStatus)
+                        ? getStatusColor(order?.records[0]?.state)
                         : Colors[colorScheme].background_light,
                       borderColor: isCompleted
-                        ? getStatusColor(order.orderStatus)
+                        ? getStatusColor(order?.records[0]?.state)
                         : Colors[colorScheme].border,
                     },
                   ]}
@@ -130,7 +139,7 @@ const OrderDetails = () => {
                     styles.statusLabel,
                     {
                       color: isCurrent
-                        ? getStatusColor(order?.orderStatus)
+                        ? getStatusColor(order?.records[0]?.state)
                         : Colors[colorScheme].text,
                     },
                   ]}
@@ -143,7 +152,7 @@ const OrderDetails = () => {
                       styles.timelineLine,
                       {
                         backgroundColor: isCompleted
-                          ? getStatusColor(order?.orderStatus)
+                          ? getStatusColor(order?.records[0]?.state)
                           : Colors[colorScheme].border,
                       },
                     ]}
@@ -158,25 +167,40 @@ const OrderDetails = () => {
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Order ID</Text>
-            <Text style={styles.infoValue}>#{order.id}</Text>
+            <Text style={styles.infoValue}>#{order?.records[0]?.id}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Date</Text>
             <Text style={styles.infoValue}>
-              {format(new Date(order.createdAt), "MMM dd, yyyy")}
+              {format(
+                new Date(order?.records[0]?.date_order),
+                "MMM dd, yyyy hh:mm a"
+              )}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Rider</Text>
+            <Text style={styles.infoValue}>
+              {order?.records[0]?.rider_id?.name || "Not Assigned"}
             </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Items</Text>
-            <Text style={styles.infoValue}>{order?.itemsCount} items</Text>
+            <Text style={styles.infoValue}>
+              {order?.records[0]?.order_line?.length} items
+            </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Total Amount</Text>
-            <Text style={styles.infoValue}>Rs. {order?.totalAmount}</Text>
+            <Text style={styles.infoValue}>
+              Rs. {order?.records[0]?.amount_total}
+            </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Payment Method</Text>
-            <Text style={styles.infoValue}>{order?.paymentMethod}</Text>
+            <Text style={styles.infoValue}>
+              {order?.records[0]?.payment_method}
+            </Text>
           </View>
         </View>
 
@@ -187,16 +211,24 @@ const OrderDetails = () => {
             <MapView
               style={styles.map}
               initialRegion={{
-                latitude: order?.pickupLocation?.latitude || 23.723081,
-                longitude: order?.pickupLocation?.longitude || 90.4087,
+                latitude:
+                  order?.records[0]?.partner_shipping_id[1]?.latitude ||
+                  23.723081,
+                longitude:
+                  order?.records[0]?.partner_shipping_id[1]?.longitude ||
+                  90.4087,
                 latitudeDelta: 0.1,
                 longitudeDelta: 0.1,
               }}
             >
               <Marker
                 coordinate={{
-                  latitude: order?.pickupLocation?.latitude || 23.723081,
-                  longitude: order?.pickupLocation?.longitude || 90.4087,
+                  latitude:
+                    order?.records[0]?.partner_shipping_id[1]?.latitude ||
+                    23.723081,
+                  longitude:
+                    order?.records[0]?.partner_shipping_id[1]?.longitude ||
+                    90.4087,
                 }}
               >
                 <View style={styles.markerContainer}>
@@ -206,18 +238,20 @@ const OrderDetails = () => {
                   <View style={styles.calloutContainer}>
                     <Text style={styles.calloutTitle}>Pickup Location</Text>
                     <Text style={styles.calloutText}>
-                      {order?.pickupAddress}
+                      {order?.records[0]?.partner_shipping_id[1]?.address}
                     </Text>
                   </View>
                 </Callout>
               </Marker>
             </MapView>
           </View>
-          <Text style={styles.addressText}>{order?.pickupAddress}</Text>
+          <Text style={styles.addressText}>
+            {order?.records[0]?.partner_shipping_id[1]?.address}
+          </Text>
         </View>
 
         {/* Action Buttons */}
-        {order.orderStatus === "pending" && (
+        {order?.records[0]?.state === "draft" && (
           <View style={styles.actionButtons}>
             <Pressable
               style={[styles.button, styles.cancelButton]}
@@ -227,14 +261,14 @@ const OrderDetails = () => {
             >
               <Text style={styles.buttonText}>Cancel Order</Text>
             </Pressable>
-            <Pressable
+            {/* <Pressable
               style={[styles.button, styles.supportButton]}
               onPress={() => {
                 // Handle contact support
               }}
             >
               <Text style={styles.buttonText}>Contact Support</Text>
-            </Pressable>
+            </Pressable> */}
           </View>
         )}
       </ScrollView>
@@ -271,6 +305,7 @@ const createStyles = (theme: "light" | "dark") =>
       flexDirection: "row",
       alignItems: "center",
       marginBottom: 20,
+      backgroundColor: "transparent",
     },
     statusIcon: {
       width: 40,
@@ -302,6 +337,7 @@ const createStyles = (theme: "light" | "dark") =>
       flexDirection: "row",
       justifyContent: "space-between",
       marginBottom: 10,
+      backgroundColor: "transparent",
     },
     infoLabel: {
       color: Colors[theme].text_secondary,
