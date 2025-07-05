@@ -24,9 +24,10 @@ export const createOrder = async (data: any) => {
     const response = await axios.post(
       `http://69.62.120.81:8088/send_request?model=sale.order`,
       {
-        fields: ["partner_id", "order_line"],
+        fields: ["partner_id", "state", "order_line"],
         values: {
           partner_id: user?.partner_id,
+          state: "sale",
           order_line: orderLine,
         },
       },

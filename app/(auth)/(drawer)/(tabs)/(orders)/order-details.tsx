@@ -15,6 +15,8 @@ import { format } from "date-fns";
 import MapView, { Marker, Callout } from "react-native-maps";
 import LocationMarker from "@/assets/images/svgs/LocationMarker";
 import Header from "@/components/Header";
+import useRealTimeRider from "@/customHooks/riders/useRealTimeRider";
+import RiderTrackingMap from "@/components/RiderTrackingMap";
 
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -27,6 +29,15 @@ const OrderDetails = () => {
     error,
   } = useGetOrderById(Number(orderId));
   console.log(order, "order in order-details", orderId, isError, error);
+
+  // Real-time rider tracking
+  const riderId = order?.records[0]?.rider_id?.[0];
+  const { riderLocation, socketConnected, isTracking } = useRealTimeRider({
+    riderId,
+    onLocationUpdate: (location) => {
+      console.log("Rider location updated:", location);
+    },
+  });
 
   if (isLoading) {
     return (
@@ -204,51 +215,71 @@ const OrderDetails = () => {
           </View>
         </View>
 
-        {/* Delivery Location */}
-        <View style={styles.mapContainer}>
-          <Text style={styles.sectionTitle}>Delivery Location</Text>
-          <View style={styles.mapWrapper}>
-            <MapView
-              style={styles.map}
-              initialRegion={{
+        {/* Real-time Rider Tracking */}
+        {order?.records[0] && (
+          <View style={styles.mapContainer}>
+            <Text style={styles.sectionTitle}>Delivery and Rider Location</Text>
+            <View style={styles.riderInfoContainer}>
+              <View style={styles.riderInfo}>
+                <Ionicons
+                  name="bicycle"
+                  size={20}
+                  color={Colors[colorScheme].primary_color}
+                />
+                <Text style={styles.riderName}>
+                  {order?.records[0]?.rider_id?.name || "Rider"}
+                </Text>
+                <View
+                  style={[
+                    styles.trackingStatus,
+                    {
+                      backgroundColor: socketConnected
+                        ? Colors[colorScheme].success
+                        : Colors[colorScheme].error,
+                    },
+                  ]}
+                >
+                  <Text style={styles.trackingStatusText}>
+                    {socketConnected ? "Live" : "Offline"}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <RiderTrackingMap
+              riderLocation={
+                riderLocation
+                  ? {
+                      latitude: riderLocation.latitude,
+                      longitude: riderLocation.longitude,
+                    }
+                  : null
+              }
+              deliveryLocation={{
                 latitude:
                   order?.records[0]?.partner_shipping_id[1]?.latitude ||
                   23.723081,
                 longitude:
                   order?.records[0]?.partner_shipping_id[1]?.longitude ||
                   90.4087,
-                latitudeDelta: 0.1,
-                longitudeDelta: 0.1,
               }}
-            >
-              <Marker
-                coordinate={{
-                  latitude:
-                    order?.records[0]?.partner_shipping_id[1]?.latitude ||
-                    23.723081,
-                  longitude:
-                    order?.records[0]?.partner_shipping_id[1]?.longitude ||
-                    90.4087,
-                }}
-              >
-                <View style={styles.markerContainer}>
-                  <LocationMarker color={Colors[colorScheme].text_secondary} />
-                </View>
-                <Callout tooltip>
-                  <View style={styles.calloutContainer}>
-                    <Text style={styles.calloutTitle}>Pickup Location</Text>
-                    <Text style={styles.calloutText}>
-                      {order?.records[0]?.partner_shipping_id[1]?.address}
-                    </Text>
-                  </View>
-                </Callout>
-              </Marker>
-            </MapView>
+              riderName={order?.records[0]?.rider_id?.name || "Rider"}
+              isConnected={socketConnected}
+              height={250}
+            />
+            {!socketConnected && (
+              <View style={styles.offlineMessage}>
+                <Ionicons
+                  name="wifi-outline"
+                  size={16}
+                  color={Colors[colorScheme].text_secondary}
+                />
+                <Text style={styles.offlineMessageText}>
+                  Rider tracking is currently offline
+                </Text>
+              </View>
+            )}
           </View>
-          <Text style={styles.addressText}>
-            {order?.records[0]?.partner_shipping_id[1]?.address}
-          </Text>
-        </View>
+        )}
 
         {/* Action Buttons */}
         {order?.records[0]?.state === "draft" && (
@@ -418,6 +449,44 @@ const createStyles = (theme: "light" | "dark") =>
       color: "white",
       fontSize: 14,
       fontWeight: "600",
+    },
+    riderInfoContainer: {
+      marginBottom: 10,
+      backgroundColor: "transparent",
+    },
+    riderInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "transparent",
+    },
+    riderName: {
+      marginLeft: 8,
+      fontSize: 16,
+      fontWeight: "600",
+      color: Colors[theme].text,
+      flex: 1,
+    },
+    trackingStatus: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    trackingStatusText: {
+      color: "white",
+      fontSize: 12,
+      fontWeight: "600",
+    },
+    offlineMessage: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 10,
+      backgroundColor: "transparent",
+    },
+    offlineMessageText: {
+      marginLeft: 6,
+      fontSize: 12,
+      color: Colors[theme].text_secondary,
     },
   });
 
