@@ -4,6 +4,7 @@ import {
   Pressable,
   ActivityIndicator,
   ScrollView,
+  Image,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -31,7 +32,7 @@ const OrderDetails = () => {
   console.log(order, "order in order-details", orderId, isError, error);
 
   // Real-time rider tracking
-  const riderId = order?.records[0]?.rider_id?.[0];
+  const riderId = order?.records[0]?.app_rider_id;
   const { riderLocation, socketConnected, isTracking } = useRealTimeRider({
     riderId,
     onLocationUpdate: (location) => {
@@ -66,17 +67,15 @@ const OrderDetails = () => {
     switch (status) {
       case "pending":
         return Colors[colorScheme].warning;
-      case "accepted":
-        return Colors[colorScheme].info;
-      case "in_transit":
+      case "started":
         return Colors[colorScheme].primary_color;
-      case "delivered":
+      case "full":
         return Colors[colorScheme].success;
       case "cancelled":
       case "failed":
         return Colors[colorScheme].error;
       default:
-        return Colors[colorScheme].text;
+        return Colors[colorScheme].warning;
     }
   };
 
@@ -84,11 +83,11 @@ const OrderDetails = () => {
     switch (status) {
       case "pending":
         return "time-outline";
-      case "accepted":
+      case "started":
         return "checkmark-circle-outline";
-      case "in_transit":
+      case "full":
         return "car-outline";
-      case "delivered":
+      case "cancelled":
         return "checkmark-done-circle-outline";
       case "cancelled":
         return "close-circle-outline";
@@ -101,9 +100,10 @@ const OrderDetails = () => {
 
   const statuses = [
     { id: "pending", label: "Order Placed" },
-    { id: "accepted", label: "Order Accepted" },
-    { id: "in_transit", label: "In Transit" },
-    { id: "delivered", label: "Delivered" },
+    { id: "started", label: "In Transit" },
+    { id: "full", label: "Delivered" },
+    { id: "cancelled", label: "Cancelled" },
+    // { id: "failed", label: "Failed" },
   ];
 
   const currentStatusIndex = statuses.findIndex(
@@ -121,6 +121,7 @@ const OrderDetails = () => {
       >
         {/* Status Timeline */}
         <View style={styles.timelineContainer}>
+          <Text style={styles.sectionTitle}>Order Status</Text>
           {statuses.map((status, index) => {
             const isCompleted = index <= currentStatusIndex;
             const isCurrent = index === currentStatusIndex;
@@ -131,10 +132,10 @@ const OrderDetails = () => {
                     styles.statusIcon,
                     {
                       backgroundColor: isCompleted
-                        ? getStatusColor(order?.records[0]?.state)
+                        ? getStatusColor(order?.delivery_status)
                         : Colors[colorScheme].background_light,
                       borderColor: isCompleted
-                        ? getStatusColor(order?.records[0]?.state)
+                        ? getStatusColor(order?.delivery_status)
                         : Colors[colorScheme].border,
                     },
                   ]}
@@ -150,7 +151,7 @@ const OrderDetails = () => {
                     styles.statusLabel,
                     {
                       color: isCurrent
-                        ? getStatusColor(order?.records[0]?.state)
+                        ? getStatusColor(order?.delivery_status)
                         : Colors[colorScheme].text,
                     },
                   ]}
@@ -163,7 +164,7 @@ const OrderDetails = () => {
                       styles.timelineLine,
                       {
                         backgroundColor: isCompleted
-                          ? getStatusColor(order?.records[0]?.state)
+                          ? getStatusColor(order?.records[0]?.delivery_status)
                           : Colors[colorScheme].border,
                       },
                     ]}
@@ -176,9 +177,14 @@ const OrderDetails = () => {
 
         {/* Order Information */}
         <View style={styles.infoContainer}>
+          <Text style={styles.sectionTitle}>Order Information</Text>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Order ID</Text>
             <Text style={styles.infoValue}>#{order?.records[0]?.id}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Order Name</Text>
+            <Text style={styles.infoValue}>{order?.records[0]?.name}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Date</Text>
@@ -192,7 +198,7 @@ const OrderDetails = () => {
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Rider</Text>
             <Text style={styles.infoValue}>
-              {order?.records[0]?.rider_id?.name || "Not Assigned"}
+              {order?.records[0]?.app_rider_id || "Not Assigned"}
             </Text>
           </View>
           <View style={styles.infoRow}>
@@ -208,15 +214,91 @@ const OrderDetails = () => {
             </Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Payment Method</Text>
+            <Text style={styles.infoLabel}>Amount Paid</Text>
             <Text style={styles.infoValue}>
-              {order?.records[0]?.payment_method}
+              Rs. {order?.records[0]?.amount_paid}
             </Text>
           </View>
         </View>
 
+        {/* Order Items */}
+        {order?.records[0]?.order_line &&
+          order?.records[0]?.order_line.length > 0 && (
+            <View style={styles.itemsContainer}>
+              <Text style={styles.sectionTitle}>Order Items</Text>
+              {order?.records[0]?.order_line.map((item: any, index: number) => (
+                <View key={item.id || index} style={styles.itemContainer}>
+                  <View style={styles.itemImageContainer}>
+                    {item?.product_image_url ? (
+                      <Image
+                        source={{ uri: item?.product_image_url }}
+                        style={styles.itemImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.itemImagePlaceholder}>
+                        <Ionicons
+                          name="image-outline"
+                          size={24}
+                          color={Colors[colorScheme].text_secondary}
+                        />
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName} numberOfLines={2}>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.itemPrice}>
+                      Rs. {item?.price_unit} x {item?.product_uom_qty}
+                    </Text>
+                    <Text style={styles.itemTotal}>
+                      Total: Rs. {item?.price_total}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
+        {/* Delivery Address */}
+        {order?.records[0]?.partner_shipping_id && (
+          <View style={styles.addressContainer}>
+            <Text style={styles.sectionTitle}>Delivery Address</Text>
+            <View style={styles.addressContent}>
+              <Ionicons
+                name="location-outline"
+                size={20}
+                color={Colors[colorScheme].primary_color}
+              />
+              <View style={styles.addressTextContainer}>
+                <Text style={styles.addressName}>
+                  {order?.records[0]?.partner_shipping_id?.name}
+                </Text>
+                <Text style={styles.addressText}>
+                  {order?.records[0]?.partner_shipping_id?.street}
+                </Text>
+                {order?.records[0]?.partner_shipping_id?.street2 && (
+                  <Text style={styles.addressText}>
+                    {order?.records[0]?.partner_shipping_id?.street2}
+                  </Text>
+                )}
+                <Text style={styles.addressText}>
+                  {order?.records[0]?.partner_shipping_id?.city},{" "}
+                  {order?.records[0]?.partner_shipping_id?.zip}
+                </Text>
+                {order?.records[0]?.partner_shipping_id?.country_id && (
+                  <Text style={styles.addressText}>
+                    {order?.records[0]?.partner_shipping_id?.country_id[1]}
+                  </Text>
+                )}
+              </View>
+            </View>
+          </View>
+        )}
+
         {/* Real-time Rider Tracking */}
-        {order?.records[0] && (
+        {order?.records[0]?.app_rider_id && (
           <View style={styles.mapContainer}>
             <Text style={styles.sectionTitle}>Delivery and Rider Location</Text>
             <View style={styles.riderInfoContainer}>
@@ -227,7 +309,7 @@ const OrderDetails = () => {
                   color={Colors[colorScheme].primary_color}
                 />
                 <Text style={styles.riderName}>
-                  {order?.records[0]?.rider_id?.name || "Rider"}
+                  {order?.records[0]?.app_rider_id || "Rider"}
                 </Text>
                 <View
                   style={[
@@ -249,20 +331,20 @@ const OrderDetails = () => {
               riderLocation={
                 riderLocation
                   ? {
-                      latitude: riderLocation.latitude,
-                      longitude: riderLocation.longitude,
+                      latitude: riderLocation?.latitude,
+                      longitude: riderLocation?.longitude,
                     }
                   : null
               }
               deliveryLocation={{
                 latitude:
-                  order?.records[0]?.partner_shipping_id[1]?.latitude ||
+                  order?.records[0]?.partner_shipping_id?.partner_latitude ||
                   23.723081,
                 longitude:
-                  order?.records[0]?.partner_shipping_id[1]?.longitude ||
+                  order?.records[0]?.partner_shipping_id?.partner_longitude ||
                   90.4087,
               }}
-              riderName={order?.records[0]?.rider_id?.name || "Rider"}
+              riderName={order?.records[0]?.app_rider_id || "Rider"}
               isConnected={socketConnected}
               height={250}
             />
@@ -379,6 +461,81 @@ const createStyles = (theme: "light" | "dark") =>
       fontSize: 14,
       fontWeight: "500",
     },
+    itemsContainer: {
+      backgroundColor: Colors[theme].background_light,
+      borderRadius: 10,
+      padding: 15,
+      margin: 15,
+    },
+    itemContainer: {
+      flexDirection: "row",
+      marginBottom: 15,
+      backgroundColor: "transparent",
+    },
+    itemImageContainer: {
+      width: 60,
+      height: 60,
+      borderRadius: 8,
+      overflow: "hidden",
+      marginRight: 12,
+    },
+    itemImage: {
+      width: "100%",
+      height: "100%",
+    },
+    itemImagePlaceholder: {
+      width: "100%",
+      height: "100%",
+      backgroundColor: Colors[theme].border,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    itemDetails: {
+      flex: 1,
+      backgroundColor: "transparent",
+    },
+    itemName: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: Colors[theme].text,
+      marginBottom: 4,
+    },
+    itemPrice: {
+      fontSize: 12,
+      color: Colors[theme].text_secondary,
+      marginBottom: 2,
+    },
+    itemTotal: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: Colors[theme].primary_color,
+    },
+    addressContainer: {
+      backgroundColor: Colors[theme].background_light,
+      borderRadius: 10,
+      padding: 15,
+      margin: 15,
+    },
+    addressContent: {
+      flexDirection: "row",
+      backgroundColor: "transparent",
+    },
+    addressTextContainer: {
+      flex: 1,
+      marginLeft: 10,
+      backgroundColor: "transparent",
+    },
+    addressName: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: Colors[theme].text,
+      marginBottom: 4,
+    },
+    addressText: {
+      fontSize: 12,
+      color: Colors[theme].text_secondary,
+      marginBottom: 2,
+    },
     mapContainer: {
       backgroundColor: Colors[theme].background_light,
       borderRadius: 10,
@@ -421,11 +578,6 @@ const createStyles = (theme: "light" | "dark") =>
       fontSize: 12,
       color: Colors[theme].text_secondary,
       textAlign: "center",
-    },
-    addressText: {
-      fontSize: 14,
-      color: Colors[theme].text_secondary,
-      marginTop: 5,
     },
     actionButtons: {
       flexDirection: "row",

@@ -48,7 +48,7 @@ The socket server should emit the following events:
 - `rider-location-update`: Emitted when rider location changes
   ```javascript
   {
-    riderId: "rider_id",
+    riderId: "app_rider_id",
     latitude: 23.723081,
     longitude: 90.4087,
     timestamp: "2024-01-01T12:00:00Z"
@@ -71,7 +71,7 @@ The real-time tracking is automatically integrated into the order details screen
 ```typescript
 // The hook is automatically used in OrderDetails component
 const { riderLocation, socketConnected, isTracking } = useRealTimeRider({
-  riderId: order?.records[0]?.rider_id?.id,
+  riderId: order?.records[0]?.app_rider_id?.id,
   onLocationUpdate: (location) => {
     console.log("Rider location updated:", location);
   },

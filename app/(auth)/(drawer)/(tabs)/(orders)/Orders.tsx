@@ -27,17 +27,16 @@ const Orders = () => {
     switch (status) {
       case "pending":
         return Colors[colorScheme].warning;
-      case "accepted":
-        return Colors[colorScheme].info;
-      case "in_transit":
+      case "started":
         return Colors[colorScheme].primary_color;
-      case "delivered":
+
+      case "full":
         return Colors[colorScheme].success;
       case "cancelled":
       case "failed":
         return Colors[colorScheme].error;
       default:
-        return Colors[colorScheme].text;
+        return Colors[colorScheme].warning;
     }
   };
 
@@ -61,10 +60,22 @@ const Orders = () => {
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: getStatusColor(item?.state) },
+            { backgroundColor: getStatusColor(item?.delivery_status) },
           ]}
         >
-          <Text style={styles.statusText}>{item?.state.toUpperCase()}</Text>
+          <Text style={styles.statusText}>
+            {item?.delivery_status === false
+              ? item?.state === "sale"
+                ? "Placed"
+                : "Pending"
+              : item?.delivery_status === "draft"
+              ? "Pending"
+              : item?.delivery_status === "started"
+              ? "In Transit"
+              : item?.delivery_status === "full"
+              ? "Delivered"
+              : "Cancelled"}
+          </Text>
         </View>
       </View>
 
@@ -99,7 +110,7 @@ const Orders = () => {
         </View>
       </View>
 
-      {item.orderStatus === "pending" && (
+      {item.delivery_status === false && (
         <Button
           variant="outline"
           size="small"

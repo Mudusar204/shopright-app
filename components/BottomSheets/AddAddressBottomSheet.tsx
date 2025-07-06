@@ -1,5 +1,12 @@
 import Colors from "@/constants/Colors";
-import React, { useState, useRef } from "react";
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  useReducer,
+  useEffect,
+} from "react";
 import {
   FlatList,
   StyleSheet,
@@ -13,13 +20,95 @@ import { Button, Text, TextInput, View } from "../Themed";
 import { useAddUserAddress } from "@/hooks/mutations/auth/auth.mutation";
 import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import MapView, { Callout, Marker } from "react-native-maps";
+import MapView, { Callout, Marker, Region } from "react-native-maps";
 import LocationMarker from "@/assets/images/svgs/LocationMarker";
 import BackHandler from "../BackHandler";
 import Header from "../Header";
 import Toast from "react-native-toast-message";
 import { useLocation } from "@/hooks/useLocation";
 import MyLocationIcon from "@/assets/images/svgs/MyLocation";
+
+// TypeScript interfaces for better type safety
+interface AddressDetails {
+  street: string;
+  street2: string;
+  city: string;
+  state_id: string;
+  country_id: string;
+  zip: number;
+  longitude: number;
+  latitude: number;
+}
+
+interface MapState {
+  region: Region;
+  isManualMode: boolean;
+}
+
+interface ValidationErrors {
+  [key: string]: string;
+}
+
+// Action types for useReducer
+type AddressAction =
+  | { type: "UPDATE_FIELD"; field: keyof AddressDetails; value: any }
+  | { type: "RESET_FORM" }
+  | { type: "SET_ADDRESS"; payload: Partial<AddressDetails> };
+
+type MapAction =
+  | { type: "UPDATE_REGION"; payload: Region }
+  | { type: "SET_MANUAL_MODE"; payload: boolean }
+  | { type: "RESET_MAP" };
+
+// Initial state constants
+const INITIAL_ADDRESS_DETAILS: AddressDetails = {
+  street: "",
+  street2: "",
+  city: "",
+  state_id: "",
+  country_id: "",
+  zip: 0,
+  longitude: 0,
+  latitude: 0,
+};
+
+const INITIAL_REGION: Region = {
+  latitude: 23.723081,
+  longitude: 90.4087,
+  latitudeDelta: 0.0922,
+  longitudeDelta: 0.0421,
+};
+
+// Reducer for address details
+const addressReducer = (
+  state: AddressDetails,
+  action: AddressAction
+): AddressDetails => {
+  switch (action.type) {
+    case "UPDATE_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET_FORM":
+      return INITIAL_ADDRESS_DETAILS;
+    case "SET_ADDRESS":
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+};
+
+// Reducer for map state
+const mapReducer = (state: MapState, action: MapAction): MapState => {
+  switch (action.type) {
+    case "UPDATE_REGION":
+      return { ...state, region: action.payload };
+    case "SET_MANUAL_MODE":
+      return { ...state, isManualMode: action.payload };
+    case "RESET_MAP":
+      return { ...state, region: INITIAL_REGION };
+    default:
+      return state;
+  }
+};
 
 const AddAddressBottomSheet = ({
   bottomSheetRef,
@@ -36,37 +125,142 @@ const AddAddressBottomSheet = ({
   const theme = useColorScheme() as "light" | "dark";
   const style = styles(theme);
   const mapRef = useRef<MapView>(null);
-  const [addManually, setAddManually] = useState(false);
-  const [region, setRegion] = useState({
-    latitude: 23.723081,
-    longitude: 90.4087,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+
+  // Use useReducer for complex state management
+  const [addressDetails, addressDispatch] = useReducer(
+    addressReducer,
+    INITIAL_ADDRESS_DETAILS
+  );
+  const [mapState, mapDispatch] = useReducer(mapReducer, {
+    region: INITIAL_REGION,
+    isManualMode: false,
   });
-  const [deliveryDetails, setDeliveryDetails] = useState({
-    street: "",
-    street2: "",
-    city: "",
-    state_id: "",
-    country_id: "",
-    zip: 0,
-    longitude: 0,
-    latitude: 0,
-  });
-  const handleAddAddress = () => {
-    addUserAddress(deliveryDetails, {
+
+  // Separate validation state with debouncing
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {}
+  );
+  const [isValidating, setIsValidating] = useState(false);
+
+  // Debounced validation effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (isValidating) {
+        validateForm();
+        setIsValidating(false);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [addressDetails, isValidating]);
+
+  // Memoized validation logic - only recalculate when addressDetails changes
+  const isFormValid = useMemo(() => {
+    const requiredFields: (keyof AddressDetails)[] = [
+      "street",
+      "street2",
+      "city",
+      "zip",
+      "longitude",
+      "latitude",
+    ];
+
+    return (
+      requiredFields.every(
+        (field) =>
+          addressDetails[field] &&
+          (typeof addressDetails[field] === "string"
+            ? addressDetails[field].toString().trim() !== ""
+            : addressDetails[field] !== 0)
+      ) &&
+      addressDetails.longitude !== 0 &&
+      addressDetails.latitude !== 0
+    );
+  }, [addressDetails]);
+
+  // Validation function - memoized to prevent recreation
+  const validateField = useCallback(
+    (field: keyof AddressDetails, value: any): string => {
+      switch (field) {
+        case "street":
+        case "street2":
+        case "city":
+          return value.trim() === ""
+            ? `${field.charAt(0).toUpperCase() + field.slice(1)} is required`
+            : "";
+        case "zip":
+          return value <= 0 ? "Valid zip code is required" : "";
+        case "longitude":
+        case "latitude":
+          return value === 0
+            ? `${field.charAt(0).toUpperCase() + field.slice(1)} is required`
+            : "";
+        default:
+          return "";
+      }
+    },
+    []
+  );
+
+  // Optimized field update - triggers validation debouncing
+  const updateAddressDetails = useCallback(
+    (field: keyof AddressDetails, value: any) => {
+      addressDispatch({ type: "UPDATE_FIELD", field, value });
+
+      // Clear validation error for this field immediately
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+
+      // Trigger debounced validation
+      setIsValidating(true);
+    },
+    []
+  );
+
+  // Optimized map state updates
+  const updateMapState = useCallback((action: MapAction) => {
+    mapDispatch(action);
+  }, []);
+
+  const resetForm = useCallback(() => {
+    addressDispatch({ type: "RESET_FORM" });
+    setValidationErrors({});
+    mapDispatch({ type: "RESET_MAP" });
+  }, []);
+
+  // Validate entire form - memoized to prevent recreation
+  const validateForm = useCallback((): boolean => {
+    const errors: ValidationErrors = {};
+
+    Object.keys(addressDetails).forEach((key) => {
+      const field = key as keyof AddressDetails;
+      const error = validateField(field, addressDetails[field]);
+      if (error) {
+        errors[field] = error;
+      }
+    });
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [addressDetails, validateField]);
+
+  // Improved address submission
+  const handleAddAddress = useCallback(() => {
+    if (!validateForm()) {
+      Toast.show({
+        type: "error",
+        text1: "Please fill in all required fields",
+      });
+      return;
+    }
+
+    addUserAddress(addressDetails, {
       onSuccess: () => {
         bottomSheetRef.current?.handleClose();
-        setDeliveryDetails({
-          street: "",
-          street2: "",
-          city: "",
-          state_id: "",
-          country_id: "",
-          zip: 0,
-          longitude: 0,
-          latitude: 0,
-        });
+        resetForm();
         Toast.show({
           type: "success",
           text1: "Address added successfully",
@@ -75,68 +269,92 @@ const AddAddressBottomSheet = ({
       onError: (error) => {
         Toast.show({
           type: "error",
-          text1: error.message,
+          text1: error.message || "Failed to add address",
         });
       },
     });
-  };
-  const handleLocationSelect = (data: any, details: any) => {
-    if (details) {
-      const { lat, lng } = details.geometry.location;
-      const newRegion = {
-        latitude: lat,
-        longitude: lng,
+  }, [addressDetails, validateForm, addUserAddress, bottomSheetRef, resetForm]);
+
+  // Improved location selection
+  const handleLocationSelect = useCallback(
+    (data: any, details: any) => {
+      if (details) {
+        const { lat, lng } = details.geometry.location;
+        const newRegion: Region = {
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        };
+
+        updateMapState({ type: "UPDATE_REGION", payload: newRegion });
+        mapRef.current?.animateToRegion(newRegion, 1000);
+
+        // Auto-fill address details if available
+        if (details.formatted_address) {
+          addressDispatch({
+            type: "SET_ADDRESS",
+            payload: {
+              street: details.formatted_address,
+              latitude: lat,
+              longitude: lng,
+            },
+          });
+        }
+      }
+    },
+    [updateMapState]
+  );
+
+  // Use current location handler
+  const handleUseCurrentLocation = useCallback(() => {
+    if (locationData.location) {
+      const newRegion: Region = {
+        latitude: locationData.location.coords.latitude,
+        longitude: locationData.location.coords.longitude,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       };
-      setRegion(newRegion);
+
+      updateMapState({ type: "UPDATE_REGION", payload: newRegion });
       mapRef.current?.animateToRegion(newRegion, 1000);
+
+      // Auto-fill with current location data
+      addressDispatch({
+        type: "SET_ADDRESS",
+        payload: {
+          latitude: locationData.location.coords.latitude,
+          longitude: locationData.location.coords.longitude,
+          street: locationData.address?.street || "",
+          city: locationData.address?.city || "",
+        },
+      });
     }
-  };
+  }, [locationData, updateMapState]);
+
+  // Toggle manual mode
+  const toggleManualMode = useCallback(
+    (isManual: boolean) => {
+      updateMapState({ type: "SET_MANUAL_MODE", payload: isManual });
+      if (!isManual) {
+        resetForm();
+      }
+    },
+    [updateMapState, resetForm]
+  );
 
   return (
     <BottomModal ref={bottomSheetRef} scrollable={false} snapPoints={["100%"]}>
-      {!addManually ? (
+      {!mapState.isManualMode ? (
         <View style={style.container}>
-          {/* <View style={style.searchContainer}>
-            <GooglePlacesAutocomplete
-              placeholder="Search location"
-              onPress={handleLocationSelect}
-              enablePoweredByContainer={false}
-              fetchDetails={false}
-              keyboardShouldPersistTaps="handled"
-              minLength={2}
-              debounce={300}
-              onFail={(error) =>
-                console.log("GooglePlacesAutocomplete failed:", error)
-              }
-              onNotFound={() =>
-                console.log("GooglePlacesAutocomplete not found")
-              }
-              query={{
-                key: "AIzaSyAsQaw80JUEAI_a82j_1bp366sei7GibWY",
-                language: "en",
-              }}
-              // styles={{
-              //   container: style.autocompleteContainer,
-              //   textInput: style.searchInput,
-              //   listView: style.listView,
-              //   row: style.row,
-              //   description: style.description,
-              //   separator: style.separator,
-              // }}
-            />
-          </View> */}
-
           <View style={style.mapContainer}>
             <MapView
               ref={mapRef}
               style={{ flex: 1 }}
-              initialRegion={region}
+              initialRegion={mapState.region}
               showsUserLocation={true}
               showsMyLocationButton={false}
             >
-              {/* Rider's current location marker */}
               {locationData.location && (
                 <Marker
                   coordinate={{
@@ -176,13 +394,13 @@ const AddAddressBottomSheet = ({
                 variant="secondary"
                 size="small"
                 title="+ Manually"
-                onPress={() => setAddManually(true)}
+                onPress={() => toggleManualMode(true)}
               />
               <Button
                 variant="secondary"
                 size="small"
                 title="Use Current Location"
-                onPress={() => bottomSheetRef.current?.handleBottomSheet()}
+                onPress={handleUseCurrentLocation}
               />
             </View>
             <Button
@@ -209,126 +427,165 @@ const AddAddressBottomSheet = ({
                 variant="primary"
                 size="small"
                 title="Search"
-                onPress={() => setAddManually(false)}
-              />
-            </View>
-            <Text style={style.label}>Street</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={style.input}
-                placeholder="Enter your street"
-                value={deliveryDetails.street}
-                onChangeText={(text) =>
-                  setDeliveryDetails({ ...deliveryDetails, street: text })
-                }
-              />
-            </View>
-            <Text style={style.label}>Address</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={style.input}
-                placeholder="Enter your address"
-                keyboardType="phone-pad"
-                value={deliveryDetails.street2}
-                onChangeText={(text) =>
-                  setDeliveryDetails({ ...deliveryDetails, street2: text })
-                }
-              />
-            </View>
-            <Text style={style.label}>City</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={style.input}
-                placeholder="Enter your city"
-                value={deliveryDetails.city}
-                onChangeText={(text) =>
-                  setDeliveryDetails({
-                    ...deliveryDetails,
-                    city: text,
-                  })
-                }
+                onPress={() => toggleManualMode(false)}
               />
             </View>
 
+            {/* Street Input */}
+            <Text style={style.label}>Street</Text>
+            <View style={style.inputContainer}>
+              <TextInput
+                style={[
+                  style.input,
+                  validationErrors.street && style.inputError,
+                ]}
+                placeholder="Enter your street"
+                value={addressDetails.street}
+                onChangeText={(text) => updateAddressDetails("street", text)}
+              />
+              {validationErrors.street && (
+                <Text style={style.errorText}>{validationErrors.street}</Text>
+              )}
+            </View>
+
+            {/* Address Input */}
+            <Text style={style.label}>Address</Text>
+            <View style={style.inputContainer}>
+              <TextInput
+                style={[
+                  style.input,
+                  validationErrors.street2 && style.inputError,
+                ]}
+                placeholder="Enter your address"
+                value={addressDetails.street2}
+                onChangeText={(text) => updateAddressDetails("street2", text)}
+              />
+              {validationErrors.street2 && (
+                <Text style={style.errorText}>{validationErrors.street2}</Text>
+              )}
+            </View>
+
+            {/* City Input */}
+            <Text style={style.label}>City</Text>
+            <View style={style.inputContainer}>
+              <TextInput
+                style={[style.input, validationErrors.city && style.inputError]}
+                placeholder="Enter your city"
+                value={addressDetails.city}
+                onChangeText={(text) => updateAddressDetails("city", text)}
+              />
+              {validationErrors.city && (
+                <Text style={style.errorText}>{validationErrors.city}</Text>
+              )}
+            </View>
+
+            {/* Zip Input */}
             <Text style={style.label}>Zip</Text>
             <View style={style.inputContainer}>
               <TextInput
-                style={style.input}
+                style={[style.input, validationErrors.zip && style.inputError]}
                 placeholder="Enter your zip"
-                value={deliveryDetails.zip.toString()}
+                keyboardType="numeric"
+                value={addressDetails.zip.toString()}
                 onChangeText={(text) =>
-                  setDeliveryDetails({
-                    ...deliveryDetails,
-                    zip: Number(text),
-                  })
+                  updateAddressDetails("zip", Number(text) || 0)
                 }
               />
+              {validationErrors.zip && (
+                <Text style={style.errorText}>{validationErrors.zip}</Text>
+              )}
             </View>
+
+            {/* State and Country Row */}
             <View style={style.row}>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>State</Text>
                 <View style={[style.inputContainer]}>
                   <TextInput
-                    style={style.input}
+                    style={[
+                      style.input,
+                      validationErrors.state_id && style.inputError,
+                    ]}
                     placeholder="Enter state"
-                    value={deliveryDetails.state_id}
+                    value={addressDetails.state_id}
                     onChangeText={(text) =>
-                      setDeliveryDetails({ ...deliveryDetails, state_id: text })
+                      updateAddressDetails("state_id", text)
                     }
                   />
+                  {validationErrors.state_id && (
+                    <Text style={style.errorText}>
+                      {validationErrors.state_id}
+                    </Text>
+                  )}
                 </View>
               </View>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>Country</Text>
                 <View style={[style.inputContainer]}>
                   <TextInput
-                    style={style.input}
+                    style={[
+                      style.input,
+                      validationErrors.country_id && style.inputError,
+                    ]}
                     placeholder="Enter country"
-                    keyboardType="number-pad"
-                    value={deliveryDetails.country_id}
+                    value={addressDetails.country_id}
                     onChangeText={(text) =>
-                      setDeliveryDetails({
-                        ...deliveryDetails,
-                        country_id: text,
-                      })
+                      updateAddressDetails("country_id", text)
                     }
                   />
+                  {validationErrors.country_id && (
+                    <Text style={style.errorText}>
+                      {validationErrors.country_id}
+                    </Text>
+                  )}
                 </View>
               </View>
             </View>
 
+            {/* Longitude and Latitude Row */}
             <View style={style.row}>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>Longitude</Text>
                 <View style={[style.inputContainer]}>
                   <TextInput
-                    style={style.input}
+                    style={[
+                      style.input,
+                      validationErrors.longitude && style.inputError,
+                    ]}
                     placeholder="Enter longitude"
-                    value={deliveryDetails.longitude.toString()}
+                    keyboardType="numeric"
+                    value={addressDetails.longitude.toString()}
                     onChangeText={(text) =>
-                      setDeliveryDetails({
-                        ...deliveryDetails,
-                        longitude: Number(text),
-                      })
+                      updateAddressDetails("longitude", Number(text) || 0)
                     }
                   />
+                  {validationErrors.longitude && (
+                    <Text style={style.errorText}>
+                      {validationErrors.longitude}
+                    </Text>
+                  )}
                 </View>
               </View>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>Latitude</Text>
                 <View style={[style.inputContainer]}>
                   <TextInput
-                    style={style.input}
+                    style={[
+                      style.input,
+                      validationErrors.latitude && style.inputError,
+                    ]}
                     placeholder="Enter latitude"
-                    keyboardType="number-pad"
-                    value={deliveryDetails.latitude.toString()}
+                    keyboardType="numeric"
+                    value={addressDetails.latitude.toString()}
                     onChangeText={(text) =>
-                      setDeliveryDetails({
-                        ...deliveryDetails,
-                        latitude: Number(text),
-                      })
+                      updateAddressDetails("latitude", Number(text) || 0)
                     }
                   />
+                  {validationErrors.latitude && (
+                    <Text style={style.errorText}>
+                      {validationErrors.latitude}
+                    </Text>
+                  )}
                 </View>
               </View>
             </View>
@@ -339,17 +596,7 @@ const AddAddressBottomSheet = ({
             title="Confirm Location"
             onPress={handleAddAddress}
             isLoading={isPending}
-            disabled={
-              isPending ||
-              !deliveryDetails.street ||
-              !deliveryDetails.street2 ||
-              !deliveryDetails.city ||
-              !deliveryDetails.state_id ||
-              !deliveryDetails.country_id ||
-              !deliveryDetails.zip ||
-              !deliveryDetails.longitude ||
-              !deliveryDetails.latitude
-            }
+            disabled={isPending || !isFormValid}
             style={style.confirmButton}
           />
         </ScrollView>
@@ -375,7 +622,6 @@ const styles = (theme: "light" | "dark") =>
       zIndex: 1000,
       backgroundColor: "transparent",
     },
-
     buttonContainer: {
       paddingHorizontal: 15,
       justifyContent: "flex-end",
@@ -387,7 +633,6 @@ const styles = (theme: "light" | "dark") =>
       alignSelf: "center",
       backgroundColor: "transparent",
     },
-
     confirmButton: {
       width: "92%",
       position: "absolute",
@@ -434,8 +679,6 @@ const styles = (theme: "light" | "dark") =>
       justifyContent: "space-between",
       gap: 10,
       backgroundColor: Colors[theme].background_light,
-      // paddingHorizontal: 15,
-      // paddingVertical: 12,
     },
     description: {
       color: Colors[theme].text,
@@ -455,7 +698,6 @@ const styles = (theme: "light" | "dark") =>
     },
     section: {
       height: Dimensions.get("window").height * 0.81,
-      // flex: 1,
       backgroundColor: Colors[theme].background_light,
       borderRadius: 10,
       padding: 15,
@@ -483,6 +725,14 @@ const styles = (theme: "light" | "dark") =>
       borderWidth: 1,
       borderColor: Colors[theme].border,
       color: Colors[theme].text,
+    },
+    inputError: {
+      borderColor: Colors[theme].error || "#ff0000",
+    },
+    errorText: {
+      color: Colors[theme].error || "#ff0000",
+      fontSize: 12,
+      marginTop: 4,
     },
     calloutContainer: {
       width: 200,
