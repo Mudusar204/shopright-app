@@ -13,7 +13,13 @@ import { OrderStatus } from "@/constants/enums";
 const Orders = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const { data: myOrders, isLoading, isError, error } = useGetMyOrders();
+  const {
+    data: myOrders,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetMyOrders();
   console.log(
     myOrders?.records[0],
     "myOrders",
@@ -204,6 +210,10 @@ const Orders = () => {
         keyExtractor={(item) => item?.id?.toString()}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        refreshing={isLoading}
+        onRefresh={() => {
+          refetch();
+        }}
       />
     </View>
   );
