@@ -3,7 +3,7 @@ import { API_ROUTES } from "@/constants/api.routes";
 import { useAuthStore } from "@/store/auth.store";
 import axios from "axios";
 export const getCategories = async () => {
-  const { odooAdmin } = useAuthStore();
+  const { odooAdmin } = useAuthStore.getState();
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }

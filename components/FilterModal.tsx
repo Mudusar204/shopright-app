@@ -75,6 +75,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
     isLoading: categoriesLoading,
     isError: categoriesError,
   } = useGetCategories();
+  console.log(categories?.records?.length, "categories");
 
   // Memoize categories data to prevent unnecessary re-renders
   const categoriesData = useMemo(() => {
