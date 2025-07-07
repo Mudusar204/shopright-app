@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import { useGetMyOrders } from "@/hooks/queries/orders/orders.query";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
+import { OrderStatus } from "@/constants/enums";
 
 const Orders = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -25,15 +26,22 @@ const Orders = () => {
   );
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
+      case OrderStatus.Pending:
         return Colors[colorScheme].warning;
-      case "started":
+      case OrderStatus.Confirmed:
         return Colors[colorScheme].primary_color;
 
-      case "full":
+      case OrderStatus.Processing:
+        return Colors[colorScheme].primary_color;
+      case OrderStatus.PickedUp:
+        return Colors[colorScheme].primary_color;
+      case OrderStatus.InTransit:
+        return Colors[colorScheme].primary_color;
+      case OrderStatus.Delivered:
         return Colors[colorScheme].success;
-      case "cancelled":
-      case "failed":
+      case OrderStatus.Cancelled:
+        return Colors[colorScheme].error;
+      case OrderStatus.FailedDelivery:
         return Colors[colorScheme].error;
       default:
         return Colors[colorScheme].warning;
@@ -64,17 +72,23 @@ const Orders = () => {
           ]}
         >
           <Text style={styles.statusText}>
-            {item?.delivery_status === false
-              ? item?.state === "sale"
-                ? "Placed"
-                : "Pending"
-              : item?.delivery_status === "draft"
+            {item?.delivery_status === OrderStatus.Pending
               ? "Pending"
-              : item?.delivery_status === "started"
+              : item?.delivery_status === OrderStatus.Confirmed
+              ? "Confirmed"
+              : item?.delivery_status === OrderStatus.Processing
+              ? "Processing"
+              : item?.delivery_status === OrderStatus.PickedUp
+              ? "Picked Up"
+              : item?.delivery_status === OrderStatus.InTransit
               ? "In Transit"
-              : item?.delivery_status === "full"
+              : item?.delivery_status === OrderStatus.Delivered
               ? "Delivered"
-              : "Cancelled"}
+              : item?.delivery_status === OrderStatus.Cancelled
+              ? "Cancelled"
+              : item?.delivery_status === OrderStatus.Refunded
+              ? "Refunded"
+              : "Pending"}
           </Text>
         </View>
       </View>

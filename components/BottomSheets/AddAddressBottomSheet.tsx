@@ -545,28 +545,6 @@ const AddAddressBottomSheet = ({
             {/* Longitude and Latitude Row */}
             <View style={style.row}>
               <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                <Text style={style.label}>Longitude</Text>
-                <View style={[style.inputContainer]}>
-                  <TextInput
-                    style={[
-                      style.input,
-                      validationErrors.longitude && style.inputError,
-                    ]}
-                    placeholder="Enter longitude"
-                    keyboardType="numeric"
-                    value={addressDetails.longitude.toString()}
-                    onChangeText={(text) =>
-                      updateAddressDetails("longitude", Number(text) || 0)
-                    }
-                  />
-                  {validationErrors.longitude && (
-                    <Text style={style.errorText}>
-                      {validationErrors.longitude}
-                    </Text>
-                  )}
-                </View>
-              </View>
-              <View style={{ flex: 1, backgroundColor: "transparent" }}>
                 <Text style={style.label}>Latitude</Text>
                 <View style={[style.inputContainer]}>
                   <TextInput
@@ -584,6 +562,28 @@ const AddAddressBottomSheet = ({
                   {validationErrors.latitude && (
                     <Text style={style.errorText}>
                       {validationErrors.latitude}
+                    </Text>
+                  )}
+                </View>
+              </View>
+              <View style={{ flex: 1, backgroundColor: "transparent" }}>
+                <Text style={style.label}>Longitude</Text>
+                <View style={[style.inputContainer]}>
+                  <TextInput
+                    style={[
+                      style.input,
+                      validationErrors.longitude && style.inputError,
+                    ]}
+                    placeholder="Enter longitude"
+                    keyboardType="numeric"
+                    value={addressDetails.longitude.toString()}
+                    onChangeText={(text) =>
+                      updateAddressDetails("longitude", Number(text) || 0)
+                    }
+                  />
+                  {validationErrors.longitude && (
+                    <Text style={style.errorText}>
+                      {validationErrors.longitude}
                     </Text>
                   )}
                 </View>
