@@ -68,25 +68,25 @@ const Orders = () => {
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: getStatusColor(item?.delivery_status) },
+            { backgroundColor: getStatusColor(item?.order_status) },
           ]}
         >
           <Text style={styles.statusText}>
-            {item?.delivery_status === OrderStatus.Pending
+            {item?.order_status === OrderStatus.Pending
               ? "Pending"
-              : item?.delivery_status === OrderStatus.Confirmed
+              : item?.order_status === OrderStatus.Confirmed
               ? "Confirmed"
-              : item?.delivery_status === OrderStatus.Processing
+              : item?.order_status === OrderStatus.Processing
               ? "Processing"
-              : item?.delivery_status === OrderStatus.PickedUp
+              : item?.order_status === OrderStatus.PickedUp
               ? "Picked Up"
-              : item?.delivery_status === OrderStatus.InTransit
+              : item?.order_status === OrderStatus.InTransit
               ? "In Transit"
-              : item?.delivery_status === OrderStatus.Delivered
+              : item?.order_status === OrderStatus.Delivered
               ? "Delivered"
-              : item?.delivery_status === OrderStatus.Cancelled
+              : item?.order_status === OrderStatus.Cancelled
               ? "Cancelled"
-              : item?.delivery_status === OrderStatus.Refunded
+              : item?.order_status === OrderStatus.Refunded
               ? "Refunded"
               : "Pending"}
           </Text>
@@ -119,12 +119,18 @@ const Orders = () => {
             color={Colors[colorScheme].text}
           />
           <Text style={styles.detailText} numberOfLines={1}>
-            {item?.partner_shipping_id[1]}
+            {item?.partner_shipping_id?.street +
+              " " +
+              item?.partner_shipping_id?.street2 +
+              " " +
+              item?.partner_shipping_id?.city +
+              " " +
+              item?.partner_shipping_id?.country}
           </Text>
         </View>
       </View>
 
-      {item.delivery_status === false && (
+      {item.order_status === false && (
         <Button
           variant="outline"
           size="small"
@@ -164,7 +170,7 @@ const Orders = () => {
     );
   }
 
-  if (!myOrders || myOrders.length === 0) {
+  if (!myOrders?.records || myOrders?.records?.length === 0) {
     return (
       <View style={styles.container}>
         <View style={styles.headerContainer}>

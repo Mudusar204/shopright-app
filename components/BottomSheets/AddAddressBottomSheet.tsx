@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import BottomModal from "./BottomSheet";
 import { useColorScheme } from "../useColorScheme";
@@ -33,11 +34,11 @@ interface AddressDetails {
   street: string;
   street2: string;
   city: string;
-  state_id: string;
-  country_id: string;
+  state: string;
+  country: string;
   zip: number;
-  longitude: number;
-  latitude: number;
+  longitude: string;
+  latitude: string;
 }
 
 interface MapState {
@@ -65,11 +66,11 @@ const INITIAL_ADDRESS_DETAILS: AddressDetails = {
   street: "",
   street2: "",
   city: "",
-  state_id: "",
-  country_id: "",
+  state: "",
+  country: "",
   zip: 0,
-  longitude: 0,
-  latitude: 0,
+  longitude: "",
+  latitude: "",
 };
 
 const INITIAL_REGION: Region = {
@@ -173,8 +174,8 @@ const AddAddressBottomSheet = ({
             ? addressDetails[field].toString().trim() !== ""
             : addressDetails[field] !== 0)
       ) &&
-      addressDetails.longitude !== 0 &&
-      addressDetails.latitude !== 0
+      addressDetails.longitude !== "" &&
+      addressDetails.latitude !== ""
     );
   }, [addressDetails]);
 
@@ -192,7 +193,7 @@ const AddAddressBottomSheet = ({
           return value <= 0 ? "Valid zip code is required" : "";
         case "longitude":
         case "latitude":
-          return value === 0
+          return value === ""
             ? `${field.charAt(0).toUpperCase() + field.slice(1)} is required`
             : "";
         default:
@@ -214,10 +215,18 @@ const AddAddressBottomSheet = ({
         return newErrors;
       });
 
-      // Trigger debounced validation
-      setIsValidating(true);
+      // For coordinate fields, validate immediately to prevent lag
+      if (field === "latitude" || field === "longitude") {
+        const error = validateField(field, value);
+        if (error) {
+          setValidationErrors((prev) => ({ ...prev, [field]: error }));
+        }
+      } else {
+        // Trigger debounced validation for other fields
+        setIsValidating(true);
+      }
     },
-    []
+    [validateField]
   );
 
   // Optimized map state updates
@@ -257,7 +266,14 @@ const AddAddressBottomSheet = ({
       return;
     }
 
-    addUserAddress(addressDetails, {
+    // Convert string coordinates to numbers for submission
+    const submissionData = {
+      ...addressDetails,
+      latitude: parseFloat(addressDetails.latitude) || 0,
+      longitude: parseFloat(addressDetails.longitude) || 0,
+    };
+
+    addUserAddress(submissionData, {
       onSuccess: () => {
         bottomSheetRef.current?.handleClose();
         resetForm();
@@ -296,8 +312,8 @@ const AddAddressBottomSheet = ({
             type: "SET_ADDRESS",
             payload: {
               street: details.formatted_address,
-              latitude: lat,
-              longitude: lng,
+              latitude: lat.toString(),
+              longitude: lng.toString(),
             },
           });
         }
@@ -323,8 +339,8 @@ const AddAddressBottomSheet = ({
       addressDispatch({
         type: "SET_ADDRESS",
         payload: {
-          latitude: locationData.location.coords.latitude,
-          longitude: locationData.location.coords.longitude,
+          latitude: locationData.location.coords.latitude.toString(),
+          longitude: locationData.location.coords.longitude.toString(),
           street: locationData.address?.street || "",
           city: locationData.address?.city || "",
         },
@@ -413,193 +429,203 @@ const AddAddressBottomSheet = ({
           </View>
         </View>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            flexGrow: 1,
-            position: "relative",
-          }}
-        >
-          <View style={style.section}>
-            <View style={[style.row, { marginBottom: 15 }]}>
-              <Text style={style.sectionTitle}>Address Details</Text>
-              <Button
-                variant="primary"
-                size="small"
-                title="Search"
-                onPress={() => toggleManualMode(false)}
-              />
-            </View>
+        <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={100}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              flexGrow: 1,
+              position: "relative",
+            }}
+          >
+            <View style={style.section}>
+              <View style={[style.row, { marginBottom: 15 }]}>
+                <Text style={style.sectionTitle}>Address Details</Text>
+                <Button
+                  variant="primary"
+                  size="small"
+                  title="Search"
+                  onPress={() => toggleManualMode(false)}
+                />
+              </View>
 
-            {/* Street Input */}
-            <Text style={style.label}>Street</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={[
-                  style.input,
-                  validationErrors.street && style.inputError,
-                ]}
-                placeholder="Enter your street"
-                value={addressDetails.street}
-                onChangeText={(text) => updateAddressDetails("street", text)}
-              />
-              {validationErrors.street && (
-                <Text style={style.errorText}>{validationErrors.street}</Text>
-              )}
-            </View>
+              {/* Street Input */}
+              <Text style={style.label}>Street</Text>
+              <View style={style.inputContainer}>
+                <TextInput
+                  style={[
+                    style.input,
+                    validationErrors.street && style.inputError,
+                  ]}
+                  placeholder="Enter your street"
+                  value={addressDetails.street}
+                  onChangeText={(text) => updateAddressDetails("street", text)}
+                />
+                {validationErrors.street && (
+                  <Text style={style.errorText}>{validationErrors.street}</Text>
+                )}
+              </View>
 
-            {/* Address Input */}
-            <Text style={style.label}>Address</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={[
-                  style.input,
-                  validationErrors.street2 && style.inputError,
-                ]}
-                placeholder="Enter your address"
-                value={addressDetails.street2}
-                onChangeText={(text) => updateAddressDetails("street2", text)}
-              />
-              {validationErrors.street2 && (
-                <Text style={style.errorText}>{validationErrors.street2}</Text>
-              )}
-            </View>
+              {/* Address Input */}
+              <Text style={style.label}>Address</Text>
+              <View style={style.inputContainer}>
+                <TextInput
+                  style={[
+                    style.input,
+                    validationErrors.street2 && style.inputError,
+                  ]}
+                  placeholder="Enter your address"
+                  value={addressDetails.street2}
+                  onChangeText={(text) => updateAddressDetails("street2", text)}
+                />
+                {validationErrors.street2 && (
+                  <Text style={style.errorText}>
+                    {validationErrors.street2}
+                  </Text>
+                )}
+              </View>
 
-            {/* City Input */}
-            <Text style={style.label}>City</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={[style.input, validationErrors.city && style.inputError]}
-                placeholder="Enter your city"
-                value={addressDetails.city}
-                onChangeText={(text) => updateAddressDetails("city", text)}
-              />
-              {validationErrors.city && (
-                <Text style={style.errorText}>{validationErrors.city}</Text>
-              )}
-            </View>
+              {/* City Input */}
+              <Text style={style.label}>City</Text>
+              <View style={style.inputContainer}>
+                <TextInput
+                  style={[
+                    style.input,
+                    validationErrors.city && style.inputError,
+                  ]}
+                  placeholder="Enter your city"
+                  value={addressDetails.city}
+                  onChangeText={(text) => updateAddressDetails("city", text)}
+                />
+                {validationErrors.city && (
+                  <Text style={style.errorText}>{validationErrors.city}</Text>
+                )}
+              </View>
 
-            {/* Zip Input */}
-            <Text style={style.label}>Zip</Text>
-            <View style={style.inputContainer}>
-              <TextInput
-                style={[style.input, validationErrors.zip && style.inputError]}
-                placeholder="Enter your zip"
-                keyboardType="numeric"
-                value={addressDetails.zip.toString()}
-                onChangeText={(text) =>
-                  updateAddressDetails("zip", Number(text) || 0)
-                }
-              />
-              {validationErrors.zip && (
-                <Text style={style.errorText}>{validationErrors.zip}</Text>
-              )}
-            </View>
+              {/* Zip Input */}
+              <Text style={style.label}>Zip</Text>
+              <View style={style.inputContainer}>
+                <TextInput
+                  style={[
+                    style.input,
+                    validationErrors.zip && style.inputError,
+                  ]}
+                  placeholder="Enter your zip"
+                  keyboardType="numeric"
+                  value={addressDetails.zip.toString()}
+                  onChangeText={(text) =>
+                    updateAddressDetails("zip", Number(text) || 0)
+                  }
+                />
+                {validationErrors.zip && (
+                  <Text style={style.errorText}>{validationErrors.zip}</Text>
+                )}
+              </View>
 
-            {/* State and Country Row */}
-            <View style={style.row}>
-              <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                <Text style={style.label}>State</Text>
-                <View style={[style.inputContainer]}>
-                  <TextInput
-                    style={[
-                      style.input,
-                      validationErrors.state_id && style.inputError,
-                    ]}
-                    placeholder="Enter state"
-                    value={addressDetails.state_id}
-                    onChangeText={(text) =>
-                      updateAddressDetails("state_id", text)
-                    }
-                  />
-                  {validationErrors.state_id && (
-                    <Text style={style.errorText}>
-                      {validationErrors.state_id}
-                    </Text>
-                  )}
+              {/* State and Country Row */}
+              <View style={style.row}>
+                <View style={{ flex: 1, backgroundColor: "transparent" }}>
+                  <Text style={style.label}>State</Text>
+                  <View style={[style.inputContainer]}>
+                    <TextInput
+                      style={[
+                        style.input,
+                        validationErrors.state && style.inputError,
+                      ]}
+                      placeholder="Enter state"
+                      value={addressDetails.state}
+                      onChangeText={(text) =>
+                        updateAddressDetails("state", text)
+                      }
+                    />
+                    {validationErrors.state && (
+                      <Text style={style.errorText}>
+                        {validationErrors.state}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+                <View style={{ flex: 1, backgroundColor: "transparent" }}>
+                  <Text style={style.label}>Country</Text>
+                  <View style={[style.inputContainer]}>
+                    <TextInput
+                      style={[
+                        style.input,
+                        validationErrors.country && style.inputError,
+                      ]}
+                      placeholder="Enter country"
+                      value={addressDetails.country}
+                      onChangeText={(text) =>
+                        updateAddressDetails("country", text)
+                      }
+                    />
+                    {validationErrors.country && (
+                      <Text style={style.errorText}>
+                        {validationErrors.country}
+                      </Text>
+                    )}
+                  </View>
                 </View>
               </View>
-              <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                <Text style={style.label}>Country</Text>
-                <View style={[style.inputContainer]}>
-                  <TextInput
-                    style={[
-                      style.input,
-                      validationErrors.country_id && style.inputError,
-                    ]}
-                    placeholder="Enter country"
-                    value={addressDetails.country_id}
-                    onChangeText={(text) =>
-                      updateAddressDetails("country_id", text)
-                    }
-                  />
-                  {validationErrors.country_id && (
-                    <Text style={style.errorText}>
-                      {validationErrors.country_id}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </View>
 
-            {/* Longitude and Latitude Row */}
-            <View style={style.row}>
-              <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                <Text style={style.label}>Latitude</Text>
-                <View style={[style.inputContainer]}>
-                  <TextInput
-                    style={[
-                      style.input,
-                      validationErrors.latitude && style.inputError,
-                    ]}
-                    placeholder="Enter latitude"
-                    keyboardType="numeric"
-                    value={addressDetails.latitude.toString()}
-                    onChangeText={(text) =>
-                      updateAddressDetails("latitude", Number(text) || 0)
-                    }
-                  />
-                  {validationErrors.latitude && (
-                    <Text style={style.errorText}>
-                      {validationErrors.latitude}
-                    </Text>
-                  )}
+              {/* Longitude and Latitude Row */}
+              <View style={style.row}>
+                <View style={{ flex: 1, backgroundColor: "transparent" }}>
+                  <Text style={style.label}>Latitude</Text>
+                  <View style={[style.inputContainer]}>
+                    <TextInput
+                      style={[
+                        style.input,
+                        validationErrors.latitude && style.inputError,
+                      ]}
+                      placeholder="Enter latitude"
+                      keyboardType="decimal-pad"
+                      value={addressDetails.latitude}
+                      onChangeText={(text) =>
+                        updateAddressDetails("latitude", text)
+                      }
+                    />
+                    {validationErrors.latitude && (
+                      <Text style={style.errorText}>
+                        {validationErrors.latitude}
+                      </Text>
+                    )}
+                  </View>
                 </View>
-              </View>
-              <View style={{ flex: 1, backgroundColor: "transparent" }}>
-                <Text style={style.label}>Longitude</Text>
-                <View style={[style.inputContainer]}>
-                  <TextInput
-                    style={[
-                      style.input,
-                      validationErrors.longitude && style.inputError,
-                    ]}
-                    placeholder="Enter longitude"
-                    keyboardType="numeric"
-                    value={addressDetails.longitude.toString()}
-                    onChangeText={(text) =>
-                      updateAddressDetails("longitude", Number(text) || 0)
-                    }
-                  />
-                  {validationErrors.longitude && (
-                    <Text style={style.errorText}>
-                      {validationErrors.longitude}
-                    </Text>
-                  )}
+                <View style={{ flex: 1, backgroundColor: "transparent" }}>
+                  <Text style={style.label}>Longitude</Text>
+                  <View style={[style.inputContainer]}>
+                    <TextInput
+                      style={[
+                        style.input,
+                        validationErrors.longitude && style.inputError,
+                      ]}
+                      placeholder="Enter longitude"
+                      keyboardType="decimal-pad"
+                      value={addressDetails.longitude}
+                      onChangeText={(text) =>
+                        updateAddressDetails("longitude", text)
+                      }
+                    />
+                    {validationErrors.longitude && (
+                      <Text style={style.errorText}>
+                        {validationErrors.longitude}
+                      </Text>
+                    )}
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-          <Button
-            variant="primary"
-            size="large"
-            title="Confirm Location"
-            onPress={handleAddAddress}
-            isLoading={isPending}
-            disabled={isPending || !isFormValid}
-            style={style.confirmButton}
-          />
-        </ScrollView>
+            <Button
+              variant="primary"
+              size="large"
+              title="Confirm Location"
+              onPress={handleAddAddress}
+              isLoading={isPending}
+              disabled={isPending || !isFormValid}
+              style={style.confirmButton}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
       )}
     </BottomModal>
   );

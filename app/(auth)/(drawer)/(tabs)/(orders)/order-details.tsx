@@ -132,10 +132,10 @@ const OrderDetails = () => {
                     styles.statusIcon,
                     {
                       backgroundColor: isCompleted
-                        ? getStatusColor(order?.delivery_status)
+                        ? getStatusColor(order?.order_status)
                         : Colors[colorScheme].background_light,
                       borderColor: isCompleted
-                        ? getStatusColor(order?.delivery_status)
+                        ? getStatusColor(order?.order_status)
                         : Colors[colorScheme].border,
                     },
                   ]}
@@ -151,7 +151,7 @@ const OrderDetails = () => {
                     styles.statusLabel,
                     {
                       color: isCurrent
-                        ? getStatusColor(order?.delivery_status)
+                        ? getStatusColor(order?.order_status)
                         : Colors[colorScheme].text,
                     },
                   ]}
@@ -164,7 +164,7 @@ const OrderDetails = () => {
                       styles.timelineLine,
                       {
                         backgroundColor: isCompleted
-                          ? getStatusColor(order?.records[0]?.delivery_status)
+                          ? getStatusColor(order?.records[0]?.order_status)
                           : Colors[colorScheme].border,
                       },
                     ]}
@@ -287,9 +287,9 @@ const OrderDetails = () => {
                   {order?.records[0]?.partner_shipping_id?.city},{" "}
                   {order?.records[0]?.partner_shipping_id?.zip}
                 </Text>
-                {order?.records[0]?.partner_shipping_id?.country_id && (
+                {order?.records[0]?.partner_shipping_id?.country && (
                   <Text style={styles.addressText}>
-                    {order?.records[0]?.partner_shipping_id?.country_id[1]}
+                    {order?.records[0]?.partner_shipping_id?.country}
                   </Text>
                 )}
               </View>

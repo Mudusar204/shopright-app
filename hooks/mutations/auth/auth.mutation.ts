@@ -28,9 +28,16 @@ const useLogin = () => {
 };
 
 const useAddUserAddress = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (payload: any) => {
       return addUserAddress(payload);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["user-addresses"],
+      });
     },
   });
 };

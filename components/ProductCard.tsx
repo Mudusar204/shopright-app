@@ -84,7 +84,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
           {/* Content */}
           <View style={[styles.content, { backgroundColor: "transparent" }]}>
-            <Text style={styles.title}>{title}</Text>
+            <Text
+              style={[
+                styles.title,
+                // { flex: 1, flexWrap: "wrap", textAlign: "center" },
+              ]}
+              numberOfLines={2}
+            >
+              {title}
+            </Text>
             <View style={styles.priceContainer}>
               <Text style={styles.title}>1 kg</Text>
               <Text style={styles.title}>Rs.{price}</Text>

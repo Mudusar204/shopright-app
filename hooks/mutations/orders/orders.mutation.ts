@@ -9,6 +9,11 @@ const useCreateOrder = () => {
       console.warn(payload, "payload");
       return createOrder(payload);
     },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["my-orders"],
+      });
+    },
   });
 };
 

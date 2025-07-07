@@ -173,8 +173,8 @@ const Checkout = () => {
           (userAddresses?.records[0]?.street ||
             userAddresses?.records[0]?.street2 ||
             userAddresses?.records[0]?.city ||
-            userAddresses?.records[0]?.state_id?.name ||
-            userAddresses?.records[0]?.country_id?.name) ? (
+            userAddresses?.records[0]?.state ||
+            userAddresses?.records[0]?.country) ? (
             <Pressable
               style={styles.addressItem}
               onPress={() => setSelectedAddress(userAddresses.records[0])}
@@ -191,10 +191,8 @@ const Checkout = () => {
                 {userAddresses.records[0]?.street}{" "}
                 {userAddresses.records[0]?.street2}{" "}
                 {userAddresses.records[0]?.city}{" "}
-                {userAddresses.records[0]?.state_id?.name ||
-                  userAddresses.records[0]?.state_id}{" "}
-                {userAddresses.records[0]?.country_id?.name ||
-                  userAddresses.records[0]?.country_id}
+                {userAddresses.records[0]?.state}{" "}
+                {userAddresses.records[0]?.country}
               </Text>
             </Pressable>
           ) : (

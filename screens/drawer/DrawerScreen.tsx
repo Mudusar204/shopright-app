@@ -7,7 +7,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image, Platform, Pressable, StyleSheet, Switch } from "react-native";
 import { router } from "expo-router";
 import { useLocationStore } from "@/store/location.store";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
 import MenuHandler from "@/components/MenuHandler";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -22,6 +21,7 @@ import UserSettingIcon from "@/assets/images/svgs/UserSettings";
 import LogoutIcon from "@/assets/images/svgs/Logout";
 import { useThemStore } from "@/store/theme.store";
 import { useAuthStore } from "@/store/auth.store";
+import { useMyCartStore } from "@/store/myCart.store";
 const TitleWithImage = ({
   Icon,
   title,
@@ -48,9 +48,9 @@ const DrawerScreen = () => {
   const theme = useThemStore((state: any) => state.theme);
   const toggleTheme = useThemStore((state: any) => state.toggleTheme);
   // const { address } = useLocationStore();
-  const navigation: any = useNavigation();
   const colorTheme = useColorScheme() as "light" | "dark";
-  const { setIsLoggedIn, user, clear } = useAuthStore();
+  const { setIsLoggedIn, odooUserAuth, clear } = useAuthStore();
+  const { cartItems, clearCart } = useMyCartStore();
   return (
     <View
       style={[
@@ -72,7 +72,7 @@ const DrawerScreen = () => {
             />
             <View style={styles.profileTextContainer}>
               <Text style={styles.profileNameText}>
-                {user?.nickName || "John Doe"}
+                {odooUserAuth?.login || "John Doe"}
               </Text>
               <View style={[styles.locationRow]}>
                 <LocationIcon color={Colors[colorTheme].primary_color} />
@@ -141,17 +141,19 @@ const DrawerScreen = () => {
           title="FAQs"
           onPress={() => {}}
         />
+        <View style={{}}>
+          <TitleWithImage
+            Icon={<LogoutIcon color="#FF5757" />}
+            title="Logout"
+            titleStyle={{ color: "#FF5757" }}
+            onPress={() => {
+              clear();
+              clearCart();
+              router.push("/login");
+            }}
+          />
+        </View>
       </View>
-
-      <TitleWithImage
-        Icon={<LogoutIcon color="#FF5757" />}
-        title="Logout"
-        titleStyle={{ color: "#FF5757" }}
-        onPress={() => {
-          clear();
-          router.push("/login");
-        }}
-      />
     </View>
   );
 };

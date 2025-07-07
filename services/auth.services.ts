@@ -100,8 +100,8 @@ export const addUserAddress = async (data: any) => {
           "street2",
           "city",
           "zip",
-          "state_id",
-          "country_id",
+          "state",
+          "country",
           "partner_latitude",
           "partner_longitude",
         ],
@@ -111,8 +111,8 @@ export const addUserAddress = async (data: any) => {
           street2: data.street2,
           city: data.city,
           zip: data.zip,
-          state_id: Number(data.state_id),
-          country_id: Number(data.country_id),
+          state: data.state,
+          country: data.country,
           partner_latitude: data.latitude,
           partner_longitude: data.longitude,
         },
@@ -145,7 +145,7 @@ export const getUserAddresses = async () => {
   console.log(odooAdmin, "odooUserAddresses");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=res.partner&Id=${user?.partner_id}&fields=name,email,zip,street,street2,city,state_id,country_id,parent_id,type,partner_latitude,partner_longitude`,
+      `http://69.62.120.81:8088/send_request?model=res.partner&Id=${user?.partner_id}&fields=name,email,zip,street,street2,city,state,country,parent_id,type,partner_latitude,partner_longitude`,
       {
         headers: {
           "Content-Type": "application/json",

@@ -17,7 +17,7 @@ const initialState: AuthStoreState = {
   userLocations: [],
   odooUserAuth: null,
   odooAdmin: {
-    api_key: "56d2a7b1-b839-4137-a3cc-7f974d91f5ea",
+    api_key: "b24aed76-7b58-42d1-b615-17fa1a87f8bb",
     login: "admin",
     password: "admin",
     db: "Testing",
@@ -36,7 +36,7 @@ export const useAuthStore = create(
       setOdooAdmin: () =>
         set({
           odooAdmin: {
-            api_key: "56d2a7b1-b839-4137-a3cc-7f974d91f5ea",
+            api_key: "b24aed76-7b58-42d1-b615-17fa1a87f8bb",
             login: "admin",
             password: "admin",
             db: "Testing",
