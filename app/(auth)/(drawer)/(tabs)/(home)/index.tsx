@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState, useMemo } from "react";
 import {
+  ActivityIndicator,
   Button,
   FlatList,
   Image,
@@ -43,7 +44,7 @@ const MemoizedProductCard = React.memo(ProductCard);
 export default function HomeScreen() {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-
+  const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [filter, setFilter] = useState<FilterItem[]>([
     { all: true },
@@ -58,6 +59,12 @@ export default function HomeScreen() {
   // Memoize filtered data to prevent recalculation on every render
   const filteredData = useMemo(() => {
     if (!data?.records) return [];
+
+    if (searchQuery) {
+      return data.records.filter((item: any) =>
+        item.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
     return data.records.filter((item: any) => {
       // If "all" is selected, show all items
@@ -88,7 +95,7 @@ export default function HomeScreen() {
 
       return true;
     });
-  }, [data?.records, filter]);
+  }, [data?.records, filter, searchQuery]);
 
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
@@ -169,6 +176,8 @@ export default function HomeScreen() {
             />
             <TextInput
               placeholder="What you are looking for?"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
               style={{ backgroundColor: "transparent" }}
             />
           </View>
@@ -192,7 +201,18 @@ export default function HomeScreen() {
         </View>
         <View style={styles.productContainer}>
           {isLoading ? (
-            <Text>Loading...</Text>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator
+                size="large"
+                color={Colors[colorScheme].primary_color}
+              />
+            </View>
           ) : isError ? (
             <Text>Error loading products</Text>
           ) : (

@@ -22,6 +22,7 @@ import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
 import Toast from "react-native-toast-message";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import socketService from "@/services/socket.service";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -60,12 +61,30 @@ const Checkout = () => {
         })),
       },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
           clearCart();
           router.push("/(auth)/order-success");
           Toast.show({
             type: "success",
             text1: "Order placed successfully",
+          });
+
+          // Emit socket event for order placed
+          socketService.emit("order-placed", {
+            orderId: response?.id || "new-order",
+            userId: "user-id", // You can get this from your auth store
+            details: {
+              items: cartItems.map((item) => ({
+                productId: item.id,
+                quantity: item.quantity,
+                title: item.title,
+                price: item.price,
+              })),
+              totalAmount: getTotalPrice(),
+              paymentMethod: selectedPayment,
+              address: selectedAddress,
+              customerNote: selectedAddress?.instructions,
+            },
           });
         },
         onError: (error) => {
