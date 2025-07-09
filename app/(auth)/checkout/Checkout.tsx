@@ -62,6 +62,7 @@ const Checkout = () => {
       },
       {
         onSuccess: (response) => {
+          console.log(response, "response in checkout");
           clearCart();
           router.push("/(auth)/order-success");
           Toast.show({
@@ -86,6 +87,7 @@ const Checkout = () => {
               customerNote: selectedAddress?.instructions,
             },
           });
+          socketService.emit("join-order-room", response?.id);
         },
         onError: (error) => {
           Toast.show({

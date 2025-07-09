@@ -9,6 +9,7 @@ import { useGetMyOrders } from "@/hooks/queries/orders/orders.query";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import { OrderStatus } from "@/constants/enums";
+import socketService from "@/services/socket.service";
 
 const Orders = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -30,6 +31,12 @@ const Orders = () => {
     error,
     "error"
   );
+
+  socketService.on("order-status-update", (payload) => {
+    console.log("Order status updated:", payload);
+    refetch();
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case OrderStatus.Pending:

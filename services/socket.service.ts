@@ -1,3 +1,4 @@
+import { useGetMyOrders } from "@/hooks/queries/orders/orders.query";
 import { io, Socket } from "socket.io-client";
 
 class SocketService {
@@ -78,6 +79,10 @@ class SocketService {
         }
       });
     });
+
+    this.socket?.on("order-status-update", (data) => {
+      console.log("order-placed", data);
+    });
   }
 
   // Subscribe to all rider location updates (admin dashboard)
@@ -106,6 +111,18 @@ class SocketService {
     };
   }
 
+  public subscribeToOrderStatus(
+    orderId: string,
+    callback: (data: any) => void
+  ) {
+    this.locationListeners.set(orderId, callback);
+    this.socket?.emit("join-order-room", orderId);
+    // No need to add a new event listener, already handled globally
+    return () => {
+      this.locationListeners.delete(orderId);
+      this.socket?.emit("leave-order-room", orderId);
+    };
+  }
   // Get connection status
   public getConnectionStatus(): boolean {
     return this.isConnected;
@@ -124,6 +141,10 @@ class SocketService {
   // Emit custom events
   public emit(event: string, data: any) {
     this.socket?.emit(event, data);
+  }
+
+  public on(event: string, callback: (data: any) => void) {
+    this.socket?.on(event, callback);
   }
 
   // Clean up all listeners
