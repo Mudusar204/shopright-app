@@ -21,16 +21,7 @@ const Orders = () => {
     error,
     refetch,
   } = useGetMyOrders();
-  console.log(
-    myOrders?.records[0],
-    "myOrders",
-    isLoading,
-    "isLoading",
-    isError,
-    "isError",
-    error,
-    "error"
-  );
+  console.log("myOrders", myOrders?.records?.length);
 
   socketService.on("order-status-update", (payload) => {
     console.log("Order status updated:", payload);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   Pressable,
@@ -18,6 +18,7 @@ import LocationMarker from "@/assets/images/svgs/LocationMarker";
 import Header from "@/components/Header";
 import useRealTimeRider from "@/customHooks/riders/useRealTimeRider";
 import RiderTrackingMap from "@/components/RiderTrackingMap";
+import socketService from "@/services/socket.service";
 
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -39,6 +40,20 @@ const OrderDetails = () => {
       console.log("Rider location updated:", location);
     },
   });
+
+  useEffect(() => {
+    const unsubscribe = socketService.subscribeToRiderLocation(
+      riderId,
+      (data) => {
+        console.log("Live location from any rider:", data);
+        // Example: update markers on Google Map
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   if (isLoading) {
     return (

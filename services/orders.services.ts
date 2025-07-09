@@ -72,7 +72,7 @@ export const getMyOrders = async () => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response, "getMyOrders response");
+    console.log("getMyOrders response");
     return response.data;
   } catch (error) {
     console.log(error, "error in getMyOrders");
