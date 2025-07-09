@@ -72,7 +72,7 @@ const Checkout = () => {
 
           // Emit socket event for order placed
           socketService.emit("order-placed", {
-            orderId: response?.id || "new-order",
+            orderId: response["New resource"][0]?.id || "new-order",
             userId: "user-id", // You can get this from your auth store
             details: {
               items: cartItems.map((item) => ({
@@ -87,7 +87,12 @@ const Checkout = () => {
               customerNote: selectedAddress?.instructions,
             },
           });
-          socketService.emit("join-order-room", response?.id);
+          socketService.subscribeToOrderStatus(
+            response["New resource"][0]?.id,
+            (data) => {
+              console.log("order-status-update", data);
+            }
+          );
         },
         onError: (error) => {
           Toast.show({

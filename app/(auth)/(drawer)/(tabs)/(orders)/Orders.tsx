@@ -37,6 +37,11 @@ const Orders = () => {
     refetch();
   });
 
+  socketService.on("new-order", (payload) => {
+    console.log("Order status updated:", payload);
+    refetch();
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case OrderStatus.Pending:
