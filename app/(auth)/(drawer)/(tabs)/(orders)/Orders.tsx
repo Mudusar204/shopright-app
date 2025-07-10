@@ -1,5 +1,5 @@
 import { StyleSheet, FlatList, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
@@ -9,7 +9,7 @@ import { useGetMyOrders } from "@/hooks/queries/orders/orders.query";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import { OrderStatus } from "@/constants/enums";
-import socketService from "@/services/socket.service";
+import { socketService } from "@/services/socket.service";
 
 const Orders = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -22,16 +22,20 @@ const Orders = () => {
     refetch,
   } = useGetMyOrders();
   console.log("myOrders", myOrders?.records?.length);
+  useEffect(() => {
+    const handleOrderUpdate = (payload: any) => {
+      console.log("Order status updated:", payload);
+      refetch(); // Refresh order list
+    };
 
-  socketService.on("order-status-update", (payload) => {
-    console.log("Order status updated:", payload);
-    refetch();
-  });
+    socketService.on("order-status-update", handleOrderUpdate);
+    socketService.on("new-order", handleOrderUpdate);
 
-  socketService.on("new-order", (payload) => {
-    console.log("Order status updated:", payload);
-    refetch();
-  });
+    return () => {
+      socketService?.off("order-status-update", handleOrderUpdate);
+      socketService?.off("new-order", handleOrderUpdate);
+    };
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {

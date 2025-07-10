@@ -18,7 +18,7 @@ import LocationMarker from "@/assets/images/svgs/LocationMarker";
 import Header from "@/components/Header";
 import useRealTimeRider from "@/customHooks/riders/useRealTimeRider";
 import RiderTrackingMap from "@/components/RiderTrackingMap";
-import socketService from "@/services/socket.service";
+import { socketService } from "@/services/socket.service";
 
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
