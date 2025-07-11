@@ -23,7 +23,6 @@ export const getCategories = async () => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response, "getCategories response");
     return response.data;
   } catch (error) {
     console.log(error, "error in getCategories");

@@ -22,7 +22,7 @@ import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
 import Toast from "react-native-toast-message";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import socketService from "@/services/socket.service";
+import { socketService } from "@/services/socket.service";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -89,7 +89,7 @@ const Checkout = () => {
           });
           socketService.subscribeToOrderStatus(
             response["New resource"][0]?.id,
-            (data) => {
+            (data: any) => {
               console.log("order-status-update", data);
             }
           );
