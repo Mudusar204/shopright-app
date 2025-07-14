@@ -29,6 +29,7 @@ import Toast from "react-native-toast-message";
 import { useLocation } from "@/hooks/useLocation";
 import MyLocationIcon from "@/assets/images/svgs/MyLocation";
 import CustomLocationSearch from "../CustomLocationSearch";
+import * as Location from "expo-location";
 
 // TypeScript interfaces for better type safety
 interface AddressDetails {
@@ -308,6 +309,172 @@ const AddAddressBottomSheet = ({
     });
   }, [addressDetails, validateForm, addUserAddress, bottomSheetRef, resetForm]);
 
+  // Function to decode location and add address
+  const handleConfirmLocation = useCallback(async () => {
+    try {
+      let locationToDecode = null;
+      let addressData: Partial<AddressDetails> = {};
+
+      // Determine which location to decode
+      if (mapState.selectedLocation) {
+        // Use selected location from search
+        locationToDecode = {
+          latitude: mapState.selectedLocation.latitude,
+          longitude: mapState.selectedLocation.longitude,
+        };
+        addressData = {
+          street: mapState.selectedLocation.address,
+          latitude: mapState.selectedLocation.latitude.toString(),
+          longitude: mapState.selectedLocation.longitude.toString(),
+        };
+      } else if (locationData.location) {
+        // Use current location
+        locationToDecode = {
+          latitude: locationData.location.coords.latitude,
+          longitude: locationData.location.coords.longitude,
+        };
+        addressData = {
+          latitude: locationData.location.coords.latitude.toString(),
+          longitude: locationData.location.coords.longitude.toString(),
+          street: locationData.address?.street || "",
+          city: locationData.address?.city || "",
+          state: locationData.address?.region || "",
+          country: locationData.address?.country || "",
+        };
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "No location selected",
+          text2: "Please select a location or use current location",
+        });
+        return;
+      }
+
+      // Use Google Geocoding API to get detailed address
+      const API_KEY = "AIzaSyAsQaw80JUEAI_a82j_1bp366sei7GibWY";
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${locationToDecode.latitude},${locationToDecode.longitude}&key=${API_KEY}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.status === "OK" && data.results.length > 0) {
+        const result = data.results[0];
+        const addressComponents = result.address_components;
+
+        // Extract address components
+        const streetNumber =
+          addressComponents.find((component: any) =>
+            component.types.includes("street_number")
+          )?.long_name || "";
+
+        const route =
+          addressComponents.find((component: any) =>
+            component.types.includes("route")
+          )?.long_name || "";
+
+        const street =
+          streetNumber && route ? `${streetNumber} ${route}` : route;
+
+        const city =
+          addressComponents.find((component: any) =>
+            component.types.includes("locality")
+          )?.long_name || "";
+
+        const state =
+          addressComponents.find((component: any) =>
+            component.types.includes("administrative_area_level_1")
+          )?.long_name || "";
+
+        const country =
+          addressComponents.find((component: any) =>
+            component.types.includes("country")
+          )?.long_name || "";
+
+        const postalCode =
+          addressComponents.find((component: any) =>
+            component.types.includes("postal_code")
+          )?.long_name || "";
+
+        // Update address details with decoded information
+        const decodedAddressData = {
+          ...addressData,
+          street: street || addressData.street || "",
+          city: city || addressData.city || "",
+          state: state || addressData.state || "",
+          country: country || addressData.country || "",
+          zip: postalCode ? parseInt(postalCode) : 0,
+          street2: result.formatted_address || "",
+        };
+
+        // Call addUserAddress with the decoded data
+        const submissionData = {
+          ...decodedAddressData,
+          latitude: parseFloat(decodedAddressData.latitude || "0") || 0,
+          longitude: parseFloat(decodedAddressData.longitude || "0") || 0,
+        };
+
+        addUserAddress(submissionData, {
+          onSuccess: () => {
+            bottomSheetRef.current?.handleClose();
+            resetForm();
+            Toast.show({
+              type: "success",
+              text1: "Address added successfully",
+            });
+          },
+          onError: (error) => {
+            Toast.show({
+              type: "error",
+              text1: error.message || "Failed to add address",
+            });
+          },
+        });
+      } else {
+        // If geocoding fails, use the basic data
+        const submissionData = {
+          ...addressData,
+          latitude: parseFloat(addressData.latitude || "0") || 0,
+          longitude: parseFloat(addressData.longitude || "0") || 0,
+        };
+
+        addUserAddress(submissionData, {
+          onSuccess: () => {
+            bottomSheetRef.current?.handleClose();
+            resetForm();
+            Toast.show({
+              type: "success",
+              text1: "Address added successfully",
+            });
+          },
+          onError: (error) => {
+            Toast.show({
+              type: "error",
+              text1: error.message || "Failed to add address",
+            });
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error decoding location:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error processing location",
+        text2: "Please try again",
+      });
+    }
+  }, [
+    mapState.selectedLocation,
+    locationData,
+    addUserAddress,
+    bottomSheetRef,
+    resetForm,
+  ]);
+
   // Improved location selection
   const handleLocationSelect = useCallback(
     (data: any, details: any) => {
@@ -493,8 +660,9 @@ const AddAddressBottomSheet = ({
               variant="primary"
               size="large"
               title="Confirm Location"
-              onPress={() => bottomSheetRef.current?.handleClose()}
+              onPress={handleConfirmLocation}
               style={style.confirmButton}
+              disabled={!mapState.selectedLocation && !locationData.location}
             />
           </View>
         </View>
