@@ -9,9 +9,11 @@ import {
   ActivityIndicator,
   Dimensions,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 interface Place {
   place_id: string;
@@ -261,14 +263,28 @@ const CustomLocationSearch: React.FC<CustomLocationSearchProps> = ({
           autoCapitalize="none"
         />
 
-        {isLoading && (
+        {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator
               size="small"
               color={Colors[theme].primary_color}
             />
           </View>
-        )}
+        ) : searchText.length > 0 ? (
+          <TouchableOpacity
+            onPress={() => {
+              setSearchText("");
+              setPredictions([]);
+              setShowSuggestions(false);
+              setHasError(false);
+            }}
+            style={{
+              paddingRight: 10,
+            }}
+          >
+            <AntDesign name="closecircle" size={24} color="black" />
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {showSuggestions && (

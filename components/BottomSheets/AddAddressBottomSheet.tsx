@@ -45,6 +45,11 @@ interface AddressDetails {
 interface MapState {
   region: Region;
   isManualMode: boolean;
+  selectedLocation: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  } | null;
 }
 
 interface ValidationErrors {
@@ -60,6 +65,10 @@ type AddressAction =
 type MapAction =
   | { type: "UPDATE_REGION"; payload: Region }
   | { type: "SET_MANUAL_MODE"; payload: boolean }
+  | {
+      type: "SET_SELECTED_LOCATION";
+      payload: { latitude: number; longitude: number; address: string } | null;
+    }
   | { type: "RESET_MAP" };
 
 // Initial state constants
@@ -105,8 +114,14 @@ const mapReducer = (state: MapState, action: MapAction): MapState => {
       return { ...state, region: action.payload };
     case "SET_MANUAL_MODE":
       return { ...state, isManualMode: action.payload };
+    case "SET_SELECTED_LOCATION":
+      return { ...state, selectedLocation: action.payload };
     case "RESET_MAP":
-      return { ...state, region: INITIAL_REGION };
+      return {
+        region: INITIAL_REGION,
+        isManualMode: false,
+        selectedLocation: null,
+      };
     default:
       return state;
   }
@@ -136,6 +151,7 @@ const AddAddressBottomSheet = ({
   const [mapState, mapDispatch] = useReducer(mapReducer, {
     region: INITIAL_REGION,
     isManualMode: false,
+    selectedLocation: null,
   });
 
   // Separate validation state with debouncing
@@ -305,7 +321,15 @@ const AddAddressBottomSheet = ({
         };
 
         updateMapState({ type: "UPDATE_REGION", payload: newRegion });
-        mapRef.current?.animateToRegion(newRegion, 1000);
+        updateMapState({
+          type: "SET_SELECTED_LOCATION",
+          payload: {
+            latitude: lat,
+            longitude: lng,
+            address: details.formatted_address || data.description,
+          },
+        });
+        mapRef.current?.animateToRegion(newRegion, 2000);
 
         // Auto-fill address details if available
         if (details.formatted_address) {
@@ -334,6 +358,7 @@ const AddAddressBottomSheet = ({
       };
 
       updateMapState({ type: "UPDATE_REGION", payload: newRegion });
+      updateMapState({ type: "SET_SELECTED_LOCATION", payload: null });
       mapRef.current?.animateToRegion(newRegion, 1000);
 
       // Auto-fill with current location data
@@ -388,7 +413,11 @@ const AddAddressBottomSheet = ({
                   description="You are here"
                 >
                   <View
-                    style={{ alignItems: "center", justifyContent: "center" }}
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "transparent",
+                    }}
                   >
                     <MyLocationIcon color={Colors[theme].primary_color} />
                   </View>
@@ -406,6 +435,40 @@ const AddAddressBottomSheet = ({
                       <Text style={style.calloutCoordinates}>
                         {locationData.location.coords.latitude.toFixed(6)},{" "}
                         {locationData.location.coords.longitude.toFixed(6)}
+                      </Text>
+                    </View>
+                  </Callout>
+                </Marker>
+              )}
+
+              {/* Selected Location Marker */}
+              {mapState.selectedLocation && (
+                <Marker
+                  coordinate={{
+                    latitude: mapState.selectedLocation.latitude,
+                    longitude: mapState.selectedLocation.longitude,
+                  }}
+                  title="Selected Location"
+                  description={mapState.selectedLocation.address}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    <LocationMarker color={"red"} />
+                  </View>
+                  <Callout tooltip>
+                    <View style={style.calloutContainer}>
+                      <Text style={style.calloutTitle}>Selected Location</Text>
+                      <Text style={style.calloutAddress}>
+                        {mapState.selectedLocation.address}
+                      </Text>
+                      <Text style={style.calloutCoordinates}>
+                        {mapState.selectedLocation.latitude.toFixed(6)},{" "}
+                        {mapState.selectedLocation.longitude.toFixed(6)}
                       </Text>
                     </View>
                   </Callout>
