@@ -28,6 +28,7 @@ import Header from "../Header";
 import Toast from "react-native-toast-message";
 import { useLocation } from "@/hooks/useLocation";
 import MyLocationIcon from "@/assets/images/svgs/MyLocation";
+import CustomLocationSearch from "../CustomLocationSearch";
 
 // TypeScript interfaces for better type safety
 interface AddressDetails {
@@ -364,6 +365,12 @@ const AddAddressBottomSheet = ({
       {!mapState.isManualMode ? (
         <View style={style.container}>
           <View style={style.mapContainer}>
+            <View style={style.searchContainer}>
+              <CustomLocationSearch
+                placeholder="Search location"
+                onLocationSelect={handleLocationSelect}
+              />
+            </View>
             <MapView
               ref={mapRef}
               style={{ flex: 1 }}

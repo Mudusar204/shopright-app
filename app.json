@@ -16,8 +16,12 @@
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
       "bundleIdentifier": "com.anonymous.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to show your current position on the map.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to show your current position on the map and provide navigation features."
+      },
       "config": {
-        "googleMapsApiKey": "AIzaSyAKmwq_hiM8N93ukg6pe1OvuLPV57_Eo8U"
+        "googleMapsApiKey": "AIzaSyAsQaw80JUEAI_a82j_1bp366sei7GibWY"
       }
     },
     "android": {
