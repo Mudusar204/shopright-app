@@ -18,30 +18,30 @@
     "@react-navigation/material-top-tabs": "^7.x",
     "@react-navigation/native": "^7.x",
     "@tanstack/react-form": "^1.9.0",
-    "@tanstack/react-query": "^5.75.1",
+    "@tanstack/react-query": "^5.75.2",
     "@tanstack/zod-form-adapter": "^0.42.1",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "expo": "53.0.19",
+    "expo": "^53.0.0",
     "expo-checkbox": "~4.1.4",
     "expo-constants": "~17.1.6",
-    "expo-device": "~7.1.4",
+    "expo-device": "^7.1.4",
     "expo-image-picker": "~16.1.4",
     "expo-linking": "~7.1.5",
     "expo-localization": "~16.1.5",
     "expo-location": "~18.1.5",
-    "expo-notifications": "~0.31.3",
+    "expo-notifications": "^0.31.4",
     "expo-router": "~5.1.1",
     "expo-splash-screen": "~0.30.9",
     "expo-status-bar": "~2.2.3",
     "i18n-js": "^4.5.1",
     "react": "19.0.0",
-    "react-native": "0.79.4",
+    "react-native": "0.79.5",
     "react-native-gesture-handler": "~2.24.0",
-    "react-native-get-random-values": "^1.11.0",
+    "react-native-get-random-values": "~1.11.0",
     "react-native-google-places-autocomplete": "^2.5.7",
-    "react-native-maps": "^1.20.1",
+    "react-native-maps": "1.20.1",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
@@ -51,10 +51,16 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/react": "~18.3.12",
-    "react-native-web": "^0.x",
-    "typescript": "~5.3.3"
+    "@babel/core": "^7.26.0",
+    "@types/react": "~19.0.10",
+    "typescript": "~5.8.3"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "listUnknownPackages": false
+      }
+    }
   },
   "private": true
 }
