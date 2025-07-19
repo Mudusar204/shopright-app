@@ -643,12 +643,12 @@ const AddAddressBottomSheet = ({
               )}
             </MapView>
             <View style={style.buttonContainer}>
-              <Button
+              {/* <Button
                 variant="secondary"
                 size="small"
                 title="+ Manually"
                 onPress={() => toggleManualMode(true)}
-              />
+              /> */}
               <Button
                 variant="secondary"
                 size="small"

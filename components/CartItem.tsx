@@ -88,14 +88,6 @@ const createStyles = (theme: "light" | "dark") =>
       backgroundColor: Colors[theme].background_light,
       borderRadius: 10,
       marginBottom: 10,
-      shadowColor: Colors[theme].text,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 3.84,
-      elevation: 5,
     },
     image: {
       width: 80,

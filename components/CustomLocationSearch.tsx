@@ -313,7 +313,7 @@ const createStyles = (theme: "light" | "dark") =>
     container: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: Colors[theme].background_light,
+      backgroundColor: Colors[theme].background,
       borderWidth: 1,
       borderColor: Colors[theme].border,
       borderRadius: 12,
@@ -350,7 +350,7 @@ const createStyles = (theme: "light" | "dark") =>
       top: 60,
       left: 0,
       width: Dimensions.get("window").width - 38,
-      backgroundColor: Colors[theme].background_light,
+      backgroundColor: Colors[theme].background,
       borderRadius: 12,
       borderWidth: 1,
       borderColor: Colors[theme].border,

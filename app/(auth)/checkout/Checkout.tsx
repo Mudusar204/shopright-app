@@ -49,6 +49,22 @@ const Checkout = () => {
       });
       return;
     }
+    if (
+      userAddresses?.records?.length === 0 ||
+      !(
+        userAddresses?.records[0]?.street ||
+        userAddresses?.records[0]?.street2 ||
+        userAddresses?.records[0]?.city ||
+        userAddresses?.records[0]?.state ||
+        userAddresses?.records[0]?.country
+      )
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Please add an address",
+      });
+      return;
+    }
     createOrder(
       {
         addressId: selectedAddress?.id,

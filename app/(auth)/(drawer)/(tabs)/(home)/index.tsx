@@ -61,33 +61,33 @@ export default function HomeScreen() {
     if (!data?.records) return [];
 
     if (searchQuery) {
-      return data.records.filter((item: any) =>
+      return data?.records?.filter((item: any) =>
         item.display_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    return data.records.filter((item: any) => {
+    return data?.records?.filter((item: any) => {
       // If "all" is selected, show all items
       if (filter[0].all) return true;
 
       // Filter by category
       if (filter[1].category !== null) {
         // Check if the product's category ID matches the selected category
-        const productCategoryIds = item.public_categ_ids || [];
-        if (!productCategoryIds.includes(filter[1].category.id)) {
+        const productCategoryIds = item?.public_categ_ids || [];
+        if (!productCategoryIds.includes(filter[1]?.category?.id)) {
           return false;
         }
       }
 
       // Filter by brand (if implemented)
-      if (filter[2].brand && item.brand !== filter[2].brand) {
+      if (filter[2].brand && item?.brand !== filter[2].brand) {
         return false;
       }
 
       // Filter by price range
       if (filter[3].priceRange) {
         const [minPrice, maxPrice] = filter[3].priceRange;
-        const itemPrice = item.list_price || 0;
+        const itemPrice = item?.list_price || 0;
         if (itemPrice < minPrice || itemPrice > maxPrice) {
           return false;
         }
@@ -122,12 +122,12 @@ export default function HomeScreen() {
   // Memoize dropdown filter data
   const dropdownFilterData = useMemo(
     () => [
-      filter[1].category != null ? filter[1].category.name : "Category",
-      filter[2].brand != "" ? filter[2].brand : "Brands",
-      filter[3].priceRange?.[1] !== 20000
-        ? filter[3].priceRange?.[0] + " - " + filter[3].priceRange?.[1]
+      filter[1]?.category != null ? filter[1]?.category?.name : "Category",
+      filter[2]?.brand != "" ? filter[2]?.brand : "Brands",
+      filter[3]?.priceRange?.[1] !== 20000
+        ? filter[3]?.priceRange?.[0] + " - " + filter[3]?.priceRange?.[1]
         : "Price",
-      filter[4].sort !== "" ? filter[4].sort : "Payment & Offers",
+      filter[4]?.sort !== "" ? filter[4]?.sort : "Payment & Offers",
     ],
     [filter]
   );

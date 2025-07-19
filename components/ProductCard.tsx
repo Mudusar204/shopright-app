@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import LocationIcon from "@/assets/images/svgs/Location";
 import PhoneIcon from "@/assets/images/svgs/Phone";
 import { useMyCartStore } from "@/store/myCart.store";
-
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 interface ProductCardProps {
   id: string;
   image: string;
@@ -75,11 +75,27 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
         <Pressable style={styles.pressableContainer} onPress={handlePress}>
           {/* Image */}
           <View style={styles.imageContainer}>
-            <Image
-              resizeMode="cover"
-              source={{ uri: image }}
-              style={styles.image}
-            />
+            {image ? (
+              <Image
+                resizeMode="cover"
+                source={{ uri: image }}
+                style={styles.image}
+              />
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <EvilIcons
+                  name="image"
+                  size={100}
+                  color={Colors[colorTheme].text}
+                />
+              </View>
+            )}
           </View>
 
           {/* Content */}
@@ -140,6 +156,9 @@ const createStyles = (colorTheme: "light" | "dark") =>
     },
     content: {
       padding: 1,
+      backgroundColor: "red",
+      flex: 1,
+      justifyContent: "space-between",
     },
     title: {
       fontWeight: "bold",
