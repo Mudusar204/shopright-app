@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ShopRight",
-    "slug": "ShopRight",
+    "slug": "shopright-club",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -31,7 +31,9 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "package": "com.anonymous.mobile",
       "config": {
@@ -58,6 +60,12 @@
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "da149288-c370-43e4-bbc9-5216690dbaf2"
+      }
+    },
+    "owner": "shopright"
   }
 }
