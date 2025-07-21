@@ -32,7 +32,7 @@ const Login = () => {
       </Text>
       <InputHandler
         leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-        placeholder="Email or Phone Number"
+        placeholder=" Phone Number"
         value={identifier}
         onChangeText={setIdentifier}
         textContentType="telephoneNumber"
@@ -54,20 +54,19 @@ const Login = () => {
         onPress={handleLogin}
       />
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => setOdooAdmin()}>
-          <Text style={styles.footerText}>
-            {/* <Link style={styles.footerLink} href="/forgetPassword"> */}
-            Forgot Password?
-            {/* </Link> */}
-          </Text>
-        </TouchableOpacity>
-
         <Text style={styles.footerText}>
           {" "}
           <Link style={styles.footerLink} href="/signup">
             Create an account
           </Link>
         </Text>
+        {/* <TouchableOpacity onPress={() => setOdooAdmin()}> */}
+        <Text style={styles.footerText}>
+          <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
+            Skip for Now
+          </Link>
+        </Text>
+        {/* </TouchableOpacity> */}
       </View>
     </View>
   );

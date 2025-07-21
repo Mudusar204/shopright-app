@@ -1,5 +1,6 @@
 import apiClient from "@/config/apiClient";
 import { API_ROUTES } from "@/constants/api.routes";
+import { OrderStatus } from "@/constants/enums";
 import { useAuthStore } from "@/store/auth.store";
 import axios from "axios";
 
@@ -22,7 +23,7 @@ export const createOrder = async (data: any) => {
     ]);
     console.log("orderLine", orderLine);
     const response = await axios.post(
-      `http://69.62.120.81:8088/send_request?model=sale.order`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order`,
       {
         fields: ["partner_id", "state", "order_line"],
         values: {
@@ -59,7 +60,7 @@ export const getMyOrders = async () => {
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=sale.order&partner_id=${user?.partner_id}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&partner_id=${user?.partner_id}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +89,7 @@ export const getOrderById = async (orderId: number) => {
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=sale.order&Id=${orderId}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&Id=${orderId}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -101,9 +102,42 @@ export const getOrderById = async (orderId: number) => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response, "getOrderById response");
     return response.data;
   } catch (error) {
     console.log(error, "error in getOrderById");
+  }
+};
+
+export const updateOrderStatus = async (
+  orderId: number,
+  status: OrderStatus
+) => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  try {
+    const response = await axios.put(
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&Id=${orderId}`,
+      {
+        fields: ["order_status"],
+        values: {
+          order_status: status,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+    console.log(response, "updateOrderStatus response");
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in updateOrderStatus");
   }
 };

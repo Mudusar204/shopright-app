@@ -161,7 +161,7 @@ const orderStatusListeners = new Map<string, (data: any) => void>();
 function initializeSocket() {
   try {
     const socketUrl =
-      process.env.EXPO_PUBLIC_SOCKET_URL || "ws://192.168.100.190:3010";
+      process.env.EXPO_PUBLIC_SOCKET_URL || "ws://69.62.120.81:5005";
 
     socket = io(socketUrl, {
       transports: ["websocket", "polling"],

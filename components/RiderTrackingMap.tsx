@@ -26,6 +26,7 @@ const RiderTrackingMap: React.FC<RiderTrackingMapProps> = ({
   isConnected,
   height = 200,
 }) => {
+  console.log(riderLocation, "riderLocation");
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const mapRef = useRef<MapView>(null);
@@ -76,11 +77,7 @@ const RiderTrackingMap: React.FC<RiderTrackingMapProps> = ({
           showsScale={true}
         >
           {/* Delivery Location Marker */}
-          <Marker
-            coordinate={deliveryLocation}
-            title="Delivery Location"
-            description="Your order will be delivered here"
-          >
+          <Marker coordinate={deliveryLocation}>
             <View style={styles.deliveryMarkerContainer}>
               <Ionicons
                 name="location"
@@ -92,11 +89,7 @@ const RiderTrackingMap: React.FC<RiderTrackingMapProps> = ({
 
           {/* Rider Location Marker */}
           {riderLocation && (
-            <Marker
-              coordinate={riderLocation}
-              title={riderName}
-              description="Your rider is here"
-            >
+            <Marker coordinate={riderLocation}>
               <View style={styles.riderMarkerContainer}>
                 <Ionicons name="bicycle" size={20} color="white" />
               </View>

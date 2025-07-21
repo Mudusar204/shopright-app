@@ -23,10 +23,12 @@ import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
 import Toast from "react-native-toast-message";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { socketService } from "@/services/socket.service";
+import { useAuthStore } from "@/store/auth.store";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
+  const { isLoggedIn } = useAuthStore();
   const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
   const { data: userAddresses } = useGetUserAddresses();
   console.log(userAddresses, "userAddresses");
@@ -276,6 +278,7 @@ const Checkout = () => {
             multiline
             numberOfLines={4}
             placeholder="Enter your instructions"
+            placeholderTextColor={Colors[colorScheme].text_secondary}
             value={selectedAddress?.instructions}
             onChangeText={(text) =>
               setSelectedAddress({ ...selectedAddress, instructions: text })
@@ -287,12 +290,21 @@ const Checkout = () => {
 
       {/* Checkout Button */}
       <View style={styles.footer}>
-        <Button
-          variant="primary"
-          size="large"
-          title="Place Order"
-          onPress={handleCheckout}
-        />
+        {isLoggedIn ? (
+          <Button
+            variant="primary"
+            size="large"
+            title="Place Order"
+            onPress={handleCheckout}
+          />
+        ) : (
+          <Button
+            variant="primary"
+            size="large"
+            title="Login to Place Order"
+            onPress={() => router.push("/(public)/login")}
+          />
+        )}
       </View>
       <AddAddressBottomSheet
         bottomSheetRef={bottomSheetRef}

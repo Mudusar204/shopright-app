@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
+  Image,
 } from "react-native";
 import Images from "@/constants/Images";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -39,6 +40,7 @@ const Onboarding = () => {
       style={[styles.container, { paddingTop: insets.top, paddingBottom: 20 }]}
     >
       <SkipButton insets={insets} setOnboarded={setOnboarded} />
+
       {splash === 1 ? (
         <SplashCard
           title={i18n.t("onboarding.splash_title_1")}

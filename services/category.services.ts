@@ -10,7 +10,7 @@ export const getCategories = async () => {
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      "http://69.62.120.81:8088/send_request?model=product.public.category",
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=product.public.category`,
       {
         headers: {
           "Content-Type": "application/json",

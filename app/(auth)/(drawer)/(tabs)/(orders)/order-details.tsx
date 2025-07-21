@@ -19,6 +19,8 @@ import Header from "@/components/Header";
 import useRealTimeRider from "@/customHooks/riders/useRealTimeRider";
 import RiderTrackingMap from "@/components/RiderTrackingMap";
 import { socketService } from "@/services/socket.service";
+import { OrderStatus } from "@/constants/enums";
+import { useUpdateOrderStatus } from "@/hooks/mutations/orders/orders.mutation";
 
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -30,6 +32,8 @@ const OrderDetails = () => {
     isError,
     error,
   } = useGetOrderById(Number(orderId));
+  const { mutate: updateOrderStatus, isPending: isUpdatingOrderStatus } =
+    useUpdateOrderStatus();
   console.log(order, "order in order-details", orderId, isError, error);
 
   // Real-time rider tracking
@@ -40,7 +44,7 @@ const OrderDetails = () => {
       console.log("Rider location updated:", location);
     },
   });
-
+  console.log(riderLocation, "riderLocation in order-details");
   useEffect(() => {
     const unsubscribe = socketService.subscribeToRiderLocation(
       riderId,
@@ -61,7 +65,7 @@ const OrderDetails = () => {
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
-            color={Colors[colorScheme].primary_color}
+            color={Colors[colorScheme]?.primary_color}
           />
         </View>
       </View>
@@ -80,14 +84,22 @@ const OrderDetails = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
+      case OrderStatus.Pending:
         return Colors[colorScheme].warning;
-      case "started":
+      case OrderStatus.Confirmed:
         return Colors[colorScheme].primary_color;
-      case "full":
+
+      case OrderStatus.Processing:
+        return Colors[colorScheme].primary_color;
+      case OrderStatus.PickedUp:
+        return Colors[colorScheme].primary_color;
+      case OrderStatus.InTransit:
+        return Colors[colorScheme].primary_color;
+      case OrderStatus.Delivered:
         return Colors[colorScheme].success;
-      case "cancelled":
-      case "failed":
+      case OrderStatus.Cancelled:
+        return Colors[colorScheme].error;
+      case OrderStatus.FailedDelivery:
         return Colors[colorScheme].error;
       default:
         return Colors[colorScheme].warning;
@@ -135,7 +147,7 @@ const OrderDetails = () => {
         style={{ flex: 1, marginBottom: 80 }}
       >
         {/* Status Timeline */}
-        <View style={styles.timelineContainer}>
+        {/* <View style={styles.timelineContainer}>
           <Text style={styles.sectionTitle}>Order Status</Text>
           {statuses.map((status, index) => {
             const isCompleted = index <= currentStatusIndex;
@@ -148,17 +160,17 @@ const OrderDetails = () => {
                     {
                       backgroundColor: isCompleted
                         ? getStatusColor(order?.order_status)
-                        : Colors[colorScheme].background_light,
+                        : Colors[colorScheme]?.background_light,
                       borderColor: isCompleted
                         ? getStatusColor(order?.order_status)
-                        : Colors[colorScheme].border,
+                        : Colors[colorScheme]?.border,
                     },
                   ]}
                 >
                   <Ionicons
                     name={getStatusIcon(status.id)}
                     size={20}
-                    color={isCompleted ? "white" : Colors[colorScheme].text}
+                    color={isCompleted ? "white" : Colors[colorScheme]?.text}
                   />
                 </View>
                 <Text
@@ -167,7 +179,7 @@ const OrderDetails = () => {
                     {
                       color: isCurrent
                         ? getStatusColor(order?.order_status)
-                        : Colors[colorScheme].text,
+                        : Colors[colorScheme]?.text,
                     },
                   ]}
                 >
@@ -180,7 +192,7 @@ const OrderDetails = () => {
                       {
                         backgroundColor: isCompleted
                           ? getStatusColor(order?.records[0]?.order_status)
-                          : Colors[colorScheme].border,
+                          : Colors[colorScheme]?.border,
                       },
                     ]}
                   />
@@ -188,11 +200,43 @@ const OrderDetails = () => {
               </View>
             );
           })}
-        </View>
+        </View> */}
 
         {/* Order Information */}
         <View style={styles.infoContainer}>
           <Text style={styles.sectionTitle}>Order Information</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Order Status</Text>
+            <Text
+              style={{
+                backgroundColor: getStatusColor(
+                  order?.records[0]?.order_status
+                ),
+                color: "white",
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 15,
+              }}
+            >
+              {order?.records[0]?.order_status === OrderStatus.Pending
+                ? "Pending"
+                : order?.records[0]?.order_status === OrderStatus.Confirmed
+                ? "Confirmed"
+                : order?.records[0]?.order_status === OrderStatus.Processing
+                ? "Processing"
+                : order?.records[0]?.order_status === OrderStatus.PickedUp
+                ? "Picked Up"
+                : order?.records[0]?.order_status === OrderStatus.InTransit
+                ? "In Transit"
+                : order?.records[0]?.order_status === OrderStatus.Delivered
+                ? "Delivered"
+                : order?.records[0]?.order_status === OrderStatus.Cancelled
+                ? "Cancelled"
+                : order?.records[0]?.order_status === OrderStatus.Refunded
+                ? "Refunded"
+                : "Pending"}
+            </Text>
+          </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Order ID</Text>
             <Text style={styles.infoValue}>#{order?.records[0]?.id}</Text>
@@ -262,7 +306,7 @@ const OrderDetails = () => {
                   </View>
                   <View style={styles.itemDetails}>
                     <Text style={styles.itemName} numberOfLines={2}>
-                      {item.name}
+                      {item?.name}
                     </Text>
                     <Text style={styles.itemPrice}>
                       Rs. {item?.price_unit} x {item?.product_uom_qty}
@@ -379,12 +423,16 @@ const OrderDetails = () => {
         )}
 
         {/* Action Buttons */}
-        {order?.records[0]?.state === "draft" && (
+        {order?.records[0]?.order_status === OrderStatus.Pending && (
           <View style={styles.actionButtons}>
             <Pressable
               style={[styles.button, styles.cancelButton]}
               onPress={() => {
                 // Handle cancel order
+                updateOrderStatus({
+                  orderId: order?.records[0]?.id,
+                  status: OrderStatus.Cancelled,
+                });
               }}
             >
               <Text style={styles.buttonText}>Cancel Order</Text>

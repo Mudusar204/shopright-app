@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import socketService from "@/services/socket.service";
+import { socketService } from "@/services/socket.service";
 
 interface Rider {
   id: number | null;

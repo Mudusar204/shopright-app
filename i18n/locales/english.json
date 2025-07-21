@@ -33,20 +33,18 @@
     "no_internet_message": "Please check your internet connection and try again",
     "ok": "Ok"
   },
- 
   "onboarding": {
     "skip": "Skip",
-    "splash_title_1": "Rorem ipsum dolor sit amet, consectetur.",
-    "splash_subtitle_1": "Jorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    "splash_title_2": "Rorem ipsum dolor sit amet, consectetur.",
-    "splash_subtitle_2": "Jorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    "splash_title_3": "Rorem ipsum dolor sit amet, consectetur.",
-    "splash_subtitle_3": "Jorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "splash_title_1": "Order Groceries with Ease",
+    "splash_subtitle_1": "Shop daily essentials and household items anytime — right from your phone.",
+    "splash_title_2": "Explore Trusted Brands",
+    "splash_subtitle_2": "Find popular products at great prices across snacks, beverages, cleaning supplies, and more.",
+    "splash_title_3": "Fast Delivery, Easy Tracking",
+    "splash_subtitle_3": "Track your orders in real-time and get updates every step of the way.",
     "next": "Next",
     "lets_start": "Let's Start"
   },
   "home": {
     "welcome_back": "Welcome Back!"
   }
- 
 }

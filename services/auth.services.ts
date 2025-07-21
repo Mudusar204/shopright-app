@@ -5,14 +5,17 @@ import { useAuthStore } from "@/store/auth.store";
 import axios from "axios";
 
 export const login = async (data: any) => {
-  const response = await axios.get(`http://69.62.120.81:8088/odoo_connect`, {
-    headers: {
-      "Content-Type": "application/json",
-      login: data.identifier,
-      password: data.password,
-      db: "Testing",
-    },
-  });
+  const response = await axios.get(
+    `${process.env.EXPO_PUBLIC_ODOO_API_URL}/odoo_connect`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        login: data.identifier,
+        password: data.password,
+        db: "Testing",
+      },
+    }
+  );
   console.log(response.data, "login response");
   return response.data;
 };
@@ -26,7 +29,7 @@ export const getOdooUser = async () => {
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=res.users&Id=2`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&Id=2`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +57,7 @@ export const register = async (data: any) => {
   console.log(odooAdmin, "odooAdmin in create user");
   try {
     const response = await axios.post(
-      `http://69.62.120.81:8088/send_request?model=res.users`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users`,
       {
         fields: ["login", "name", "password"],
         values: {
@@ -92,7 +95,7 @@ export const addUserAddress = async (data: any) => {
   console.log(odooAdmin, "odooAdmin in create user");
   try {
     const response = await axios.put(
-      `http://69.62.120.81:8088/send_request?model=res.partner&Id=${user?.partner_id}`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.partner&Id=${user?.partner_id}`,
       {
         fields: [
           "type",
@@ -145,7 +148,7 @@ export const getUserAddresses = async () => {
   console.log(odooAdmin, "odooUserAddresses");
   try {
     const response = await axios.get(
-      `http://69.62.120.81:8088/send_request?model=res.partner&Id=${user?.partner_id}&fields=name,email,zip,street,street2,city,state,country,parent_id,type,partner_latitude,partner_longitude`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.partner&Id=${user?.partner_id}&fields=name,email,zip,street,street2,city,state,country,parent_id,type,partner_latitude,partner_longitude`,
       {
         headers: {
           "Content-Type": "application/json",
