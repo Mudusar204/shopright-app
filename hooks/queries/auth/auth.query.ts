@@ -1,4 +1,5 @@
 import { getOdooUser, getUserAddresses } from "@/services/auth.services";
+import { getRiderLocation } from "@/services/rider.services";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export const useGetOdooUser = () => {
@@ -19,5 +20,14 @@ export const useGetUserAddresses = () => {
       return getUserAddresses();
     },
     // staleTime: 60 * 5000, //5 minutes
+  });
+};
+
+export const useGetRiderLocation = (riderId: string) => {
+  return useQuery({
+    queryKey: ["rider-location"],
+    queryFn: () => {
+      return getRiderLocation(riderId);
+    },
   });
 };

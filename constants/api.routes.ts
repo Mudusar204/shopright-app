@@ -38,4 +38,7 @@ export const API_ROUTES = {
     UPDATE_BRAND: (id: string) => `/brands/${id}`,
     DELETE_BRAND: (id: string) => `/brands/${id}`,
   },
+  RIDER: {
+    GET_RIDER_LOCATION: (riderId: string) => `/riders/${riderId}/location`,
+  },
 };

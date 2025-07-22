@@ -21,6 +21,7 @@ import RiderTrackingMap from "@/components/RiderTrackingMap";
 import { socketService } from "@/services/socket.service";
 import { OrderStatus } from "@/constants/enums";
 import { useUpdateOrderStatus } from "@/hooks/mutations/orders/orders.mutation";
+import { useGetRiderLocation } from "@/hooks/queries/auth/auth.query";
 
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -32,6 +33,10 @@ const OrderDetails = () => {
     isError,
     error,
   } = useGetOrderById(Number(orderId));
+  const { data: riderLastLocation } = useGetRiderLocation(
+    order?.records[0]?.app_rider_id || ""
+  );
+  console.log(riderLastLocation, "riderLastLocation in order-details");
   const { mutate: updateOrderStatus, isPending: isUpdatingOrderStatus } =
     useUpdateOrderStatus();
   console.log(order, "order in order-details", orderId, isError, error);
@@ -403,7 +408,10 @@ const OrderDetails = () => {
                       latitude: riderLocation?.latitude,
                       longitude: riderLocation?.longitude,
                     }
-                  : null
+                  : {
+                      latitude: riderLastLocation?.latitude || 0,
+                      longitude: riderLastLocation?.longitude || 0,
+                    }
               }
               deliveryLocation={{
                 latitude:
