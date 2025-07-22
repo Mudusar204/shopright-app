@@ -4,7 +4,7 @@ import axios from "axios";
 
 const apiClient = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
-  // baseURL: 'http://192.168.0.104:3000/api/v1',
+  // baseURL: "http://192.168.100.200:5001",
 });
 
 apiClient.interceptors.request.use(

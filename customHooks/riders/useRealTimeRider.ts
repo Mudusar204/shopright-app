@@ -50,11 +50,17 @@ const useRealTimeRider = ({
 
   // Subscribe to rider location updates
   useEffect(() => {
+    console.log("useRealTimeRider useEffect triggered with riderId:", riderId);
+    console.log("riderId type:", typeof riderId);
+    console.log("riderId value:", riderId);
+
     if (!riderId) {
+      console.log("No riderId provided, stopping tracking");
       setIsTracking(false);
       return;
     }
 
+    console.log("Starting tracking for riderId:", riderId.toString());
     setIsTracking(true);
     const unsubscribe = socketService.subscribeToRiderLocation(
       riderId.toString(),
@@ -68,6 +74,7 @@ const useRealTimeRider = ({
     );
 
     return () => {
+      console.log("Cleaning up tracking for riderId:", riderId.toString());
       unsubscribe();
       setIsTracking(false);
     };

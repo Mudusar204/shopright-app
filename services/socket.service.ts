@@ -161,7 +161,14 @@ const orderStatusListeners = new Map<string, (data: any) => void>();
 function initializeSocket() {
   try {
     const socketUrl =
-      process.env.EXPO_PUBLIC_SOCKET_URL || "ws://69.62.120.81:5005";
+      // process.env.EXPO_PUBLIC_SOCKET_URL || "ws://69.62.120.81:5005";
+      "ws://192.168.100.202:5005";
+
+    console.log("Initializing socket with URL:", socketUrl);
+    console.log(
+      "Environment EXPO_PUBLIC_SOCKET_URL:",
+      process.env.EXPO_PUBLIC_SOCKET_URL
+    );
 
     socket = io(socketUrl, {
       transports: ["websocket", "polling"],
@@ -172,6 +179,7 @@ function initializeSocket() {
       timeout: 20000,
     });
 
+    console.log("Socket instance created:", socket ? "success" : "failed");
     setupEventListeners();
   } catch (error) {
     console.error("Failed to initialize socket:", error);
@@ -179,21 +187,31 @@ function initializeSocket() {
 }
 
 function setupEventListeners() {
-  if (!socket) return;
+  if (!socket) {
+    console.log("No socket instance available for event listeners");
+    return;
+  }
+
+  console.log("Setting up socket event listeners");
 
   socket.on("connect", () => {
-    console.log("Socket connected:", socket?.id);
+    console.log("✅ Socket connected successfully!");
+    console.log("Socket ID:", socket?.id);
+    console.log("Socket connected:", socket?.connected);
     isConnected = true;
     reconnectAttempts = 0;
   });
 
   socket.on("disconnect", (reason) => {
-    console.log("Socket disconnected:", reason);
+    console.log("❌ Socket disconnected:", reason);
+    console.log("Socket connected:", socket?.connected);
     isConnected = false;
   });
 
   socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error);
+    console.error("🔥 Socket connection error:", error);
+    console.log("Error message:", error.message);
+    console.log("Error details:", error);
     isConnected = false;
     reconnectAttempts++;
 
@@ -203,13 +221,13 @@ function setupEventListeners() {
   });
 
   socket.on("reconnect", (attemptNumber) => {
-    console.log("Socket reconnected after", attemptNumber, "attempts");
+    console.log("🔄 Socket reconnected after", attemptNumber, "attempts");
     isConnected = true;
     reconnectAttempts = 0;
   });
 
   socket.on("rider-location-update", (data) => {
-    console.log("rider-location-update", data);
+    console.log("📍 rider-location-update received:", data);
     const { riderId, latitude, longitude, timestamp } = data;
 
     locationListeners.forEach((listener, key) => {
@@ -220,10 +238,9 @@ function setupEventListeners() {
   });
 
   socket.on("order-status-update", (data) => {
-    console.log("order-placed", data);
+    console.log("📦 order-status-update received:", data);
 
     orderStatusListeners.forEach((listener) => {
-      // You can refine this if needed, for example by checking if key === orderId
       listener(data);
     });
   });
@@ -232,12 +249,46 @@ function setupEventListeners() {
 // Public API
 export const socketService = {
   subscribeToRiderLocation(riderId: string, callback: (data: any) => void) {
-    locationListeners.set(riderId, callback);
-    socket?.emit("join-rider-tracking", riderId);
+    console.log("subscribeToRiderLocation called with riderId:", riderId);
+    console.log("Socket connection status:", isConnected);
+    console.log("Socket instance:", socket ? "exists" : "null");
+
+    if (!riderId) {
+      console.warn("riderId is empty or undefined, skipping subscription");
+      return () => {};
+    }
+
+    if (!socket) {
+      console.warn("Socket not initialized, attempting to connect...");
+      initializeSocket();
+      return () => {};
+    }
+
+    if (!isConnected) {
+      console.warn("Socket not connected, waiting for connection...");
+      // Wait for connection before emitting
+      const checkConnection = () => {
+        if (isConnected) {
+          console.log("Socket now connected, emitting join-rider-tracking");
+          locationListeners.set(riderId, callback);
+          socket?.emit("join-rider-tracking", riderId);
+        } else {
+          setTimeout(checkConnection, 1000);
+        }
+      };
+      checkConnection();
+    } else {
+      console.log("Socket connected, emitting join-rider-tracking immediately");
+      locationListeners.set(riderId, callback);
+      socket?.emit("join-rider-tracking", riderId);
+    }
 
     return () => {
+      console.log("Unsubscribing from rider location:", riderId);
       locationListeners.delete(riderId);
-      socket?.emit("leave-rider-tracking", riderId);
+      if (socket && isConnected) {
+        socket.emit("leave-rider-tracking", riderId);
+      }
     };
   },
 
@@ -277,6 +328,20 @@ export const socketService = {
   cleanup() {
     locationListeners.clear();
     socket?.disconnect();
+  },
+
+  // Test function for debugging
+  testEmitJoinRiderTracking(riderId: string) {
+    console.log("🧪 Testing join-rider-tracking emission");
+    console.log("Socket connected:", isConnected);
+    console.log("Socket instance:", socket ? "exists" : "null");
+
+    if (socket && isConnected) {
+      console.log("Emitting test join-rider-tracking event");
+      socket.emit("join-rider-tracking", riderId);
+    } else {
+      console.log("Cannot emit - socket not ready");
+    }
   },
 };
 

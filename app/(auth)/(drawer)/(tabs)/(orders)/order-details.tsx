@@ -38,26 +38,36 @@ const OrderDetails = () => {
 
   // Real-time rider tracking
   const riderId = order?.records[0]?.app_rider_id;
+  console.log("riderId extracted from order:", riderId);
+  console.log("Full order data:", order?.records[0]);
+
   const { riderLocation, socketConnected, isTracking } = useRealTimeRider({
     riderId,
     onLocationUpdate: (location) => {
       console.log("Rider location updated:", location);
     },
   });
-  console.log(riderLocation, "riderLocation in order-details");
-  useEffect(() => {
-    const unsubscribe = socketService.subscribeToRiderLocation(
-      riderId,
-      (data) => {
-        console.log("Live location from any rider:", data);
-        // Example: update markers on Google Map
-      }
-    );
+  console.log("useRealTimeRider result:", {
+    riderLocation,
+    socketConnected,
+    isTracking,
+  });
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  // Remove duplicate subscription - useRealTimeRider already handles this
+  // useEffect(() => {
+  //   console.log("riderId in order-details", riderId, socketConnected);
+  //   const unsubscribe = socketService.subscribeToRiderLocation(
+  //     riderId,
+  //     (data) => {
+  //       console.log("Live location from any rider:", data);
+  //       // Example: update markers on Google Map
+  //     }
+  //   );
+
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   if (isLoading) {
     return (
