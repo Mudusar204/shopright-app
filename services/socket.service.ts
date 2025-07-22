@@ -161,8 +161,8 @@ const orderStatusListeners = new Map<string, (data: any) => void>();
 function initializeSocket() {
   try {
     const socketUrl =
-      // process.env.EXPO_PUBLIC_SOCKET_URL || "ws://69.62.120.81:5005";
-      "ws://192.168.100.202:5005";
+      process.env.EXPO_PUBLIC_SOCKET_URL || "ws://69.62.120.81:5005";
+    // "ws://192.168.100.202:5005";
 
     console.log("Initializing socket with URL:", socketUrl);
     console.log(

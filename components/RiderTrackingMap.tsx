@@ -97,14 +97,14 @@ const RiderTrackingMap: React.FC<RiderTrackingMapProps> = ({
           )}
 
           {/* Route Line */}
-          {riderLocation && (
+          {/* {riderLocation && (
             <Polyline
               coordinates={getRouteCoordinates()}
               strokeColor={Colors[colorScheme].primary_color}
               strokeWidth={3}
               lineDashPattern={[5, 5]}
             />
-          )}
+          )} */}
         </MapView>
 
         {/* Connection Status Indicator */}
