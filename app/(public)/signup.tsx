@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, ScrollView } from "react-native";
+import { Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Button, Text, View } from "@/components/Themed";
 import React, { useRef, useState } from "react";
 import Header from "@/components/Header";
@@ -11,6 +11,7 @@ import SmsIcon from "@/assets/images/svgs/Sms";
 import Lock2Icon from "@/assets/images/svgs/Lock2";
 
 import useSignupScreen from "@/customHooks/auth/useSignupScreen";
+import { useAuthStore } from "@/store/auth.store";
 const Signup = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
@@ -26,6 +27,7 @@ const Signup = () => {
     handleRegister,
     isLoading,
   } = useSignupScreen();
+  const { setOdooAdmin } = useAuthStore();
   return (
     <View style={styles.container}>
       <Header title={null} backButton={true} />
@@ -85,6 +87,9 @@ const Signup = () => {
             Sign in
           </Link>
         </Text>
+        <TouchableOpacity onPress={() => setOdooAdmin()}>
+          <Text style={styles.footerText}>Skip</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -117,6 +122,8 @@ const createStyles = (theme: "light" | "dark") =>
       marginBottom: 15,
     },
     footer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
       marginTop: 20,
       alignItems: "center",
     },

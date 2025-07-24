@@ -9,7 +9,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token;
+    const token = useAuthStore.getState().odooUserAuth?.api_key;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

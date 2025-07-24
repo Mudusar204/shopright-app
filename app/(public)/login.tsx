@@ -60,13 +60,15 @@ const Login = () => {
             Create an account
           </Link>
         </Text>
-        {/* <TouchableOpacity onPress={() => setOdooAdmin()}> */}
         <Text style={styles.footerText}>
           <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
             Skip for Now
           </Link>
         </Text>
-        {/* </TouchableOpacity> */}
+      </View>
+      <View style={styles.footer}>
+        <Text>API URL: {process.env.EXPO_PUBLIC_API_URL}</Text>
+        <Text>ODOO API URL: {process.env.EXPO_PUBLIC_ODOO_API_URL}</Text>
       </View>
     </View>
   );
