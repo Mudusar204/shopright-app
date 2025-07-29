@@ -1,77 +1,73 @@
-import { Dimensions, Image, Pressable, StyleSheet } from 'react-native'
-import { Button, Text, View } from '@/components/Themed'
-import React, { useState } from 'react'
-import Header from '@/components/Header'
-import { useColorScheme } from '@/components/useColorScheme';
-import Colors from '@/constants/Colors';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
+import { Dimensions, Image, Pressable, StyleSheet } from "react-native";
+import { Button, Text, View } from "@/components/Themed";
+import React, { useState } from "react";
+import Header from "@/components/Header";
+import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 const Settings = () => {
-  const width = Dimensions.get('window').width;
-  const colorScheme = useColorScheme() as 'light' | 'dark';
+  const width = Dimensions.get("window").width;
+  const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme, width);
 
   const links = [
     {
-      title: 'Edit Profile',
-      onPress: () => router.push('/(auth)/editProfile')
+      title: "Edit Profile",
+      onPress: () => router.push("/(auth)/editProfile"),
     },
+
     {
-      title: 'Language',
-      leftText: 'English',
-      // onPress: () => router.push('/(auth)/(drawer)/changePassword')
-    },
-    {
-      title: 'Security',
+      title: "Security",
       // onPress: () => router.push('/(auth)/(drawer)/security')
     },
     {
-      title: 'Legal and Policy',
+      title: "Legal and Policy",
       // onPress: () => router.push('/(auth)/(drawer)/legal')
     },
-    {
-      title: 'Help and Support',
-      // onPress: () => router.push('/(auth)/(drawer)/about')
-    }
-  ]
+  ];
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Header title={'Settings'} />
+        <Header title={"Settings"} />
       </View>
       {links.map((link, index) => (
-        <Pressable onPress={link.onPress} key={index} >
-
-          <View key={index} style={styles.linkContainer} >
-            <Text style={styles.linkText} >{link.title}</Text>
-            <View style={styles.linkIconContainer} >
-              <Text style={styles.linkIconText} >{link?.leftText}</Text>
-              <Ionicons name="chevron-forward-outline" size={24} color={Colors[colorScheme].icon_color} />
+        <Pressable onPress={link.onPress} key={index}>
+          <View key={index} style={styles.linkContainer}>
+            <Text style={styles.linkText}>{link.title}</Text>
+            <View style={styles.linkIconContainer}>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={24}
+                color={Colors[colorScheme].icon_color}
+              />
             </View>
           </View>
         </Pressable>
       ))}
-    </View >
-  )
-}
+    </View>
+  );
+};
 
-export default Settings
+export default Settings;
 
-const createStyles = (theme: 'light' | 'dark', width: number) =>
+const createStyles = (theme: "light" | "dark", width: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme === 'light' ? Colors[theme].background_light : 'rgba(0, 0, 0, 0.95)',
+      backgroundColor:
+        theme === "light"
+          ? Colors[theme].background_light
+          : "rgba(0, 0, 0, 0.95)",
     },
     headerContainer: {
       paddingHorizontal: 15,
       paddingBottom: 20,
-      marginBottom: 50,
     },
     linkContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       borderColor: Colors[theme].border,
       borderRadius: 12,
       paddingHorizontal: 15,
@@ -80,9 +76,9 @@ const createStyles = (theme: 'light' | 'dark', width: number) =>
       marginHorizontal: 15,
     },
     linkIconContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
     },
     linkText: {
       fontSize: 16,

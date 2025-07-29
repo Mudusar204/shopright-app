@@ -111,7 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
               {title}
             </Text>
             <View style={styles.priceContainer}>
-              <Text style={styles.title}>1 kg</Text>
+              <Text style={styles.title}>1</Text>
               <Text style={styles.title}>Rs.{price}</Text>
             </View>
 

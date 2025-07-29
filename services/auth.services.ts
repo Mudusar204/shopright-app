@@ -22,6 +22,7 @@ export const login = async (data: any) => {
 
 export const getOdooUser = async () => {
   const odooAdmin = useAuthStore.getState().odooAdmin;
+  const odooUserAuth = useAuthStore.getState().odooUserAuth;
 
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
@@ -29,7 +30,7 @@ export const getOdooUser = async () => {
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&Id=2`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&id=${odooUserAuth?.id}`,
       {
         headers: {
           "Content-Type": "application/json",

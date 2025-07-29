@@ -26,7 +26,6 @@ import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
 import { useGetProducts } from "@/hooks/queries/products/products.query";
-import { useGetOdooUser } from "@/hooks/queries/auth/auth.query";
 import { useGetCategories } from "@/hooks/queries/categories/categories.query";
 
 type FilterItem = {

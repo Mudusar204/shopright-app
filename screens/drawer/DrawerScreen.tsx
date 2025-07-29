@@ -22,6 +22,8 @@ import LogoutIcon from "@/assets/images/svgs/Logout";
 import { useThemStore } from "@/store/theme.store";
 import { useAuthStore } from "@/store/auth.store";
 import { useMyCartStore } from "@/store/myCart.store";
+import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
+import AntDesign from "@expo/vector-icons/AntDesign";
 const TitleWithImage = ({
   Icon,
   title,
@@ -50,6 +52,8 @@ const DrawerScreen = () => {
   // const { address } = useLocationStore();
   const colorTheme = useColorScheme() as "light" | "dark";
   const { setIsLoggedIn, odooUserAuth, clear } = useAuthStore();
+  const { data: userAddresses } = useGetUserAddresses();
+
   const { cartItems, clearCart } = useMyCartStore();
   return (
     <View
@@ -66,10 +70,11 @@ const DrawerScreen = () => {
         </View>
         <Pressable>
           <View style={styles.profileContainer}>
-            <Image
+            {/* <Image
               source={require("@/assets/images/profileImg.png")}
               style={styles.profileImage}
-            />
+            /> */}
+            <AntDesign name="user" size={30} color={Colors[colorTheme].text} />
             <View style={styles.profileTextContainer}>
               <Text style={styles.profileNameText}>
                 {odooUserAuth?.login || "John Doe"}
@@ -82,7 +87,9 @@ const DrawerScreen = () => {
                     { color: Colors[colorTheme].primary_color },
                   ]}
                 >
-                  Faisalabad, Pakistan
+                  {userAddresses?.records[0].state +
+                    ", " +
+                    userAddresses?.records[0].country}
                 </Text>
               </View>
             </View>
@@ -107,22 +114,24 @@ const DrawerScreen = () => {
             style={{ marginTop: 30 }}
           />
         </View>
-        <TitleWithImage
+        {/* <TitleWithImage
           Icon={<InfoIcon color={Colors[colorTheme].icon_color} />}
           title="Account Information"
           onPress={() => {}}
-        />
-        <TitleWithImage
+        /> */}
+        {/* <TitleWithImage
           Icon={<LockIcon color={Colors[colorTheme].icon_color} />}
           title="Password"
           onPress={() => {
             router.push("/(public)/newPassword");
           }}
-        />
+        /> */}
         <TitleWithImage
           Icon={<BagIcon color={Colors[colorTheme].icon_color} />}
           title="My Orders"
-          onPress={() => {}}
+          onPress={() => {
+            router.push("/(auth)/(drawer)/(tabs)/(orders)/Orders");
+          }}
         />
         <TitleWithImage
           Icon={<HeartIcon color={Colors[colorTheme].icon_color} />}
@@ -139,6 +148,17 @@ const DrawerScreen = () => {
         <TitleWithImage
           Icon={<InfoIcon color={Colors[colorTheme].icon_color} />}
           title="FAQs"
+          onPress={() => {}}
+        />
+        <TitleWithImage
+          Icon={
+            <MaterialIcons
+              name="support-agent"
+              color={Colors[colorTheme].icon_color}
+              size={24}
+            />
+          }
+          title="Support"
           onPress={() => {}}
         />
         <View style={{}}>

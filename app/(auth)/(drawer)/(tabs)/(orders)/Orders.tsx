@@ -201,6 +201,14 @@ const Orders = () => {
               router.push("/(auth)/(tabs)");
             }}
           />
+          <Button
+            variant="primary"
+            size="large"
+            title="Refresh"
+            onPress={() => {
+              refetch();
+            }}
+          />
         </View>
       </View>
     );

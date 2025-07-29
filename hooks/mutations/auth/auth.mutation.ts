@@ -4,7 +4,6 @@ import {
   login,
   register,
   logout,
-  getOdooUser,
   addUserAddress,
 } from "@/services/auth.services";
 
