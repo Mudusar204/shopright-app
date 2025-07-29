@@ -7,6 +7,7 @@ import { View, Text, Button } from "@/components/Themed";
 import { router } from "expo-router";
 import PhoneIcon from "@/assets/images/svgs/Phone";
 import LocationIcon from "@/assets/images/svgs/Location";
+import { getImageSource } from "@/utils";
 
 interface RelatedProductCardProps {
   explorePage?: boolean;
@@ -45,7 +46,7 @@ const RelatedProductCard: React.FC<RelatedProductCardProps> = ({
       >
         <Image
           resizeMode="cover"
-          source={{ uri: image }}
+          source={getImageSource(image)}
           style={styles.image}
         />
       </View>

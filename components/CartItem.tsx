@@ -5,6 +5,7 @@ import Colors from "@/constants/Colors";
 import { Button } from "@/components/Themed";
 import { Ionicons } from "@expo/vector-icons";
 import { useMyCartStore } from "@/store/myCart.store";
+import { getImageSource } from "@/utils";
 
 interface CartItemProps {
   item: {
@@ -25,10 +26,11 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
     const newQuantity = Math.max(1, item.quantity + change);
     updateQuantity(item.id, newQuantity);
   };
+  console.log(item);
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: item.image }} style={styles.image} />
+      <Image source={getImageSource(item.image)} style={styles.image} />
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.price}>{`Rs.${item.price}`}</Text>

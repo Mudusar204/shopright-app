@@ -8,6 +8,7 @@ import LocationIcon from "@/assets/images/svgs/Location";
 import PhoneIcon from "@/assets/images/svgs/Phone";
 import { useMyCartStore } from "@/store/myCart.store";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { getImageSource } from "@/utils";
 interface ProductCardProps {
   id: string;
   image: string;
@@ -78,7 +79,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             {image ? (
               <Image
                 resizeMode="cover"
-                source={{ uri: image }}
+                source={getImageSource(image)}
                 style={styles.image}
               />
             ) : (

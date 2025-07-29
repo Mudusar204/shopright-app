@@ -22,6 +22,7 @@ import { socketService } from "@/services/socket.service";
 import { OrderStatus } from "@/constants/enums";
 import { useUpdateOrderStatus } from "@/hooks/mutations/orders/orders.mutation";
 import { useGetRiderLocation } from "@/hooks/queries/auth/auth.query";
+import { getImageSource } from "@/utils";
 
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -305,7 +306,7 @@ const OrderDetails = () => {
                   <View style={styles.itemImageContainer}>
                     {item?.product_image_url ? (
                       <Image
-                        source={{ uri: item?.product_image_url }}
+                        source={getImageSource(item?.product_image_url)}
                         style={styles.itemImage}
                         resizeMode="cover"
                       />
