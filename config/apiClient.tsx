@@ -3,8 +3,8 @@ import { useLocationStore } from "@/store/location.store";
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
-  // baseURL: "http://192.168.100.200:5001",
+  // baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: "http://192.168.100.212:5001",
 });
 
 apiClient.interceptors.request.use(

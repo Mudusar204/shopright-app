@@ -5,11 +5,15 @@ import {
   NotificationData,
 } from "@/services/notification.service";
 import { useAuthStore } from "@/store/auth.store";
+import { useGetUserAddresses } from "./queries/auth/auth.query";
 
 export const useNotifications = () => {
   const [notification, setNotification] =
     useState<Notifications.Notification | null>(null);
+  const { data: userAddresses } = useGetUserAddresses();
+
   const notificationListener = useRef<Notifications.Subscription | null>(null);
+
   const responseListener = useRef<Notifications.Subscription | null>(null);
   const { odooUserAuth, expoPushToken, setExpoPushToken } = useAuthStore();
   useEffect(() => {
@@ -89,7 +93,7 @@ export const useNotifications = () => {
     if (odooUserAuth?.id && expoPushToken) {
       console.log("sending token");
       const response = await notificationService.registerPushToken(
-        odooUserAuth.id.toString(),
+        userAddresses.records[0]?.id.toString(),
         expoPushToken
       );
       console.log(response, "response ");
@@ -102,7 +106,7 @@ export const useNotifications = () => {
     if (odooUserAuth?.id && expoPushToken) {
       setExpoPushToken(null);
       return await notificationService.unregisterPushToken(
-        odooUserAuth.id.toString(),
+        userAddresses.records[0]?.id.toString(),
         expoPushToken
       );
     }
