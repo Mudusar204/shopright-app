@@ -139,16 +139,17 @@ const DrawerScreen = () => {
           onPress={() => {}}
         />
         <TitleWithImage
-          Icon={<UserSettingIcon color={Colors[colorTheme].icon_color} />}
+          Icon={
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={Colors[colorTheme].icon_color}
+            />
+          }
           title="Settings"
           onPress={() => {
             router.push("/(auth)/settings");
           }}
-        />
-        <TitleWithImage
-          Icon={<InfoIcon color={Colors[colorTheme].icon_color} />}
-          title="FAQs"
-          onPress={() => {}}
         />
         <TitleWithImage
           Icon={
@@ -159,8 +160,16 @@ const DrawerScreen = () => {
             />
           }
           title="Support"
+          onPress={() => {
+            router.push("/(auth)/support");
+          }}
+        />
+        <TitleWithImage
+          Icon={<InfoIcon color={Colors[colorTheme].icon_color} />}
+          title="FAQs"
           onPress={() => {}}
         />
+
         <View style={{}}>
           <TitleWithImage
             Icon={<LogoutIcon color="#FF5757" />}

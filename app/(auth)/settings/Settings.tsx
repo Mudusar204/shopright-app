@@ -18,8 +18,8 @@ const Settings = () => {
     },
 
     {
-      title: "Security",
-      // onPress: () => router.push('/(auth)/(drawer)/security')
+      title: "Notifications",
+      onPress: () => router.push("/(auth)/settings/notifications"),
     },
     {
       title: "Legal and Policy",

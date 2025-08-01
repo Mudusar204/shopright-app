@@ -39,7 +39,7 @@ const Profile = () => {
 
     {
       title: "Phone",
-      value: odooUser?.phone || "N/A",
+      value: "N/A",
     },
     {
       title: "Address",

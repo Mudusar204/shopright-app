@@ -14,6 +14,7 @@ const initialState: AuthStoreState = {
   isLoading: false,
   isOnboarded: false,
   odooUser: null,
+  expoPushToken: null,
   userLocations: [],
   odooUserAuth: null,
   odooAdmin: {
@@ -44,6 +45,9 @@ export const useAuthStore = create(
         }),
       setIsLoading: (isLoading: boolean) => set({ isLoading }),
       setOnboarded: (isOnboarded: boolean) => set({ isOnboarded }),
+      setExpoPushToken: (expoPushToken: string | null) =>
+        set({ expoPushToken }),
+
       clear: () => {
         set({
           isLoggedIn: false,

@@ -2,6 +2,7 @@ interface AuthStoreState {
   isLoggedIn: boolean;
   isLoading: boolean;
   odooUser?: OdooUser | null;
+  expoPushToken?: string | null;
   userLocations?: any[] | null;
   odooAdmin?: OdooAdmin | null;
   odooUserAuth?: OdooUserAuth | null;
@@ -13,6 +14,7 @@ interface AuthStoreActions {
   setOdooUser: (user: OdooUser | null) => void;
   setOdooUserAuth: (userAuth: OdooUserAuth | null) => void;
   setOdooAdmin: () => void;
+  setExpoPushToken: (expoPushToken: string | null) => void;
   setIsLoading: (isLoading: boolean) => void;
   setOnboarded: (isOnboarded: boolean) => void;
   clear: () => void;
