@@ -208,6 +208,7 @@ const Orders = () => {
             onPress={() => {
               refetch();
             }}
+            style={{ marginTop: 10 }}
           />
         </View>
       </View>

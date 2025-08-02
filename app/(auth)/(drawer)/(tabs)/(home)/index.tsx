@@ -147,11 +147,19 @@ export default function HomeScreen() {
             <MenuHandler />
           </View>
           <View style={{ flex: 1 }}>
-            <Image
-              resizeMode="contain"
-              style={styles.userImage}
-              source={require("@/assets/images/logo.png")}
-            />
+            {colorScheme === "dark" ? (
+              <Image
+                resizeMode="contain"
+                style={styles.userImage}
+                source={require("@/assets/images/logo.png")}
+              />
+            ) : (
+              <Image
+                resizeMode="contain"
+                style={styles.userImage}
+                source={require("@/assets/images/logo-dark.png")}
+              />
+            )}
           </View>
           <Pressable
             style={styles.cart}

@@ -27,6 +27,7 @@ const Profile = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const { data: userAddresses } = useGetUserAddresses();
   const odooUser = useAuthStore().odooUserAuth;
+  const isLoggedIn = useAuthStore().isLoggedIn;
   console.log(odooUser, "odooUser");
   console.log(userAddresses, "userAddresses", odooUser);
   const styles = createStyles(colorScheme, width);
@@ -44,13 +45,11 @@ const Profile = () => {
     {
       title: "Address",
       value:
-        userAddresses?.records[0].street +
-        ", " +
-        userAddresses?.records[0].city +
-        ", " +
-        userAddresses?.records[0].state +
-        ", " +
-        userAddresses?.records[0].country,
+        userAddresses?.records[0]?.street ||
+        "N/A" + ", " + userAddresses?.records[0]?.city ||
+        "N/A" + ", " + userAddresses?.records[0]?.state ||
+        "N/A" + ", " + userAddresses?.records[0]?.country ||
+        "N/A",
     },
   ];
   return (
@@ -82,6 +81,17 @@ const Profile = () => {
           </View>
         </View>
       ))}
+      {!isLoggedIn && (
+        <Button
+          variant="primary"
+          size="large"
+          title="Login"
+          onPress={() => {
+            router.push("/(public)/login");
+          }}
+          style={{ marginTop: 30 }}
+        />
+      )}
     </View>
   );
 };
