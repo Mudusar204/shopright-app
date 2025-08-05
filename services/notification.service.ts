@@ -58,11 +58,11 @@ class NotificationService {
     try {
       const hasPermission = await this.requestPermissions();
       if (!hasPermission) return null;
-
       const token = await Notifications.getExpoPushTokenAsync({
         // projectId: process.env.EXPO_PROJECT_ID, // You'll need to set this
         projectId: "da149288-c370-43e4-bbc9-5216690dbaf2",
       });
+      console.log("expo push token", token);
 
       this.expoPushToken = token.data;
       return token.data;

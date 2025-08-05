@@ -12,6 +12,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { useAuthStore } from "@/store/auth.store";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
+import notificationService from "@/services/notification.service";
 
 interface NotificationSettingsProps {
   onClose?: () => void;
@@ -54,6 +55,11 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     } catch (error) {
       Alert.alert("Error", "Failed to enable notifications");
     }
+  };
+
+  const getPushToken = async () => {
+    const token = await notificationService.getExpoPushToken();
+    console.log("token", token);
   };
 
   const handleUnregisterToken = async () => {
@@ -129,6 +135,13 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               onPress={handleRegisterToken}
             >
               <Text style={styles.buttonText}>Enable Notifications</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.enableButton]}
+              onPress={getPushToken}
+            >
+              <Text style={styles.buttonText}>Get Push Token</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
