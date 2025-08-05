@@ -9,7 +9,7 @@ import SmsIcon from "@/assets/images/svgs/Sms";
 import InputHandler from "@/components/InputHandler";
 import Lock2Icon from "@/assets/images/svgs/Lock2";
 import useLoginScreen from "@/customHooks/auth/useLoginScreen";
-
+import Feather from "@expo/vector-icons/Feather";
 const Login = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
@@ -22,7 +22,7 @@ const Login = () => {
     handleLogin,
     isLoading,
   } = useLoginScreen();
-
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome back!</Text>
@@ -32,17 +32,25 @@ const Login = () => {
       </Text>
       <InputHandler
         leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-        placeholder=" Phone Number"
+        placeholder="Email or Phone Number"
         value={identifier}
         onChangeText={setIdentifier}
         textContentType="telephoneNumber"
       />
       <InputHandler
         leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
+        rightIcon={
+          <Feather
+            name={!isPasswordVisible ? "eye-off" : "eye"}
+            size={20}
+            color={Colors[colorScheme].icon_color}
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          />
+        }
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry={true}
+        secureTextEntry={!isPasswordVisible}
         textContentType="password"
       />
       <Button

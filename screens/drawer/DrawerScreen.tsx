@@ -77,7 +77,9 @@ const DrawerScreen = () => {
             <AntDesign name="user" size={30} color={Colors[colorTheme].text} />
             <View style={styles.profileTextContainer}>
               <Text style={styles.profileNameText}>
-                {odooUserAuth?.login || "John Doe"}
+                {odooUserAuth?.login
+                  ? odooUserAuth?.login.substring(0, 15) + "..."
+                  : "Guest"}
               </Text>
               <View style={[styles.locationRow]}>
                 <LocationIcon color={Colors[colorTheme].primary_color} />

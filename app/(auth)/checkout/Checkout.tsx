@@ -210,7 +210,8 @@ const Checkout = () => {
               size="small"
               title="+ Address"
               onPress={() => bottomSheetRef.current?.handleBottomSheet()}
-              style={{ marginBottom: 15 }}
+              style={{ marginBottom: 15, opacity: !isLoggedIn ? 0.5 : 1 }}
+              disabled={!isLoggedIn}
             />
           </View>
           {userAddresses?.records?.length > 0 &&
@@ -294,8 +295,9 @@ const Checkout = () => {
           <Button
             variant="primary"
             size="large"
-            title="Place Order"
+            title={isPending ? "Placing Order..." : "Place Order"}
             onPress={handleCheckout}
+            disabled={isPending}
           />
         ) : (
           <Button

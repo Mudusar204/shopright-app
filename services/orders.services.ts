@@ -3,6 +3,7 @@ import { API_ROUTES } from "@/constants/api.routes";
 import { OrderStatus } from "@/constants/enums";
 import { useAuthStore } from "@/store/auth.store";
 import axios from "axios";
+import { socketService } from "./socket.service";
 
 export const createOrder = async (data: any) => {
   console.log("create order data", data);
@@ -135,6 +136,13 @@ export const updateOrderStatus = async (
         },
       }
     );
+    socketService.emit("order-status-update", {
+      orderId: orderId,
+      userId: odooAdmin.login, // You can get this from your auth store
+      details: {
+        orderStatus: status,
+      },
+    });
     console.log(response, "updateOrderStatus response");
     return response.data;
   } catch (error) {

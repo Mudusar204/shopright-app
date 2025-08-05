@@ -6,6 +6,7 @@ import {
   Alert,
   BackHandler,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import { Button, Text, View } from "@/components/Themed";
 import React, { useState } from "react";
@@ -24,12 +25,18 @@ const Support = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme, width);
 
+  const handlePhonePress = () => {
+    Linking.openURL("tel:+923001234567");
+  };
+
   return (
     <View style={styles.container}>
       <Header title="Support Center" />
       <View style={styles.contentContainer}>
         <Text style={styles.titleText}>Contact Admin</Text>
-        <Text style={styles.phoneText}>+92 300 1234567</Text>
+        <TouchableOpacity onPress={handlePhonePress}>
+          <Text style={styles.phoneText}>+92 300 1234567</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -57,5 +64,6 @@ const createStyles = (theme: "light" | "dark", width: number) =>
     phoneText: {
       fontSize: 24,
       fontWeight: "600",
+      color: "lightblue",
     },
   });

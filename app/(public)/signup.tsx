@@ -12,6 +12,7 @@ import Lock2Icon from "@/assets/images/svgs/Lock2";
 
 import useSignupScreen from "@/customHooks/auth/useSignupScreen";
 import { useAuthStore } from "@/store/auth.store";
+import Feather from "@expo/vector-icons/Feather";
 const Signup = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
@@ -28,6 +29,7 @@ const Signup = () => {
     isLoading,
   } = useSignupScreen();
   const { setOdooAdmin } = useAuthStore();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   return (
     <View style={styles.container}>
       <Header title={null} backButton={true} />
@@ -54,18 +56,34 @@ const Signup = () => {
       />
       <InputHandler
         leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
+        rightIcon={
+          <Feather
+            name={!isPasswordVisible ? "eye-off" : "eye"}
+            size={20}
+            color={Colors[colorScheme].icon_color}
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          />
+        }
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry={true}
+        secureTextEntry={!isPasswordVisible}
         textContentType="password"
       />
       <InputHandler
         leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
+        rightIcon={
+          <Feather
+            name={!isPasswordVisible ? "eye-off" : "eye"}
+            size={24}
+            color={Colors[colorScheme].icon_color}
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          />
+        }
         placeholder="Confirm Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
-        secureTextEntry={true}
+        secureTextEntry={!isPasswordVisible}
         textContentType="password"
       />
       <Button

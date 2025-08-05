@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Image,
+  RefreshControl,
 } from "react-native";
 import { View, Text } from "@/components/Themed";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -33,13 +34,13 @@ const OrderDetails = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = useGetOrderById(Number(orderId));
   const { data: riderLastLocation } = useGetRiderLocation(
     order?.records[0]?.app_rider_id || ""
   );
   console.log(riderLastLocation, "riderLastLocation in order-details");
-  const { mutate: updateOrderStatus, isPending: isUpdatingOrderStatus } =
-    useUpdateOrderStatus();
+  const { mutate: updateOrderStatus, isPending } = useUpdateOrderStatus();
   console.log(order, "order in order-details", orderId, isError, error);
 
   // Real-time rider tracking
@@ -159,6 +160,9 @@ const OrderDetails = () => {
         <Header title="Order Details" />
       </View>
       <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, marginBottom: 80 }}
       >
@@ -373,73 +377,76 @@ const OrderDetails = () => {
         )}
 
         {/* Real-time Rider Tracking */}
-        {order?.records[0]?.app_rider_id && (
-          <View style={styles.mapContainer}>
-            <Text style={styles.sectionTitle}>Delivery and Rider Location</Text>
-            <View style={styles.riderInfoContainer}>
-              <View style={styles.riderInfo}>
-                <Ionicons
-                  name="bicycle"
-                  size={20}
-                  color={Colors[colorScheme].primary_color}
-                />
-                <Text style={styles.riderName}>
-                  {order?.records[0]?.app_rider_id || "Rider"}
-                </Text>
-                <View
-                  style={[
-                    styles.trackingStatus,
-                    {
-                      backgroundColor: socketConnected
-                        ? Colors[colorScheme].success
-                        : Colors[colorScheme].error,
-                    },
-                  ]}
-                >
-                  <Text style={styles.trackingStatusText}>
-                    {socketConnected ? "Live" : "Offline"}
+        {order?.records[0]?.app_rider_id &&
+          order?.records[0]?.order_status === OrderStatus.InTransit && (
+            <View style={styles.mapContainer}>
+              <Text style={styles.sectionTitle}>
+                Delivery and Rider Location
+              </Text>
+              <View style={styles.riderInfoContainer}>
+                <View style={styles.riderInfo}>
+                  <Ionicons
+                    name="bicycle"
+                    size={20}
+                    color={Colors[colorScheme].primary_color}
+                  />
+                  <Text style={styles.riderName}>
+                    {order?.records[0]?.app_rider_id || "Rider"}
                   </Text>
+                  <View
+                    style={[
+                      styles.trackingStatus,
+                      {
+                        backgroundColor: socketConnected
+                          ? Colors[colorScheme].success
+                          : Colors[colorScheme].error,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.trackingStatusText}>
+                      {socketConnected ? "Live" : "Offline"}
+                    </Text>
+                  </View>
                 </View>
               </View>
+              <RiderTrackingMap
+                riderLocation={
+                  riderLocation
+                    ? {
+                        latitude: riderLocation?.latitude,
+                        longitude: riderLocation?.longitude,
+                      }
+                    : {
+                        latitude: riderLastLocation?.latitude || 0,
+                        longitude: riderLastLocation?.longitude || 0,
+                      }
+                }
+                deliveryLocation={{
+                  latitude:
+                    order?.records[0]?.partner_shipping_id?.partner_latitude ||
+                    23.723081,
+                  longitude:
+                    order?.records[0]?.partner_shipping_id?.partner_longitude ||
+                    90.4087,
+                }}
+                riderName={order?.records[0]?.app_rider_id || "Rider"}
+                isConnected={socketConnected}
+                height={250}
+              />
+              {!socketConnected && (
+                <View style={styles.offlineMessage}>
+                  <Ionicons
+                    name="wifi-outline"
+                    size={16}
+                    color={Colors[colorScheme].text_secondary}
+                  />
+                  <Text style={styles.offlineMessageText}>
+                    Rider tracking is currently offline
+                  </Text>
+                </View>
+              )}
             </View>
-            <RiderTrackingMap
-              riderLocation={
-                riderLocation
-                  ? {
-                      latitude: riderLocation?.latitude,
-                      longitude: riderLocation?.longitude,
-                    }
-                  : {
-                      latitude: riderLastLocation?.latitude || 0,
-                      longitude: riderLastLocation?.longitude || 0,
-                    }
-              }
-              deliveryLocation={{
-                latitude:
-                  order?.records[0]?.partner_shipping_id?.partner_latitude ||
-                  23.723081,
-                longitude:
-                  order?.records[0]?.partner_shipping_id?.partner_longitude ||
-                  90.4087,
-              }}
-              riderName={order?.records[0]?.app_rider_id || "Rider"}
-              isConnected={socketConnected}
-              height={250}
-            />
-            {!socketConnected && (
-              <View style={styles.offlineMessage}>
-                <Ionicons
-                  name="wifi-outline"
-                  size={16}
-                  color={Colors[colorScheme].text_secondary}
-                />
-                <Text style={styles.offlineMessageText}>
-                  Rider tracking is currently offline
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
+          )}
 
         {/* Action Buttons */}
         {order?.records[0]?.order_status === OrderStatus.Pending && (
@@ -454,7 +461,9 @@ const OrderDetails = () => {
                 });
               }}
             >
-              <Text style={styles.buttonText}>Cancel Order</Text>
+              <Text style={styles.buttonText}>
+                {isPending ? "Cancelling..." : "Cancel Order"}
+              </Text>
             </Pressable>
             {/* <Pressable
               style={[styles.button, styles.supportButton]}
