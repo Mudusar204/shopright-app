@@ -77,21 +77,20 @@ const RiderTrackingMap: React.FC<RiderTrackingMapProps> = ({
           showsScale={true}
         >
           {/* Delivery Location Marker */}
-          <Marker coordinate={deliveryLocation}>
-            <View style={styles.deliveryMarkerContainer}>
-              <Ionicons
-                name="location"
-                size={24}
-                color={Colors[colorScheme].primary_color}
-              />
-            </View>
-          </Marker>
+          <Marker
+            coordinate={deliveryLocation}
+            image={require("@/assets/images/home.png")}
+            style={{
+              width: 10,
+              height: 10,
+            }}
+          ></Marker>
 
           {/* Rider Location Marker */}
           {riderLocation && (
             <Marker coordinate={riderLocation}>
               <View style={styles.riderMarkerContainer}>
-                <Ionicons name="bicycle" size={20} color="white" />
+                <Ionicons name="bicycle" size={16} color="white" />
               </View>
             </Marker>
           )}
@@ -170,7 +169,7 @@ const createStyles = (theme: "light" | "dark") =>
     riderMarkerContainer: {
       backgroundColor: Colors[theme].primary_color,
       borderRadius: 20,
-      padding: 8,
+      padding: 4,
       borderWidth: 2,
       borderColor: "white",
       shadowColor: "#000",
