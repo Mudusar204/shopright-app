@@ -56,6 +56,12 @@ const Orders = () => {
         return Colors[colorScheme].error;
       case OrderStatus.FailedDelivery:
         return Colors[colorScheme].error;
+      case OrderStatus.Returned:
+        return Colors[colorScheme].warning;
+      case OrderStatus.ReturnedToVendor:
+        return Colors[colorScheme].warning;
+      case OrderStatus.Refunded:
+        return Colors[colorScheme].error;
       default:
         return Colors[colorScheme].warning;
     }
@@ -101,6 +107,9 @@ const Orders = () => {
               ? "Cancelled"
               : item?.order_status === OrderStatus.Refunded
               ? "Refunded"
+              : item?.order_status === OrderStatus.ReturnedToVendor ||
+                item?.order_status === OrderStatus.Returned
+              ? "Returned"
               : "Pending"}
           </Text>
         </View>
