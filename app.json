@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -15,7 +14,7 @@
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
-      "bundleIdentifier": "com.anonymous.mobile",
+      "bundleIdentifier": "com.shopright.club",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to show your current position on the map.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to show your current position on the map and provide navigation features."
@@ -30,14 +29,13 @@
         "foregroundImage": "./assets/app-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.INTERNET"
       ],
-      "package": "com.anonymous.mobile",
+      "package": "com.shopright.club",
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyAKmwq_hiM8N93ukg6pe1OvuLPV57_Eo8U"
@@ -47,10 +45,9 @@
     "web": {
       "favicon": "./assets/app-icon.png"
     },
-    "scheme": "shopright",
+    "scheme": "shopright-club",
     "plugins": [
       "expo-localization",
-      "@react-native-firebase/app",
       [
         "expo-location",
         {
