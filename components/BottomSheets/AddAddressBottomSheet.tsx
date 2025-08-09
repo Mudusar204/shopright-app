@@ -553,7 +553,7 @@ const AddAddressBottomSheet = ({
   );
 
   return (
-    <BottomModal ref={bottomSheetRef} scrollable={false} snapPoints={["100%"]}>
+    <BottomModal ref={bottomSheetRef} scrollable={true} snapPoints={["100%"]}>
       {!mapState.isManualMode ? (
         <View style={style.container}>
           <View style={style.mapContainer}>
@@ -568,46 +568,15 @@ const AddAddressBottomSheet = ({
               style={{ flex: 1 }}
               initialRegion={mapState.region}
               showsUserLocation={true}
-              showsMyLocationButton={false}
+              showsMyLocationButton={true}
+              showsCompass={true}
+              showsScale={true}
+              zoomTapEnabled={true}
+              zoomEnabled={true}
+              scrollEnabled={true}
+              pitchEnabled={true}
+              rotateEnabled={true}
             >
-              {locationData.location && (
-                <Marker
-                  coordinate={{
-                    latitude: locationData.location.coords.latitude,
-                    longitude: locationData.location.coords.longitude,
-                  }}
-                  title="Your Location"
-                  description="You are here"
-                >
-                  <View
-                    style={{
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "transparent",
-                    }}
-                  >
-                    <MyLocationIcon color={Colors[theme].primary_color} />
-                  </View>
-                  <Callout tooltip>
-                    <View style={style.calloutContainer}>
-                      <Text style={style.calloutTitle}>Your Location</Text>
-                      <Text style={style.calloutAddress}>
-                        {locationData.address
-                          ? `${locationData.address.street || ""} ${
-                              locationData.address.city || ""
-                            } ${locationData.address.region || ""}`.trim() ||
-                            "Current location"
-                          : "Current location"}
-                      </Text>
-                      <Text style={style.calloutCoordinates}>
-                        {locationData.location.coords.latitude.toFixed(6)},{" "}
-                        {locationData.location.coords.longitude.toFixed(6)}
-                      </Text>
-                    </View>
-                  </Callout>
-                </Marker>
-              )}
-
               {/* Selected Location Marker */}
               {mapState.selectedLocation && (
                 <Marker
@@ -618,7 +587,7 @@ const AddAddressBottomSheet = ({
                   title="Selected Location"
                   description={mapState.selectedLocation.address}
                 >
-                  <View
+                  {/* <View
                     style={{
                       alignItems: "center",
                       justifyContent: "center",
@@ -626,7 +595,7 @@ const AddAddressBottomSheet = ({
                     }}
                   >
                     <LocationMarker color={"red"} />
-                  </View>
+                  </View> */}
                   <Callout tooltip>
                     <View style={style.calloutContainer}>
                       <Text style={style.calloutTitle}>Selected Location</Text>
