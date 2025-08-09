@@ -23,8 +23,8 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
 }) => {
   const colorTheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorTheme);
-  const { expoPushToken, registerToken, unregisterToken } = useNotifications();
-  const odooUserAuth = useAuthStore.getState().odooUserAuth;
+  const { registerToken, unregisterToken } = useNotifications();
+  const { odooUserAuth, expoPushToken, setExpoPushToken } = useAuthStore();
 
   const [settings, setSettings] = useState({
     orderNotifications: true,
@@ -59,6 +59,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
 
   const getPushToken = async () => {
     const token = await notificationService.getExpoPushToken();
+    setExpoPushToken(token);
     console.log("token", token);
   };
 
