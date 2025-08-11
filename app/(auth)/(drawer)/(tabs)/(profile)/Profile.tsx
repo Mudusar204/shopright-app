@@ -26,7 +26,7 @@ const Profile = () => {
   const width = Dimensions.get("window").width;
   const colorScheme = useColorScheme() as "light" | "dark";
   const { data: userAddresses } = useGetUserAddresses();
-  const odooUser = useAuthStore().odooUserAuth;
+  const { data: odooUser } = useGetOdooUser();
   const isLoggedIn = useAuthStore().isLoggedIn;
   console.log(odooUser, "odooUser");
   console.log(userAddresses, "userAddresses", odooUser);
@@ -35,17 +35,17 @@ const Profile = () => {
   const links = [
     {
       title: "Email",
-      value: odooUser?.login,
+      value: odooUser?.records[0]?.login || "N/A",
     },
 
     {
       title: "Phone",
-      value: "N/A",
+      value: odooUser?.records[0]?.phone || "N/A",
     },
     {
       title: "Address",
       value:
-        userAddresses?.records[0]?.street ||
+        userAddresses?.records[0]?.street2 ||
         "N/A" + ", " + userAddresses?.records[0]?.city ||
         "N/A" + ", " + userAddresses?.records[0]?.state ||
         "N/A" + ", " + userAddresses?.records[0]?.country ||

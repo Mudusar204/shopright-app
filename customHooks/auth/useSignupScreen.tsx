@@ -10,6 +10,7 @@ export default function useSignupScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { mutateAsync, error, isPending, isSuccess } = useRegister();
   const { odooUser, setOdooUser, setOdooUserAuth } = useAuthStore();
@@ -29,7 +30,7 @@ export default function useSignupScreen() {
       const response = await mutateAsync(
         {
           name: name,
-          email: email,
+          phone: phone,
           login: email,
           password: password,
         },
@@ -78,6 +79,8 @@ export default function useSignupScreen() {
 
   return {
     email,
+    phone,
+    setPhone,
     setEmail,
     password,
     setPassword,

@@ -234,11 +234,11 @@ const Checkout = () => {
                 }
               /> */}
               <Text style={styles.addressItemText}>
-                {userAddresses.records[0]?.street}{" "}
+                {/* {userAddresses.records[0]?.street}{" "} */}
                 {userAddresses.records[0]?.street2}{" "}
-                {userAddresses.records[0]?.city}{" "}
-                {userAddresses.records[0]?.state}{" "}
-                {userAddresses.records[0]?.country}
+                {/* {userAddresses.records[0]?.city}{" "} */}
+                {/* {userAddresses.records[0]?.state}{" "} */}
+                {/* {userAddresses.records[0]?.country} */}
               </Text>
             </Pressable>
           ) : (

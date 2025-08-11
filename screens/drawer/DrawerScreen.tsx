@@ -89,7 +89,7 @@ const DrawerScreen = () => {
                     { color: Colors[colorTheme].primary_color },
                   ]}
                 >
-                  {userAddresses?.records[0].state +
+                  {userAddresses?.records[0].city +
                     ", " +
                     userAddresses?.records[0].country}
                 </Text>

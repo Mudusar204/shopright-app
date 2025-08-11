@@ -30,7 +30,7 @@ export const getOdooUser = async () => {
   console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&id=${odooUserAuth?.id}`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&id=${odooUserAuth?.id}&fields=name,login,phone`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -63,6 +63,7 @@ export const register = async (data: any) => {
         fields: ["login", "name", "password"],
         values: {
           login: data.login,
+          phone: data.phone,
           name: data.name,
           password: data.password,
         },

@@ -203,9 +203,9 @@ export default function HomeScreen() {
           />
         </View>
 
-        <View style={styles.mapContainer}>
+        {/* <View style={styles.mapContainer}>
           <MapComponent />
-        </View>
+        </View> */}
         <View style={styles.productContainer}>
           {isLoading ? (
             <View

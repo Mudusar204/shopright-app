@@ -19,6 +19,8 @@ const Signup = () => {
   const {
     password,
     setPassword,
+    phone,
+    setPhone,
     confirmPassword,
     setConfirmPassword,
     name,
@@ -53,6 +55,13 @@ const Signup = () => {
         value={email}
         onChangeText={setEmail}
         textContentType="emailAddress"
+      />
+      <InputHandler
+        leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
+        placeholder="Phone"
+        value={phone}
+        onChangeText={setPhone}
+        textContentType="none"
       />
       <InputHandler
         leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
