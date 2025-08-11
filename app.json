@@ -28,7 +28,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/app-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundImage": "./assets/background.png"
       },
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -51,7 +51,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location for deliver your order."
         }
       ],
       [

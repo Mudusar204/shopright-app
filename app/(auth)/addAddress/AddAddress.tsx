@@ -15,21 +15,22 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from "react-native";
-import BottomModal from "./BottomSheet";
-import { useColorScheme } from "../useColorScheme";
-import { Button, Text, TextInput, View } from "../Themed";
+import BottomModal from "../../../components/BottomSheets/BottomSheet";
+import { useColorScheme } from "../../../components/useColorScheme";
+import { Button, Text, TextInput, View } from "../../../components/Themed";
 import { useAddUserAddress } from "@/hooks/mutations/auth/auth.mutation";
 import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import MapView, { Callout, Marker, Region } from "react-native-maps";
 import LocationMarker from "@/assets/images/svgs/LocationMarker";
-import BackHandler from "../BackHandler";
-import Header from "../Header";
+import BackHandler from "../../../components/BackHandler";
+import Header from "../../../components/Header";
 import Toast from "react-native-toast-message";
 import { useLocation } from "@/hooks/useLocation";
 import MyLocationIcon from "@/assets/images/svgs/MyLocation";
-import CustomLocationSearch from "../CustomLocationSearch";
+import CustomLocationSearch from "../../../components/CustomLocationSearch";
 import * as Location from "expo-location";
+import { router } from "expo-router";
 
 // TypeScript interfaces for better type safety
 interface AddressDetails {
@@ -128,12 +129,10 @@ const mapReducer = (state: MapState, action: MapAction): MapState => {
   }
 };
 
-const AddAddressBottomSheet = ({
-  bottomSheetRef,
+const AddAddress = ({
   selectedAddress,
   setSelectedAddress,
 }: {
-  bottomSheetRef: any;
   selectedAddress: any;
   setSelectedAddress: (address: any) => void;
 }) => {
@@ -293,7 +292,7 @@ const AddAddressBottomSheet = ({
 
     addUserAddress(submissionData, {
       onSuccess: () => {
-        bottomSheetRef.current?.handleClose();
+        router.back();
         resetForm();
         Toast.show({
           type: "success",
@@ -307,7 +306,7 @@ const AddAddressBottomSheet = ({
         });
       },
     });
-  }, [addressDetails, validateForm, addUserAddress, bottomSheetRef, resetForm]);
+  }, [addressDetails, validateForm, addUserAddress, resetForm]);
 
   // Function to decode location and add address
   const handleConfirmLocation = useCallback(async () => {
@@ -420,7 +419,7 @@ const AddAddressBottomSheet = ({
 
         addUserAddress(submissionData, {
           onSuccess: () => {
-            bottomSheetRef.current?.handleClose();
+            router.back();
             resetForm();
             Toast.show({
               type: "success",
@@ -444,7 +443,7 @@ const AddAddressBottomSheet = ({
 
         addUserAddress(submissionData, {
           onSuccess: () => {
-            bottomSheetRef.current?.handleClose();
+            router.back();
             resetForm();
             Toast.show({
               type: "success",
@@ -467,13 +466,7 @@ const AddAddressBottomSheet = ({
         text2: "Please try again",
       });
     }
-  }, [
-    mapState.selectedLocation,
-    locationData,
-    addUserAddress,
-    bottomSheetRef,
-    resetForm,
-  ]);
+  }, [mapState.selectedLocation, locationData, addUserAddress, resetForm]);
 
   // Improved location selection
   const handleLocationSelect = useCallback(
@@ -553,7 +546,10 @@ const AddAddressBottomSheet = ({
   );
 
   return (
-    <BottomModal ref={bottomSheetRef} scrollable={true} snapPoints={["100%"]}>
+    <View style={style.container}>
+      <View style={style.headerContainer}>
+        <Header title="Add Address" />
+      </View>
       {!mapState.isManualMode ? (
         <View style={style.container}>
           <View style={style.mapContainer}>
@@ -569,13 +565,7 @@ const AddAddressBottomSheet = ({
               initialRegion={mapState.region}
               showsUserLocation={true}
               showsMyLocationButton={true}
-              showsCompass={true}
-              showsScale={true}
-              zoomTapEnabled={true}
-              zoomEnabled={true}
-              scrollEnabled={true}
-              pitchEnabled={true}
-              rotateEnabled={true}
+              pointerEvents="box-none"
             >
               {/* Selected Location Marker */}
               {mapState.selectedLocation && (
@@ -834,11 +824,11 @@ const AddAddressBottomSheet = ({
           </ScrollView>
         </KeyboardAvoidingView>
       )}
-    </BottomModal>
+    </View>
   );
 };
 
-export default AddAddressBottomSheet;
+export default AddAddress;
 
 const styles = (theme: "light" | "dark") =>
   StyleSheet.create({
@@ -846,14 +836,18 @@ const styles = (theme: "light" | "dark") =>
       flex: 1,
       backgroundColor: Colors[theme].background,
     },
+    headerContainer: {
+      paddingHorizontal: 15,
+      paddingBottom: 10,
+    },
     searchContainer: {
       position: "absolute",
       top: 0,
       left: 0,
       right: 0,
       paddingHorizontal: 15,
-      zIndex: 1000,
       backgroundColor: "transparent",
+      zIndex: 1000,
     },
     buttonContainer: {
       paddingHorizontal: 15,
@@ -922,7 +916,7 @@ const styles = (theme: "light" | "dark") =>
       backgroundColor: Colors[theme].border,
     },
     mapContainer: {
-      height: Dimensions.get("window").height * 0.83,
+      height: Dimensions.get("window").height - 50,
       borderRadius: 10,
       overflow: "hidden",
     },

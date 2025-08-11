@@ -17,7 +17,7 @@ import { useMyCartStore } from "@/store/myCart.store";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "@/components/Header";
 import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
-import AddAddressBottomSheet from "@/components/BottomSheets/AddAddressBottomSheet";
+import AddAddressBottomSheet from "@/app/(auth)/addAddress/AddAddress";
 import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
 import Toast from "react-native-toast-message";
@@ -209,7 +209,8 @@ const Checkout = () => {
               variant="primary"
               size="small"
               title="+ Address"
-              onPress={() => bottomSheetRef.current?.handleBottomSheet()}
+              // onPress={() => bottomSheetRef.current?.handleBottomSheet()}
+              onPress={() => router.push("/(auth)/addAddress")}
               style={{ marginBottom: 15, opacity: !isLoggedIn ? 0.5 : 1 }}
               disabled={!isLoggedIn}
             />
@@ -308,11 +309,11 @@ const Checkout = () => {
           />
         )}
       </View>
-      <AddAddressBottomSheet
+      {/* <AddAddressBottomSheet
         bottomSheetRef={bottomSheetRef}
         selectedAddress={selectedAddress}
         setSelectedAddress={setSelectedAddress}
-      />
+      /> */}
     </View>
   );
 };
