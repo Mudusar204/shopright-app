@@ -155,7 +155,7 @@ const Onboarding = () => {
             height: 350,
             backgroundColor: "transparent",
           }}
-          source={require("@/assets/lotties/order.json")}
+          source={require("@/assets/lotties/shopping.json")}
           imageAssetsFolder="assets/lotties"
         />
       )}

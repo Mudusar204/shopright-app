@@ -1,4 +1,9 @@
-import { StyleSheet, FlatList, Pressable } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -173,7 +178,10 @@ const Orders = () => {
           <Header title="My Orders" />
         </View>
         <View style={styles.body}>
-          <Text>Loading orders...</Text>
+          <ActivityIndicator
+            size="large"
+            color={Colors[colorScheme].primary_color}
+          />
         </View>
       </View>
     );

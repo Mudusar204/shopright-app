@@ -126,7 +126,7 @@ export default function HomeScreen() {
       filter[3]?.priceRange?.[1] !== 20000
         ? filter[3]?.priceRange?.[0] + " - " + filter[3]?.priceRange?.[1]
         : "Price",
-      filter[4]?.sort !== "" ? filter[4]?.sort : "Payment & Offers",
+      filter[4]?.sort !== "" ? filter[4]?.sort : "Sort by",
     ],
     [filter]
   );
