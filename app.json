@@ -67,6 +67,12 @@
         "projectId": "da149288-c370-43e4-bbc9-5216690dbaf2"
       }
     },
-    "owner": "shopright"
+    "owner": "shopright",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/da149288-c370-43e4-bbc9-5216690dbaf2"
+    }
   }
 }

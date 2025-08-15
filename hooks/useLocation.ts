@@ -20,22 +20,22 @@ export const useLocation = () => {
   // Open settings function, memoized to prevent re-creation
   const openSettings = useCallback(() => {
     Alert.alert(
-      i18n.t("location.permission_required"),
-      i18n.t("location.please_enable_location"),
+      "Location Permission",
+      "Please enable location services to continue",
       [
         {
-          text: i18n.t("actions.cancel"),
+          text: "Cancel",
           style: "cancel",
           onPress: () => {
             Toast.show({
               type: "error",
-              text1: i18n.t("location.permission_denied"),
+              text1: "Location permission denied",
             });
             router.push("/");
           },
         },
         {
-          text: i18n.t("actions.open_settings"),
+          text: "Open Settings",
           onPress: () => {
             Linking.openSettings();
           },
@@ -56,8 +56,8 @@ export const useLocation = () => {
       if (!servicesEnabled) {
         Toast.show({
           type: "error",
-          text1: i18n.t("location.permission_required"),
-          text2: i18n.t("location.please_enable_location"),
+          text1: "Location Permission Required",
+          text2: "Please enable location services to continue",
         });
         openSettings();
         return;
@@ -85,8 +85,8 @@ export const useLocation = () => {
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: i18n.t("alert.error"),
-        text2: i18n.t("location.error"),
+        text1: "Error",
+        text2: "Location error",
       });
     } finally {
       updateLocationState("loading", false);
