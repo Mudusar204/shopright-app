@@ -59,13 +59,7 @@ export default function HomeScreen() {
   const filteredData = useMemo(() => {
     if (!data?.records) return [];
 
-    if (searchQuery) {
-      return data?.records?.filter((item: any) =>
-        item.display_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    return data?.records?.filter((item: any) => {
+    let filteredItems = data?.records?.filter((item: any) => {
       // If "all" is selected, show all items
       if (filter[0].all) return true;
 
@@ -94,6 +88,34 @@ export default function HomeScreen() {
 
       return true;
     });
+
+    // Apply search filter
+    if (searchQuery) {
+      filteredItems = filteredItems.filter((item: any) =>
+        item.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply sorting
+    if (filter[4]?.sort) {
+      const sortBy = filter[4].sort;
+      filteredItems.sort((a: any, b: any) => {
+        switch (sortBy) {
+          case "Price":
+            // Sort by price (low to high)
+            return (a?.list_price || 0) - (b?.list_price || 0);
+          case "Categories":
+            // Sort by category name (alphabetical)
+            const categoryA = a?.categ_id?.[0]?.name || "";
+            const categoryB = b?.categ_id?.[0]?.name || "";
+            return categoryA.localeCompare(categoryB);
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return filteredItems;
   }, [data?.records, filter, searchQuery]);
 
   const handleFilterPress = useCallback(() => {
@@ -221,7 +243,7 @@ export default function HomeScreen() {
               />
             </View>
           ) : isError ? (
-            <Text>Error loading products</Text>
+            <Text>Something went wrong</Text>
           ) : (
             <FlatList
               data={filteredData}

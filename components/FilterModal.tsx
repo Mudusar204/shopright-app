@@ -8,13 +8,13 @@ import {
   TouchableWithoutFeedback,
   StatusBar,
   FlatList,
+  TextInput,
 } from "react-native";
 import { View, Text, Button } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
 import { AntDesign } from "@expo/vector-icons";
 import SelectButton from "./SelectButton";
-import Slider from "@react-native-community/slider";
 import { useGetCategories } from "@/hooks/queries/categories/categories.query";
 
 const brands = ["Nestle", "Pepsi", "PeakFreeze", "Candy"];
@@ -68,7 +68,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedSort, setSelectedSort] = useState("");
-  const [priceRange, setPriceRange] = useState([1, 1000]);
+  const [minPrice, setMinPrice] = useState("1");
+  const [maxPrice, setMaxPrice] = useState("100000");
 
   const {
     data: categories,
@@ -131,7 +132,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const handleReset = useCallback(() => {
     setSelectedCategory(null);
     setSelectedBrand("");
-    setPriceRange([1, 1000]);
+    setMinPrice("1");
+    setMaxPrice("1000");
     setSelectedSort("");
     setFilter([
       { all: true },
@@ -145,15 +147,15 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
   // Memoize apply function
   const handleApply = useCallback(() => {
+    const min = parseInt(minPrice) || 1;
+    const max = parseInt(maxPrice) || 100000;
+
     setFilter([
       { all: false },
       { category: selectedCategory ? selectedCategory : null },
       { brand: selectedBrand },
       {
-        priceRange:
-          priceRange[0] === 1 && priceRange[1] === 1000
-            ? [1, 20000]
-            : priceRange,
+        priceRange: min === 1 && max === 1000 ? [1, 20000] : [min, max],
       },
       { sort: selectedSort },
     ]);
@@ -161,11 +163,27 @@ const FilterModal: React.FC<FilterModalProps> = ({
   }, [
     selectedCategory,
     selectedBrand,
-    priceRange,
+    minPrice,
+    maxPrice,
     selectedSort,
     setFilter,
     onClose,
   ]);
+
+  // Handle price input changes
+  const handleMinPriceChange = (value: string) => {
+    const numValue = parseInt(value) || 0;
+    if (numValue >= 0 && numValue <= parseInt(maxPrice)) {
+      setMinPrice(value);
+    }
+  };
+
+  const handleMaxPriceChange = (value: string) => {
+    const numValue = parseInt(value) || 0;
+    if (numValue >= parseInt(minPrice)) {
+      setMaxPrice(value);
+    }
+  };
 
   return (
     <Modal
@@ -237,23 +255,41 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
                 {/* Price Range */}
                 <Text style={styles.sectionTitle}>Price</Text>
-                <Text style={styles.priceLabel}>
-                  Rs.{priceRange[0]} - {priceRange[1]}
-                </Text>
-                <Slider
-                  style={{ width: "100%", height: 20 }}
-                  minimumValue={1}
-                  maximumValue={20000}
-                  lowerLimit={1}
-                  upperLimit={20000}
-                  step={1}
-                  value={priceRange[1]}
-                  onValueChange={(value) =>
-                    setPriceRange([priceRange[0], value])
-                  }
-                  minimumTrackTintColor={Colors[colorScheme].primary_color}
-                  thumbTintColor={Colors[colorScheme].primary_color}
-                />
+                <View style={styles.priceContainer}>
+                  <View style={styles.priceInputContainer}>
+                    <Text style={styles.priceLabel}>Min Price</Text>
+                    <View style={styles.priceInputWrapper}>
+                      <Text style={styles.pricePrefix}>Rs.</Text>
+                      <TextInput
+                        style={styles.priceInput}
+                        value={minPrice}
+                        onChangeText={handleMinPriceChange}
+                        keyboardType="numeric"
+                        placeholder="0"
+                        placeholderTextColor={
+                          Colors[colorScheme].text_secondary
+                        }
+                      />
+                    </View>
+                  </View>
+
+                  <View style={styles.priceInputContainer}>
+                    <Text style={styles.priceLabel}>Max Price</Text>
+                    <View style={styles.priceInputWrapper}>
+                      <Text style={styles.pricePrefix}>Rs.</Text>
+                      <TextInput
+                        style={styles.priceInput}
+                        value={maxPrice}
+                        onChangeText={handleMaxPriceChange}
+                        keyboardType="numeric"
+                        placeholder="0"
+                        placeholderTextColor={
+                          Colors[colorScheme].text_secondary
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
 
                 <Text style={styles.sectionTitle}>Sort By</Text>
                 <View style={styles.row}>
@@ -298,9 +334,10 @@ const createStyles = (colorTheme: "light" | "dark") =>
       justifyContent: "flex-start",
     },
     modalContainer: {
-      height: "65%",
+      height: "70%",
       backgroundColor: Colors[colorTheme].background,
-      borderRadius: 15,
+      borderBottomLeftRadius: 15,
+      borderBottomRightRadius: 15,
       overflow: "hidden",
       // shadowColor: '#000',
       shadowOffset: {
@@ -379,6 +416,35 @@ const createStyles = (colorTheme: "light" | "dark") =>
       justifyContent: "space-between",
       paddingBottom: 20,
       marginTop: 16,
+    },
+    priceContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 10,
+      marginBottom: 10,
+    },
+    priceInputContainer: {
+      flex: 1,
+    },
+    priceInputWrapper: {
+      flexDirection: "row",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: Colors[colorTheme].border,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+    },
+    priceInput: {
+      flex: 1,
+      fontSize: 16,
+      color: Colors[colorTheme].text_primary,
+      paddingRight: 5,
+    },
+    pricePrefix: {
+      fontSize: 16,
+      color: Colors[colorTheme].text_primary,
+      marginRight: 5,
     },
   });
 
