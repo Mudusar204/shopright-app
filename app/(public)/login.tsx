@@ -1,4 +1,10 @@
-import { Alert, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Button, Text, TextInput, View } from "@/components/Themed";
 import React, { useState } from "react";
 import Header from "@/components/Header";
@@ -24,61 +30,72 @@ const Login = () => {
   } = useLoginScreen();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back!</Text>
-      <Text style={styles.subtitle}>
-        {" "}
-        Great to see you again, You've been missed!
-      </Text>
-      <InputHandler
-        leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-        placeholder="Email or Phone Number"
-        value={identifier}
-        onChangeText={setIdentifier}
-        textContentType="telephoneNumber"
-      />
-      <InputHandler
-        leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
-        rightIcon={
-          <Feather
-            name={!isPasswordVisible ? "eye-off" : "eye"}
-            size={20}
-            color={Colors[colorScheme].icon_color}
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-          />
-        }
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={!isPasswordVisible}
-        textContentType="password"
-      />
-      <Button
-        textColor={Colors[colorScheme].text_white}
-        style={styles.button}
-        variant={isLoading || !identifier || !password ? "primary" : "primary"}
-        size="large"
-        title={isLoading ? "Logging in..." : "Login"}
-        onPress={handleLogin}
-      />
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome back!</Text>
+        <Image
+          source={require("@/assets/images/login.gif")}
+          style={{
+            width: 300,
+            height: 300,
+            marginTop: 20,
+            // resizeMode: "contain",
+            alignSelf: "center",
+            // backgroundColor: "white",
+          }}
+        />
+        <Text style={styles.subtitle}>
           {" "}
-          <Link style={styles.footerLink} href="/signup">
-            Create an account
-          </Link>
+          Great to see you again, You've been missed!
         </Text>
-        <Text style={styles.footerText}>
-          <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
-            Skip for Now
-          </Link>
-        </Text>
+        <InputHandler
+          leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
+          placeholder="Email or Phone Number"
+          value={identifier}
+          onChangeText={setIdentifier}
+          textContentType="telephoneNumber"
+        />
+        <InputHandler
+          leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
+          rightIcon={
+            <Feather
+              name={!isPasswordVisible ? "eye-off" : "eye"}
+              size={20}
+              color={Colors[colorScheme].icon_color}
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            />
+          }
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!isPasswordVisible}
+          textContentType="password"
+        />
+        <Button
+          textColor={Colors[colorScheme].text_white}
+          style={styles.button}
+          variant={
+            isLoading || !identifier || !password ? "primary" : "primary"
+          }
+          size="large"
+          title={isLoading ? "Logging in..." : "Login"}
+          onPress={handleLogin}
+        />
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            {" "}
+            <Link style={styles.footerLink} href="/signup">
+              Create an account
+            </Link>
+          </Text>
+          <Text style={styles.footerText}>
+            <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
+              Continue as Guest
+            </Link>
+          </Text>
+        </View>
       </View>
-      <View style={styles.footer}>
-        <Text>API URL: {process.env.EXPO_PUBLIC_API_URL}</Text>
-        <Text>ODOO API URL: {process.env.EXPO_PUBLIC_ODOO_API_URL}</Text>
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -100,7 +117,8 @@ const createStyles = (theme: "light" | "dark") =>
       fontSize: 16,
       color: Colors[theme].text_secondary,
       textAlign: "center",
-      marginTop: 5,
+      marginTop: -20,
+
       marginBottom: 15,
     },
     footer: {
@@ -117,6 +135,6 @@ const createStyles = (theme: "light" | "dark") =>
       color: Colors[theme].primary_color,
     },
     button: {
-      marginTop: 50,
+      marginTop: 15,
     },
   });
