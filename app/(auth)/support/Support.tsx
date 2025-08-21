@@ -26,7 +26,7 @@ const Support = () => {
   const styles = createStyles(colorScheme, width);
 
   const handlePhonePress = () => {
-    Linking.openURL("tel:+923001234567");
+    Linking.openURL("tel:+923206464124");
   };
 
   return (
@@ -35,7 +35,7 @@ const Support = () => {
       <View style={styles.contentContainer}>
         <Text style={styles.titleText}>Contact Admin</Text>
         <TouchableOpacity onPress={handlePhonePress}>
-          <Text style={styles.phoneText}>+92 300 1234567</Text>
+          <Text style={styles.phoneText}>+92 320 6464124</Text>
         </TouchableOpacity>
       </View>
     </View>
