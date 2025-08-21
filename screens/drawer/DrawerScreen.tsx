@@ -24,6 +24,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useMyCartStore } from "@/store/myCart.store";
 import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useQueryClient } from "@tanstack/react-query";
 const TitleWithImage = ({
   Icon,
   title,
@@ -53,6 +54,7 @@ const DrawerScreen = () => {
   const colorTheme = useColorScheme() as "light" | "dark";
   const { setIsLoggedIn, odooUserAuth, clear } = useAuthStore();
   const { data: userAddresses } = useGetUserAddresses();
+  const queryClient = useQueryClient();
 
   const { cartItems, clearCart } = useMyCartStore();
   return (
@@ -178,6 +180,8 @@ const DrawerScreen = () => {
             title="Logout"
             titleStyle={{ color: "#FF5757" }}
             onPress={() => {
+              // Invalidate all queries before logout
+              queryClient.clear();
               clear();
               clearCart();
               router.push("/login");

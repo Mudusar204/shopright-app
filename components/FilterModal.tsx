@@ -16,8 +16,9 @@ import { useColorScheme } from "./useColorScheme";
 import { AntDesign } from "@expo/vector-icons";
 import SelectButton from "./SelectButton";
 import { useGetCategories } from "@/hooks/queries/categories/categories.query";
+import { useGetBrands } from "@/hooks/queries/categories/brands.query";
 
-const brands = ["Nestle", "Pepsi", "PeakFreeze", "Candy"];
+// const brands = ["Nestle", "Pepsi", "PeakFreeze", "Candy"];
 
 interface FilterModalProps {
   visible: boolean;
@@ -76,12 +77,22 @@ const FilterModal: React.FC<FilterModalProps> = ({
     isLoading: categoriesLoading,
     isError: categoriesError,
   } = useGetCategories();
-  console.log(categories?.records?.length, "categories");
+  console.log(categories?.records?.[0], "categories");
+  const {
+    data: brands,
+    isLoading: brandsLoading,
+    isError: brandsError,
+  } = useGetBrands();
+  console.log(brands?.records, "brands");
 
   // Memoize categories data to prevent unnecessary re-renders
   const categoriesData = useMemo(() => {
     return categories?.records || [];
   }, [categories?.records]);
+
+  const brandsData = useMemo(() => {
+    return brands?.records || [];
+  }, [brands?.records]);
 
   // Memoize the category render item function
   const renderCategoryItem = useCallback(
@@ -99,7 +110,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   const renderBrandItem = useCallback(
     ({ item }: { item: any }) => (
       <BrandItem
-        brand={item}
+        brand={item.name}
         selectedBrand={selectedBrand}
         setSelectedBrand={setSelectedBrand}
       />
@@ -241,16 +252,35 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
                 {/* Brands */}
                 <Text style={styles.sectionTitle}>Brands</Text>
-                <View style={styles.row}>
-                  {brands.map((brand) => (
-                    <BrandItem
-                      key={brand}
-                      brand={brand}
-                      selectedBrand={selectedBrand}
-                      setSelectedBrand={setSelectedBrand}
-                    />
-                  ))}
-                </View>
+                {brandsLoading ? (
+                  <Text>Loading brands...</Text>
+                ) : brandsError ? (
+                  <Text>Error loading brands</Text>
+                ) : (
+                  <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={brandsData}
+                    renderItem={renderBrandItem}
+                    keyExtractor={brandKeyExtractor}
+                    contentContainerStyle={{ gap: 12 }}
+                    removeClippedSubviews={true}
+                    maxToRenderPerBatch={10}
+                    windowSize={10}
+                    initialNumToRender={5}
+                    ListEmptyComponent={
+                      <Text
+                        style={{
+                          color: Colors[colorScheme].text,
+                          textAlign: "center",
+                          width: "100%",
+                        }}
+                      >
+                        No brands found
+                      </Text>
+                    }
+                  />
+                )}
                 {/* Languages */}
 
                 {/* Price Range */}
@@ -334,7 +364,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
       justifyContent: "flex-start",
     },
     modalContainer: {
-      height: "70%",
+      height: "65%",
       backgroundColor: Colors[colorTheme].background,
       borderBottomLeftRadius: 15,
       borderBottomRightRadius: 15,
@@ -351,7 +381,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
     content: {
       flex: 1,
       padding: 25,
-      marginTop: 20,
+      // marginTop: 20,
     },
     header: {
       fontSize: 20,
@@ -367,7 +397,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
     sectionTitle: {
       fontSize: 14,
       fontWeight: "600",
-      marginVertical: 20,
+      marginVertical: 5,
     },
     row: {
       flexDirection: "row",
@@ -415,7 +445,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
       flexDirection: "row",
       justifyContent: "space-between",
       paddingBottom: 20,
-      marginTop: 16,
+      marginVertical: 10,
     },
     priceContainer: {
       flexDirection: "row",

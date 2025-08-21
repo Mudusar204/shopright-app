@@ -26,7 +26,8 @@ import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
 import { useGetProducts } from "@/hooks/queries/products/products.query";
-import { useGetCategories } from "@/hooks/queries/categories/categories.query";
+// import { useGetCategories } from "@/hooks/queries/categories/categories.query";
+import ImageSlider from "@/components/ImageSlider";
 
 type FilterItem = {
   all?: boolean;
@@ -54,6 +55,30 @@ export default function HomeScreen() {
   ]);
   const { cartItems } = useMyCartStore();
   const { data, isLoading, isError, refetch } = useGetProducts();
+
+  // Sample banner images for the slider
+  const bannerImages = [
+    {
+      id: 1,
+      image:
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=450",
+    },
+    {
+      id: 2,
+      image:
+        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop",
+    },
+    {
+      id: 3,
+      image:
+        "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&h=400&fit=crop",
+    },
+    {
+      id: 4,
+      image:
+        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop",
+    },
+  ];
 
   // Memoize filtered data to prevent recalculation on every render
   const filteredData = useMemo(() => {
@@ -225,9 +250,15 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* <View style={styles.mapContainer}>
-          <MapComponent />
-        </View> */}
+        <View style={styles.mapContainer}>
+          <ImageSlider
+            images={bannerImages}
+            height={200}
+            showDots={true}
+            autoPlay={true}
+            autoPlayInterval={2000}
+          />
+        </View>
         <View style={styles.productContainer}>
           {isLoading ? (
             <View
