@@ -4,7 +4,7 @@
     "slug": "shopright-club",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.shopright.club",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to show your current position on the map.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to show your current position on the map and provide navigation features."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to show your current position on the map and provide navigation features.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "config": {
         "googleMapsApiKey": "AIzaSyAsQaw80JUEAI_a82j_1bp366sei7GibWY"

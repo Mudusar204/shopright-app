@@ -53,7 +53,7 @@ export default function HomeScreen() {
     { sort: "" },
   ]);
   const { cartItems } = useMyCartStore();
-  const { data, isLoading, isError } = useGetProducts();
+  const { data, isLoading, isError, refetch } = useGetProducts();
 
   // Memoize filtered data to prevent recalculation on every render
   const filteredData = useMemo(() => {
@@ -268,6 +268,10 @@ export default function HomeScreen() {
                   <Text>No products found</Text>
                 </View>
               }
+              refreshing={isLoading}
+              onRefresh={() => {
+                refetch();
+              }}
             />
           )}
         </View>

@@ -1,34 +1,31 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { Platform, Pressable, TouchableOpacity } from 'react-native';
-import BackHandler from '@/components/BackHandler';
-import HomeIcon from '@/assets/images/svgs/HomeIcon';
-import AddListingIcon from '@/assets/images/svgs/AddListingIcon';
-import ExploreIcon from '@/assets/images/svgs/ExploreIcon';
-import { useGlobalStore } from '@/store/global.store';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
- export default function TabLayout() {
-  const colorScheme = useColorScheme() as 'light' | 'dark';
-  
-  const { isModalVisible, setIsModalVisible } = useGlobalStore(
-    (state) => state
-  );
+import React from "react";
+import { Tabs } from "expo-router";
+import Colors from "@/constants/Colors";
+import { useColorScheme } from "@/components/useColorScheme";
+import { Platform, Pressable, TouchableOpacity } from "react-native";
+import BackHandler from "@/components/BackHandler";
+import HomeIcon from "@/assets/images/svgs/HomeIcon";
+import AddListingIcon from "@/assets/images/svgs/AddListingIcon";
+import ExploreIcon from "@/assets/images/svgs/ExploreIcon";
+import { useGlobalStore } from "@/store/global.store";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+export default function TabLayout() {
+  const colorScheme = useColorScheme() as "light" | "dark";
+
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].text_primary,
         tabBarInactiveTintColor: Colors[colorScheme].icon_color,
         tabBarStyle: {
-          position: 'absolute',
+          position: "absolute",
           borderTopColor: Colors[colorScheme].text_secondary,
           backgroundColor: Colors[colorScheme].background,
-          overflow: 'visible',
-          height: Platform.OS === 'ios' ? 88 : 80,
-          paddingTop: Platform.OS === 'ios' ? 20 : 0,
+          overflow: "visible",
+          height: Platform.OS === "ios" ? 88 : 80,
+          paddingTop: Platform.OS === "ios" ? 20 : 0,
 
-          shadowColor: 'gray',
+          shadowColor: "gray",
           shadowOffset: {
             width: 0,
             height: 1,
@@ -43,26 +40,32 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
       <Tabs.Screen
         name="(home)"
         options={{
-          title: 'Home',
-         
-         
+          title: "Home",
+
           tabBarIcon: ({ focused }) => (
             <HomeIcon
-              color={focused ? Colors[colorScheme].primary_color : Colors[colorScheme].secondary_color}
+              color={
+                focused
+                  ? Colors[colorScheme].primary_color
+                  : Colors[colorScheme].secondary_color
+              }
             />
           ),
         }}
       />
 
-       <Tabs.Screen
+      <Tabs.Screen
         name="(orders)"
-       
         options={{
-          title: 'Orders',
+          title: "Orders",
           tabBarIcon: ({ focused }) => (
-              <AddListingIcon
-                color={focused ? Colors[colorScheme].primary_color : Colors[colorScheme].secondary_color}
-              />
+            <AddListingIcon
+              color={
+                focused
+                  ? Colors[colorScheme].primary_color
+                  : Colors[colorScheme].secondary_color
+              }
+            />
           ),
         }}
       />
@@ -70,15 +73,23 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
       <Tabs.Screen
         name="(profile)"
         options={{
-          title: 'Profile',
+          title: "Profile",
           tabBarIcon: ({ focused }) => (
-            <FontAwesome name="user" size={24}  color={focused ? Colors[colorScheme].primary_color : Colors[colorScheme].secondary_color} />
+            <FontAwesome
+              name="user"
+              size={24}
+              color={
+                focused
+                  ? Colors[colorScheme].primary_color
+                  : Colors[colorScheme].secondary_color
+              }
+            />
             // <ExploreIcon
             //   color={focused ? Colors[colorScheme].primary_color : Colors[colorScheme].secondary_color}
             // />
           ),
         }}
-      /> 
+      />
     </Tabs>
   );
 }

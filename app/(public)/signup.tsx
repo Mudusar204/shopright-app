@@ -4,6 +4,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Button, Text, View } from "@/components/Themed";
 import React, { useRef, useState } from "react";
@@ -39,103 +40,113 @@ const Signup = () => {
   const { setOdooAdmin } = useAuthStore();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Create Account</Text>
-        <Image
-          source={require("@/assets/images/login.gif")}
-          style={{
-            width: 300,
-            height: 300,
-            marginTop: 20,
-            // resizeMode: "contain",
-            alignSelf: "center",
-            // backgroundColor: "red",
-          }}
-        />
-        <Text style={styles.subtitle}>
-          Please fill the details and create account
-        </Text>
-
-        <InputHandler
-          leftIcon={<ProfileIcon color={Colors[colorScheme].icon_color} />}
-          placeholder="Full Name"
-          value={name}
-          onChangeText={setName}
-          textContentType="name"
-        />
-
-        <InputHandler
-          leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          textContentType="emailAddress"
-        />
-        <InputHandler
-          leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-          placeholder="Phone"
-          value={phone}
-          onChangeText={setPhone}
-          textContentType="none"
-        />
-        <InputHandler
-          leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
-          rightIcon={
-            <Feather
-              name={!isPasswordVisible ? "eye-off" : "eye"}
-              size={20}
-              color={Colors[colorScheme].icon_color}
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            />
-          }
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!isPasswordVisible}
-          textContentType="password"
-        />
-        <InputHandler
-          leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
-          rightIcon={
-            <Feather
-              name={!isPasswordVisible ? "eye-off" : "eye"}
-              size={24}
-              color={Colors[colorScheme].icon_color}
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            />
-          }
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={!isPasswordVisible}
-          textContentType="password"
-        />
-        <Button
-          textColor={Colors[colorScheme].text_white}
-          style={{ marginTop: 12 }}
-          variant={
-            isLoading || !name || !email || !password || !confirmPassword
-              ? "primary"
-              : "primary"
-          }
-          size="large"
-          title={isLoading ? "Signing up..." : "Sign up"}
-          onPress={handleRegister}
-        />
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Already have an account?{" "}
-            <Link style={styles.footerLink} href="/login">
-              Sign in
-            </Link>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: 20,
+        }}
+        style={{
+          backgroundColor: Colors[colorScheme].background,
+        }}
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Create Account</Text>
+          <Image
+            source={require("@/assets/images/login.gif")}
+            style={{
+              width: 300,
+              height: 300,
+              marginTop: 20,
+              // resizeMode: "contain",
+              alignSelf: "center",
+              // backgroundColor: "red",
+            }}
+          />
+          <Text style={styles.subtitle}>
+            Please fill the details and create account
           </Text>
-          {/* <TouchableOpacity onPress={() => setOdooAdmin()}>
-          <Text style={styles.footerText}>Skip</Text>
-        </TouchableOpacity> */}
+
+          <InputHandler
+            leftIcon={<ProfileIcon color={Colors[colorScheme].icon_color} />}
+            placeholder="Full Name"
+            value={name}
+            onChangeText={setName}
+            textContentType="name"
+          />
+
+          <InputHandler
+            leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            textContentType="emailAddress"
+          />
+          <InputHandler
+            leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
+            placeholder="Phone"
+            value={phone}
+            onChangeText={setPhone}
+            textContentType="none"
+          />
+          <InputHandler
+            leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
+            rightIcon={
+              <Feather
+                name={!isPasswordVisible ? "eye-off" : "eye"}
+                size={20}
+                color={Colors[colorScheme].icon_color}
+                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              />
+            }
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
+            textContentType="password"
+          />
+          <InputHandler
+            leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
+            rightIcon={
+              <Feather
+                name={!isPasswordVisible ? "eye-off" : "eye"}
+                size={24}
+                color={Colors[colorScheme].icon_color}
+                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              />
+            }
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!isPasswordVisible}
+            textContentType="password"
+          />
+          <Button
+            textColor={Colors[colorScheme].text_white}
+            style={{ marginTop: 12 }}
+            variant={
+              isLoading || !name || !email || !password || !confirmPassword
+                ? "primary"
+                : "primary"
+            }
+            size="large"
+            title={isLoading ? "Signing up..." : "Sign up"}
+            onPress={handleRegister}
+          />
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Already have an account?{" "}
+              <Link style={styles.footerLink} href="/login">
+                Sign in
+              </Link>
+            </Text>
+            <TouchableOpacity onPress={() => setOdooAdmin()}>
+              <Text style={styles.footerText}>Skip</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

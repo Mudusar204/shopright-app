@@ -161,6 +161,7 @@ const Checkout = () => {
               styles.paymentOption,
               selectedPayment === "card" && styles.selectedPayment,
             ]}
+            disabled={true}
             onPress={() => setSelectedPayment("card")}
           >
             <Ionicons

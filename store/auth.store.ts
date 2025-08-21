@@ -18,10 +18,10 @@ const initialState: AuthStoreState = {
   userLocations: [],
   odooUserAuth: null,
   odooAdmin: {
-    api_key: "b24aed76-7b58-42d1-b615-17fa1a87f8bb",
-    login: "admin",
-    password: "admin",
-    db: "Testing",
+    api_key: "9e5560f8-bba4-45b5-b11f-ae191b4e8a34",
+    login: "app@gmail.com",
+    password: "Shopright1@FSD",
+    db: "Production_3_April",
   },
 };
 
@@ -37,10 +37,10 @@ export const useAuthStore = create(
       setOdooAdmin: () =>
         set({
           odooAdmin: {
-            api_key: "b24aed76-7b58-42d1-b615-17fa1a87f8bb",
-            login: "admin",
-            password: "admin",
-            db: "Testing",
+            api_key: "9e5560f8-bba4-45b5-b11f-ae191b4e8a34",
+            login: "app@gmail.com",
+            password: "Shopright1@FSD",
+            db: "Production_3_April",
           },
         }),
       setIsLoading: (isLoading: boolean) => set({ isLoading }),

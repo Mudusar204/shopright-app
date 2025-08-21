@@ -3,11 +3,13 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ActivityIndicator } from "react-native";
 import Colors from "@/constants/Colors";
+import { useGetProducts } from "@/hooks/queries/products/products.query";
 
 const index = () => {
   const { isLoggedIn, isOnboarded } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
-
+  const { data, isLoading, isError } = useGetProducts();
+  console.log(data, "data products");
   useEffect(() => {
     // Ensure the component is mounted and ready before navigation
     const timer = setTimeout(() => {

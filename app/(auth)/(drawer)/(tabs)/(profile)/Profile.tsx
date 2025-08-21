@@ -28,19 +28,19 @@ const Profile = () => {
   const { data: userAddresses } = useGetUserAddresses();
   const { data: odooUser } = useGetOdooUser();
   const isLoggedIn = useAuthStore().isLoggedIn;
-  console.log(odooUser, "odooUser");
+  console.log(odooUser, "odooUser found");
   console.log(userAddresses, "userAddresses", odooUser);
   const styles = createStyles(colorScheme, width);
   const [selectedImage, setSelectedImage] = useState<ImagePickerAsset>();
   const links = [
     {
       title: "Email",
-      value: odooUser?.records[0]?.login || "N/A",
+      value: typeof odooUser === "object" ? odooUser?.records[0]?.login : "N/A",
     },
 
     {
       title: "Phone",
-      value: odooUser?.records[0]?.phone || "N/A",
+      value: typeof odooUser === "object" ? odooUser?.records[0]?.phone : "N/A",
     },
     {
       title: "Address",

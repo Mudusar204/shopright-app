@@ -1,6 +1,7 @@
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -30,72 +31,81 @@ const Login = () => {
   } = useLoginScreen();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome back!</Text>
-        <Image
-          source={require("@/assets/images/login.gif")}
-          style={{
-            width: 300,
-            height: 300,
-            marginTop: 20,
-            // resizeMode: "contain",
-            alignSelf: "center",
-            // backgroundColor: "white",
-          }}
-        />
-        <Text style={styles.subtitle}>
-          {" "}
-          Great to see you again, You've been missed!
-        </Text>
-        <InputHandler
-          leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-          placeholder="Email or Phone Number"
-          value={identifier}
-          onChangeText={setIdentifier}
-          textContentType="telephoneNumber"
-        />
-        <InputHandler
-          leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
-          rightIcon={
-            <Feather
-              name={!isPasswordVisible ? "eye-off" : "eye"}
-              size={20}
-              color={Colors[colorScheme].icon_color}
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            />
-          }
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!isPasswordVisible}
-          textContentType="password"
-        />
-        <Button
-          textColor={Colors[colorScheme].text_white}
-          style={styles.button}
-          variant={
-            isLoading || !identifier || !password ? "primary" : "primary"
-          }
-          size="large"
-          title={isLoading ? "Logging in..." : "Login"}
-          onPress={handleLogin}
-        />
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        style={{
+          backgroundColor: Colors[colorScheme].background,
+        }}
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome back!</Text>
+          <Image
+            source={require("@/assets/images/login.gif")}
+            style={{
+              width: 300,
+              height: 300,
+              marginTop: 20,
+              // resizeMode: "contain",
+              alignSelf: "center",
+              // backgroundColor: "white",
+            }}
+          />
+          <Text style={styles.subtitle}>
             {" "}
-            <Link style={styles.footerLink} href="/signup">
-              Create an account
-            </Link>
+            Great to see you again, You've been missed!
           </Text>
-          <Text style={styles.footerText}>
-            <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
-              Continue as Guest
-            </Link>
-          </Text>
+          <InputHandler
+            leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
+            placeholder="Email or Phone Number"
+            value={identifier}
+            onChangeText={setIdentifier}
+            textContentType="telephoneNumber"
+          />
+          <InputHandler
+            leftIcon={<Lock2Icon color={Colors[colorScheme].icon_color} />}
+            rightIcon={
+              <Feather
+                name={!isPasswordVisible ? "eye-off" : "eye"}
+                size={20}
+                color={Colors[colorScheme].icon_color}
+                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              />
+            }
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
+            textContentType="password"
+          />
+          <Button
+            textColor={Colors[colorScheme].text_white}
+            style={styles.button}
+            variant={
+              isLoading || !identifier || !password ? "primary" : "primary"
+            }
+            size="large"
+            title={isLoading ? "Logging in..." : "Login"}
+            onPress={handleLogin}
+          />
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              {" "}
+              <Link style={styles.footerLink} href="/signup">
+                Create an account
+              </Link>
+            </Text>
+            <Text style={styles.footerText}>
+              <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
+                Continue as Guest
+              </Link>
+            </Text>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

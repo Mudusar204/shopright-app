@@ -60,7 +60,7 @@ export default function useLoginScreen() {
         api_key: response?.["api-key"],
         login: identifier,
         password: password,
-        db: "Testing",
+        db: "Production_3_April",
       });
       router.push("/(auth)/(tabs)");
     } catch (err: any) {
