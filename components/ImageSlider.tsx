@@ -38,9 +38,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const colorScheme = useColorScheme() as "light" | "dark";
 
   React.useEffect(() => {
-    if (autoPlay && images.length > 1) {
+    if (autoPlay && images?.length > 1) {
       const interval = setInterval(() => {
-        const nextIndex = (currentIndex + 1) % images.length;
+        const nextIndex = (currentIndex + 1) % images?.length;
         setCurrentIndex(nextIndex);
         flatListRef.current?.scrollToIndex({
           index: nextIndex,
@@ -50,7 +50,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
 
       return () => clearInterval(interval);
     }
-  }, [currentIndex, images.length, autoPlay, autoPlayInterval]);
+  }, [currentIndex, images?.length, autoPlay, autoPlayInterval]);
 
   const handleScroll = (event: any) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
@@ -61,7 +61,11 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const renderImageItem = ({ item }: { item: any }) => (
     <View style={[styles.imageContainer, { height }]}>
       <Image
-        source={{ uri: item.image }}
+        source={
+          item?.image?.includes("http")
+            ? { uri: item.image }
+            : require("@/assets/images/banner1.png")
+        }
         style={styles.image}
         resizeMode="cover"
         defaultSource={require("@/assets/images/banner1.png")}
@@ -99,10 +103,10 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
     />
   );
 
-  if (!images || images.length === 0) {
+  if (!images || images?.length === 0) {
     return (
-      <View style={[styles.placeholder, { height }]}>
-        <Text style={styles.placeholderText}>No Banner Available</Text>
+      <View style={[styles.placeholder]}>
+        {/* <Text style={styles.placeholderText}>No Promotions Available</Text> */}
       </View>
     );
   }
@@ -128,9 +132,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
         })}
       />
 
-      {showDots && images.length > 1 && (
+      {showDots && images?.length > 1 && (
         <View style={styles.dotsContainer}>
-          {images.map((_, index) => renderDot(index))}
+          {images?.map((_, index) => renderDot(index))}
         </View>
       )}
     </View>
@@ -184,11 +188,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   placeholder: {
-    justifyContent: "center",
+    // justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f0f0f0",
     borderRadius: 20,
-    marginHorizontal: 20,
+    // paddingTop: 70,
+    // marginHorizontal: 20,
+    width: "100%",
   },
   placeholderText: {
     color: "#666",

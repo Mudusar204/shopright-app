@@ -26,7 +26,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
 import { useGetProducts } from "@/hooks/queries/products/products.query";
-// import { useGetCategories } from "@/hooks/queries/categories/categories.query";
+import { useGetSliderImages } from "@/hooks/queries/categories/sliderImages.query ";
 import ImageSlider from "@/components/ImageSlider";
 
 type FilterItem = {
@@ -46,6 +46,13 @@ export default function HomeScreen() {
   const styles = createStyles(colorScheme);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const {
+    data: sliderImages,
+    isLoading: sliderImagesLoading,
+    isError: sliderImagesError,
+    refetch: sliderImagesRefetch,
+  } = useGetSliderImages();
+  console.log(sliderImages, "sliderImages");
   const [filter, setFilter] = useState<FilterItem[]>([
     { all: true },
     { category: null },
@@ -57,28 +64,10 @@ export default function HomeScreen() {
   const { data, isLoading, isError, refetch } = useGetProducts();
 
   // Sample banner images for the slider
-  const bannerImages = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=450",
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop",
-    },
-    {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&h=400&fit=crop",
-    },
-    {
-      id: 4,
-      image:
-        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop",
-    },
-  ];
+  const bannerImages = sliderImages?.records?.map((item: any) => ({
+    id: item?.id,
+    image: item?.img_url,
+  }));
 
   // Memoize filtered data to prevent recalculation on every render
   const filteredData = useMemo(() => {
