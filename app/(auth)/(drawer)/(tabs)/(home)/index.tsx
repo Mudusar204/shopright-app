@@ -243,7 +243,16 @@ export default function HomeScreen() {
               />
             </View>
           ) : isError ? (
-            <Text>Something went wrong</Text>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text>Something went wrong</Text>
+              <Button title="Retry" onPress={() => refetch()} />
+            </View>
           ) : (
             <FlatList
               data={filteredData}
