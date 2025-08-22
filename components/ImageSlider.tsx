@@ -31,7 +31,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   height = 200,
   showDots = true,
   autoPlay = true,
-  autoPlayInterval = 3000,
+  autoPlayInterval = 4000,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
@@ -63,7 +63,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
       <Image
         source={
           item?.image?.includes("http")
-            ? { uri: item.image }
+            ? { uri: item?.image }
             : require("@/assets/images/banner1.png")
         }
         style={styles.image}

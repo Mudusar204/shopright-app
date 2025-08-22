@@ -397,7 +397,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
     sectionTitle: {
       fontSize: 14,
       fontWeight: "600",
-      marginVertical: 5,
+      marginVertical: 15,
     },
     row: {
       flexDirection: "row",

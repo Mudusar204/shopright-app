@@ -26,7 +26,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useMyCartStore } from "@/store/myCart.store";
 import { useGetProducts } from "@/hooks/queries/products/products.query";
-import { useGetSliderImages } from "@/hooks/queries/categories/sliderImages.query ";
+import { useGetSliderImages } from "@/hooks/queries/categories/sliderImages.query";
 import ImageSlider from "@/components/ImageSlider";
 
 type FilterItem = {
@@ -245,7 +245,7 @@ export default function HomeScreen() {
             height={200}
             showDots={true}
             autoPlay={true}
-            autoPlayInterval={2000}
+            autoPlayInterval={4000}
           />
         </View>
         <View style={styles.productContainer}>
