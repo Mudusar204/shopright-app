@@ -279,7 +279,7 @@ export default function HomeScreen() {
                 <View style={styles.mapContainer}>
                   <ImageSlider
                     images={bannerImages}
-                    height={200}
+                    height={150}
                     showDots={true}
                     autoPlay={true}
                     autoPlayInterval={4000}

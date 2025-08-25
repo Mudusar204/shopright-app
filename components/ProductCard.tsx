@@ -78,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
           <View style={styles.imageContainer}>
             {image ? (
               <Image
-                resizeMode="cover"
+                resizeMode="contain"
                 source={getImageSource(image)}
                 style={styles.image}
               />
