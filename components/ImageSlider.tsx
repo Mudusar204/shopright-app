@@ -67,7 +67,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
             : require("@/assets/images/banner1.png")
         }
         style={styles.image}
-        resizeMode="cover"
+        resizeMode="stretch"
         defaultSource={require("@/assets/images/banner1.png")}
       />
       {/* {(item.title || item.description) && (
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   imageContainer: {
-    width: screenWidth, // Account for horizontal margins
+    width: screenWidth - 40, // Account for horizontal margins
     borderRadius: 20,
     overflow: "hidden",
     marginHorizontal: 0,

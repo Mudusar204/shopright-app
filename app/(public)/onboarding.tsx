@@ -38,7 +38,7 @@ const SkipButton = ({
       style={[styles.skipButton, { top: 10 }]}
       onPress={() => {
         setOnboarded(true);
-        router.push("/(public)/login");
+        router.replace("/(public)/login");
       }}
     >
       <Text style={styles.skipText}>{i18n.t("onboarding.skip")}</Text>
@@ -198,7 +198,7 @@ const Onboarding = () => {
           title={i18n.t("onboarding.splash_title_3")}
           subtitle={i18n.t("onboarding.splash_subtitle_3")}
           onPressContinue={() => {
-            router.push("/(public)/login");
+            router.replace("/(public)/login");
             setOnboarded(true);
           }}
           currentStep={splash}

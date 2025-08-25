@@ -238,16 +238,6 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
           />
         </View>
-
-        <View style={styles.mapContainer}>
-          <ImageSlider
-            images={bannerImages}
-            height={200}
-            showDots={true}
-            autoPlay={true}
-            autoPlayInterval={4000}
-          />
-        </View>
         <View style={styles.productContainer}>
           {isLoading ? (
             <View
@@ -285,6 +275,17 @@ export default function HomeScreen() {
               maxToRenderPerBatch={6}
               windowSize={10}
               initialNumToRender={9}
+              ListHeaderComponent={
+                <View style={styles.mapContainer}>
+                  <ImageSlider
+                    images={bannerImages}
+                    height={200}
+                    showDots={true}
+                    autoPlay={true}
+                    autoPlayInterval={4000}
+                  />
+                </View>
+              }
               ListEmptyComponent={
                 <View
                   style={{
@@ -399,9 +400,9 @@ const createStyles = (colorTheme: "light" | "dark") =>
     },
 
     mapContainer: {
-      flex: 1,
+      // flex: 1,
       marginTop: 10,
-      marginHorizontal: 20,
+      marginHorizontal: 10,
       borderRadius: 20,
       overflow: "hidden",
     },

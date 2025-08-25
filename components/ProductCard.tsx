@@ -111,7 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
               {title}
             </Text>
             <View style={styles.priceContainer}>
-              <Text style={styles.title}>1</Text>
+              <Text style={styles.title}></Text>
               <Text style={styles.title}>Rs.{price}</Text>
             </View>
 
@@ -138,7 +138,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
       marginBottom: 10,
       borderRadius: 5,
       overflow: "hidden",
-      borderWidth: 1,
+      // borderWidth: 1,
       borderColor: Colors[colorTheme].border,
       margin: 5,
       backgroundColor: Colors[colorTheme].background_light,
