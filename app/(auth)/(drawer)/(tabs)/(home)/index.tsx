@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState, useMemo } from "react";
 import {
   ActivityIndicator,
   Button,
+  Dimensions,
   FlatList,
   Image,
   Pressable,
@@ -44,6 +45,8 @@ const MemoizedProductCard = React.memo(ProductCard);
 export default function HomeScreen() {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
+  const screenWidth = Dimensions.get("window").width;
+  const screenHeight = Dimensions.get("window").height;
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const {
@@ -182,7 +185,7 @@ export default function HomeScreen() {
           <View style={styles.headerLeft}>
             <MenuHandler />
           </View>
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, alignItems: "center" }}>
             {colorScheme === "dark" ? (
               <Image
                 resizeMode="contain"
@@ -279,7 +282,7 @@ export default function HomeScreen() {
                 <View style={styles.mapContainer}>
                   <ImageSlider
                     images={bannerImages}
-                    height={150}
+                    height={screenHeight * 0.2}
                     showDots={true}
                     autoPlay={true}
                     autoPlayInterval={4000}

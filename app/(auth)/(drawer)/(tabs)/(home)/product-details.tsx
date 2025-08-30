@@ -17,6 +17,7 @@ import PhoneIcon from "@/assets/images/svgs/Phone";
 import LocationIcon from "@/assets/images/svgs/Location";
 import Feather from "@expo/vector-icons/Feather";
 import { useMyCartStore } from "@/store/myCart.store";
+import { getImageSource } from "@/utils";
 
 const ProductDetails = () => {
   const params = useLocalSearchParams();
@@ -38,7 +39,6 @@ const ProductDetails = () => {
   const colorTheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorTheme);
   const { addToCart, cartItems, removeFromCart } = useMyCartStore();
-
   const handleAddToCart = () => {
     if (cartItems.find((item) => item.id === id)) {
       removeFromCart(id as string);
@@ -62,11 +62,8 @@ const ProductDetails = () => {
       </View>
       {/* Header Image */}
       <Image
-        source={
-          image && image.includes("http")
-            ? { uri: image }
-            : require("@/assets/images/productImg.jpg")
-        }
+        resizeMode="contain"
+        source={getImageSource(image)}
         style={styles.headerImage}
       />
 
@@ -149,7 +146,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
     headerImage: {
       width: "100%",
       height: 270,
-      resizeMode: "cover",
+      // resizeMode: "cover",
       marginTop: 10,
     },
     contentSection: {

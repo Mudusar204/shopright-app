@@ -10,6 +10,7 @@ import {
 import { Text } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
+import { getImageSource } from "@/utils";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -61,11 +62,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   const renderImageItem = ({ item }: { item: any }) => (
     <View style={[styles.imageContainer, { height }]}>
       <Image
-        source={
-          item?.image?.includes("http")
-            ? { uri: item?.image }
-            : require("@/assets/images/banner1.png")
-        }
+        source={getImageSource(item.image)}
         style={styles.image}
         resizeMode="stretch"
         defaultSource={require("@/assets/images/banner1.png")}

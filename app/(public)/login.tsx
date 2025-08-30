@@ -59,7 +59,7 @@ const Login = () => {
           </Text>
           <InputHandler
             leftIcon={<SmsIcon color={Colors[colorScheme].icon_color} />}
-            placeholder="Email or Phone Number"
+            placeholder="Enter your email"
             value={identifier}
             onChangeText={setIdentifier}
             textContentType="telephoneNumber"

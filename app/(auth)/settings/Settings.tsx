@@ -12,19 +12,19 @@ const Settings = () => {
   const styles = createStyles(colorScheme, width);
 
   const links = [
-    {
-      title: "Edit Profile",
-      onPress: () => router.push("/(auth)/editProfile"),
-    },
+    // {
+    //   title: "Edit Profile",
+    //   onPress: () => router.push("/(auth)/editProfile"),
+    // },
 
     {
       title: "Notifications",
       onPress: () => router.push("/(auth)/settings/notifications"),
     },
-    {
-      title: "Legal and Policy",
-      // onPress: () => router.push('/(auth)/(drawer)/legal')
-    },
+    // {
+    //   title: "Legal and Policy",
+    //   // onPress: () => router.push('/(auth)/(drawer)/legal')
+    // },
   ];
   return (
     <View style={styles.container}>

@@ -9,6 +9,7 @@ import {
   StatusBar,
   FlatList,
   TextInput,
+  Dimensions,
 } from "react-native";
 import { View, Text, Button } from "@/components/Themed";
 import Colors from "@/constants/Colors";
@@ -60,7 +61,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   setFilter,
 }) => {
   const colorScheme = useColorScheme() as "light" | "dark";
-  const styles = createStyles(colorScheme);
+  const screenHeight = Dimensions.get("window").height;
+  const styles = createStyles(colorScheme, screenHeight);
 
   // Animation value
   const [animation] = useState(new Animated.Value(0));
@@ -203,7 +205,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <StatusBar hidden={true} />
+      {/* <StatusBar hidden={true} /> */}
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
@@ -356,7 +358,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   );
 };
 
-const createStyles = (colorTheme: "light" | "dark") =>
+const createStyles = (colorTheme: "light" | "dark", height: number) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -392,7 +394,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: 12,
+      marginVertical: 12,
     },
     sectionTitle: {
       fontSize: 14,

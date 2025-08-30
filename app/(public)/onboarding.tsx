@@ -7,6 +7,7 @@ import {
   StyleSheet,
   StatusBar,
   Image,
+  Dimensions,
 } from "react-native";
 import Images from "@/constants/Images";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -118,7 +119,9 @@ const SplashCard = ({
 const Onboarding = () => {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
+  const screenHeight = Dimensions.get("window").height;
   const styles = createStyles(colorScheme);
+
   const { setOnboarded } = useAuthStore();
   const [splash, setSplash] = useState<1 | 2 | 3>(1);
 
@@ -138,8 +141,10 @@ const Onboarding = () => {
           autoPlay
           // ref={animation}
           style={{
-            width: 350,
-            height: 350,
+            // width: 350,
+            // height: 350,
+            width: screenHeight * 0.5,
+            height: screenHeight * 0.5,
             backgroundColor: "transparent",
           }}
           source={require("@/assets/lotties/order.json")}
@@ -151,8 +156,8 @@ const Onboarding = () => {
           autoPlay
           // ref={animation}
           style={{
-            width: 350,
-            height: 350,
+            width: screenHeight * 0.5,
+            height: screenHeight * 0.5,
             backgroundColor: "transparent",
           }}
           source={require("@/assets/lotties/shopping.json")}
@@ -164,8 +169,8 @@ const Onboarding = () => {
           autoPlay
           // ref={animation}
           style={{
-            width: 600,
-            height: 600,
+            width: screenHeight * 0.7,
+            height: screenHeight * 0.7,
             backgroundColor: "transparent",
             marginBottom: -100,
           }}

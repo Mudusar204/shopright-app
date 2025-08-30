@@ -83,19 +83,21 @@ const DrawerScreen = () => {
                   ? odooUserAuth?.login.substring(0, 15) + "..."
                   : "Guest"}
               </Text>
-              <View style={[styles.locationRow]}>
-                <LocationIcon color={Colors[colorTheme].primary_color} />
-                <Text
-                  style={[
-                    styles.profileLocationText,
-                    { color: Colors[colorTheme].primary_color },
-                  ]}
-                >
-                  {userAddresses?.records[0].city +
-                    ", " +
-                    userAddresses?.records[0].country}
-                </Text>
-              </View>
+              {odooUserAuth?.login && (
+                <View style={[styles.locationRow]}>
+                  <LocationIcon color={Colors[colorTheme].primary_color} />
+                  <Text
+                    style={[
+                      styles.profileLocationText,
+                      { color: Colors[colorTheme].primary_color },
+                    ]}
+                  >
+                    {userAddresses?.records[0].city +
+                      ", " +
+                      userAddresses?.records[0].country}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </Pressable>

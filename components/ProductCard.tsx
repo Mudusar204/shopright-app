@@ -34,7 +34,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     const { addToCart, cartItems, removeFromCart } = useMyCartStore();
 
     const colorTheme = useColorScheme() as "light" | "dark";
-    const styles = createStyles(colorTheme);
+    const screenHeight = Dimensions.get("window").height;
+    const styles = createStyles(colorTheme, screenHeight);
     const { width } = Dimensions.get("window");
 
     // Memoize the card width
@@ -132,7 +133,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
 ProductCard.displayName = "ProductCard";
 
-const createStyles = (colorTheme: "light" | "dark") =>
+const createStyles = (colorTheme: "light" | "dark", height: number) =>
   StyleSheet.create({
     container: {
       marginBottom: 10,
@@ -149,7 +150,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
     },
     imageContainer: {
       width: "100%",
-      height: 75,
+      height: height * 0.1,
     },
     image: {
       width: "100%",

@@ -138,19 +138,19 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               <Text style={styles.buttonText}>Enable Notifications</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.button, styles.enableButton]}
               onPress={getPushToken}
             >
               <Text style={styles.buttonText}>Get Push Token</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[styles.button, styles.disableButton]}
               onPress={handleUnregisterToken}
             >
               <Text style={styles.buttonText}>Disable Notifications</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </ScrollView>
