@@ -1,6 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getErrorMessage } from "@/utils";
-import { login, register, logout } from "@/services/auth.services";
+import {
+  login,
+  register,
+  logout,
+  deleteOdooUser,
+} from "@/services/auth.services";
 import { addUserAddress } from "@/services/auth.services";
 
 const useRegister = () => {
@@ -20,4 +25,12 @@ const useRegister = () => {
   });
 };
 
-export { useRegister };
+const useDeleteOdooUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => {
+      return deleteOdooUser();
+    },
+  });
+};
+export { useRegister, useDeleteOdooUser };

@@ -46,9 +46,9 @@ const Profile = () => {
       title: "Address",
       value:
         userAddresses?.records[0]?.street2 ||
-        "N/A" + ", " + userAddresses?.records[0]?.city ||
-        "N/A" + ", " + userAddresses?.records[0]?.state ||
-        "N/A" + ", " + userAddresses?.records[0]?.country ||
+        userAddresses?.records[0]?.city ||
+        userAddresses?.records[0]?.state ||
+        userAddresses?.records[0]?.country ||
         "N/A",
     },
   ];

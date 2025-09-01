@@ -50,6 +50,33 @@ export const getOdooUser = async () => {
   }
 };
 
+export const deleteOdooUser = async () => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  const odooUserAuth = useAuthStore.getState().odooUserAuth;
+
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(odooAdmin, "odooUserAuth");
+  try {
+    const response = await axios.delete(
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&Id=${odooUserAuth?.id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in deleteOdooUser");
+  }
+};
 export const register = async (data: any) => {
   const odooAdmin = useAuthStore.getState().odooAdmin;
   if (!odooAdmin) {

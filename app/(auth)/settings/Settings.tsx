@@ -6,20 +6,20 @@ import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
+import { useAuthStore } from "@/store/auth.store";
 const Settings = () => {
   const width = Dimensions.get("window").width;
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme, width);
-
+  const { isLoggedIn } = useAuthStore();
   const links = [
-    // {
-    //   title: "Edit Profile",
-    //   onPress: () => router.push("/(auth)/editProfile"),
-    // },
-
     {
       title: "Notifications",
       onPress: () => router.push("/(auth)/settings/notifications"),
+    },
+    {
+      title: "Delete Account",
+      onPress: () => router.push("/(auth)/deleteAccount"),
     },
     // {
     //   title: "Legal and Policy",
@@ -32,7 +32,7 @@ const Settings = () => {
         <Header title={"Settings"} />
       </View>
       {links.map((link, index) => (
-        <Pressable onPress={link.onPress} key={index}>
+        <Pressable onPress={link.onPress} key={index} disabled={!isLoggedIn}>
           <View key={index} style={styles.linkContainer}>
             <Text style={styles.linkText}>{link.title}</Text>
             <View style={styles.linkIconContainer}>

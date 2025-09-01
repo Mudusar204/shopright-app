@@ -52,7 +52,7 @@ const DrawerScreen = () => {
   const toggleTheme = useThemStore((state: any) => state.toggleTheme);
   // const { address } = useLocationStore();
   const colorTheme = useColorScheme() as "light" | "dark";
-  const { setIsLoggedIn, odooUserAuth, clear } = useAuthStore();
+  const { setIsLoggedIn, odooUserAuth, isLoggedIn, clear } = useAuthStore();
   const { data: userAddresses } = useGetUserAddresses();
   const queryClient = useQueryClient();
 
@@ -83,21 +83,23 @@ const DrawerScreen = () => {
                   ? odooUserAuth?.login.substring(0, 15) + "..."
                   : "Guest"}
               </Text>
-              {odooUserAuth?.login && (
-                <View style={[styles.locationRow]}>
-                  <LocationIcon color={Colors[colorTheme].primary_color} />
-                  <Text
-                    style={[
-                      styles.profileLocationText,
-                      { color: Colors[colorTheme].primary_color },
-                    ]}
-                  >
-                    {userAddresses?.records[0].city +
-                      ", " +
-                      userAddresses?.records[0].country}
-                  </Text>
-                </View>
-              )}
+              {odooUserAuth?.login &&
+                (userAddresses?.records[0].city ||
+                  userAddresses?.records[0].country) && (
+                  <View style={[styles.locationRow]}>
+                    <LocationIcon color={Colors[colorTheme].primary_color} />
+                    <Text
+                      style={[
+                        styles.profileLocationText,
+                        { color: Colors[colorTheme].primary_color },
+                      ]}
+                    >
+                      {userAddresses?.records[0].city +
+                        ", " +
+                        userAddresses?.records[0].country}
+                    </Text>
+                  </View>
+                )}
             </View>
           </View>
         </Pressable>
@@ -177,18 +179,29 @@ const DrawerScreen = () => {
         />
 
         <View style={{}}>
-          <TitleWithImage
-            Icon={<LogoutIcon color="#FF5757" />}
-            title="Logout"
-            titleStyle={{ color: "#FF5757" }}
-            onPress={() => {
-              // Invalidate all queries before logout
-              queryClient.clear();
-              clear();
-              clearCart();
-              router.push("/login");
-            }}
-          />
+          {isLoggedIn ? (
+            <TitleWithImage
+              Icon={<LogoutIcon color="#FF5757" />}
+              title="Logout"
+              titleStyle={{ color: "#FF5757" }}
+              onPress={() => {
+                // Invalidate all queries before logout
+                queryClient.clear();
+                clear();
+                clearCart();
+                router.push("/login");
+              }}
+            />
+          ) : (
+            <TitleWithImage
+              Icon={<LogoutIcon color="#FF5757" />}
+              title="Login"
+              titleStyle={{ color: "#FF5757" }}
+              onPress={() => {
+                router.push("/login");
+              }}
+            />
+          )}
         </View>
       </View>
     </View>
