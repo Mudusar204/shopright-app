@@ -614,15 +614,15 @@ const AddAddress = ({
                 title="Use Current Location"
                 onPress={handleUseCurrentLocation}
               />
+              <Button
+                variant="primary"
+                size="large"
+                title="Confirm Location"
+                onPress={handleConfirmLocation}
+                style={style.confirmButton}
+                disabled={!mapState.selectedLocation && !locationData.location}
+              />
             </View>
-            <Button
-              variant="primary"
-              size="large"
-              title="Confirm Location"
-              onPress={handleConfirmLocation}
-              style={style.confirmButton}
-              disabled={!mapState.selectedLocation && !locationData.location}
-            />
           </View>
         </View>
       ) : (
@@ -856,15 +856,15 @@ const styles = (theme: "light" | "dark") =>
       alignItems: "flex-end",
       width: "100%",
       position: "absolute",
-      bottom: 80,
+      bottom: 20,
       alignSelf: "center",
       backgroundColor: "transparent",
     },
     confirmButton: {
-      width: "92%",
-      position: "absolute",
-      bottom: 20,
-      alignSelf: "center",
+      // width: "92%",
+      // position: "absolute",
+      // bottom: 20,
+      // alignSelf: "center",
     },
     autocompleteContainer: {
       flex: 1,

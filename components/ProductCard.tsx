@@ -43,7 +43,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
     // Memoize cart item check
     const isInCart = useMemo(
-      () => cartItems.find((item) => item.id === id),
+      () => cartItems.find((item) => Number(item.id) === Number(id)),
       [cartItems, id]
     );
 

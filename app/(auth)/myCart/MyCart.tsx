@@ -76,7 +76,6 @@ const createStyles = (theme: "light" | "dark") =>
       paddingHorizontal: 15,
     },
     scrollView: {
-      flex: 1,
       padding: 15,
     },
     body: {

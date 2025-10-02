@@ -43,3 +43,16 @@ export const getImageSource = (imageUrl: any) => {
   // Fallback to default image
   return require("@/assets/images/no-image.png");
 };
+
+/**
+ * Utility function to strip HTML tags from text content
+ * Removes all HTML tags and returns clean text
+ */
+export const stripHtmlTags = (htmlString: string): string => {
+  if (!htmlString || typeof htmlString !== "string") {
+    return "";
+  }
+
+  // Remove HTML tags using regex
+  return htmlString.replace(/<[^>]*>/g, "").trim();
+};

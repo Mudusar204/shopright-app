@@ -273,7 +273,10 @@ export default function HomeScreen() {
               keyExtractor={keyExtractor}
               showsVerticalScrollIndicator={false}
               numColumns={3}
-              contentContainerStyle={{ marginHorizontal: 10 }}
+              contentContainerStyle={{
+                marginHorizontal: 10,
+                paddingBottom: 80,
+              }}
               removeClippedSubviews={true}
               maxToRenderPerBatch={6}
               windowSize={10}

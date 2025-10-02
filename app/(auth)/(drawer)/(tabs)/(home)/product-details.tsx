@@ -17,7 +17,7 @@ import PhoneIcon from "@/assets/images/svgs/Phone";
 import LocationIcon from "@/assets/images/svgs/Location";
 import Feather from "@expo/vector-icons/Feather";
 import { useMyCartStore } from "@/store/myCart.store";
-import { getImageSource } from "@/utils";
+import { getImageSource, stripHtmlTags } from "@/utils";
 
 const ProductDetails = () => {
   const params = useLocalSearchParams();
@@ -45,10 +45,7 @@ const ProductDetails = () => {
     } else {
       addToCart({
         id: id as string,
-        image:
-          image && image.includes("http")
-            ? { uri: image }
-            : require("@/assets/images/productImg.jpg"),
+        image,
         title: title as string,
         price: price as string,
       });
@@ -91,7 +88,9 @@ const ProductDetails = () => {
 
         <Text style={styles.sectionTitle}>Description</Text>
 
-        <Text style={styles.description}>{description}</Text>
+        <Text style={styles.description}>
+          {stripHtmlTags(description as string)}
+        </Text>
         {tagList && tagList.length > 0 && (
           <View style={styles.inputBatchContainer}>
             {tagList?.map((tag: any, index: any) => (
