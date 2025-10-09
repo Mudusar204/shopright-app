@@ -85,9 +85,10 @@ const INITIAL_ADDRESS_DETAILS: AddressDetails = {
   latitude: "",
 };
 
+// Faisalabad, Punjab, Pakistan
 const INITIAL_REGION: Region = {
-  latitude: 23.723081,
-  longitude: 90.4087,
+  latitude: 31.4181,
+  longitude: 73.0791,
   latitudeDelta: 0.0922,
   longitudeDelta: 0.0421,
 };
@@ -558,6 +559,10 @@ const AddAddress = ({
                 placeholder="Search location"
                 onLocationSelect={handleLocationSelect}
               />
+              <Text style={{ textAlign: "center", marginTop: 10 }}>
+                You can simply tap on the map to select location after search or
+                zoom in to the desired location.
+              </Text>
             </View>
             <MapView
               ref={mapRef}
@@ -566,6 +571,34 @@ const AddAddress = ({
               showsUserLocation={true}
               showsMyLocationButton={true}
               pointerEvents="box-none"
+              onPress={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                const newRegion: Region = {
+                  latitude,
+                  longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                };
+                updateMapState({ type: "UPDATE_REGION", payload: newRegion });
+                updateMapState({
+                  type: "SET_SELECTED_LOCATION",
+                  payload: {
+                    latitude,
+                    longitude,
+                    address: "",
+                    // address: `Lat ${latitude.toFixed(
+                    //   6
+                    // )}, Lng ${longitude.toFixed(6)}`,
+                  },
+                });
+                addressDispatch({
+                  type: "SET_ADDRESS",
+                  payload: {
+                    latitude: latitude.toString(),
+                    longitude: longitude.toString(),
+                  },
+                });
+              }}
             >
               {/* Selected Location Marker */}
               {mapState.selectedLocation && (

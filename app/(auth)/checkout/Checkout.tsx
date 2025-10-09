@@ -275,7 +275,7 @@ const Checkout = () => {
             }
           /> */}
         </View>
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Special Instructions</Text>
           <TextInput
             multiline
@@ -288,7 +288,7 @@ const Checkout = () => {
             }
             style={[styles.input, { height: 100, textAlignVertical: "top" }]}
           />
-        </View>
+        </View> */}
       </ScrollView>
 
       {/* Checkout Button */}

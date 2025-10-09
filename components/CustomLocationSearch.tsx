@@ -60,10 +60,21 @@ const CustomLocationSearch: React.FC<CustomLocationSearchProps> = ({
     setHasError(false);
 
     try {
+      // Restrict to Pakistan, Punjab with location bias around Faisalabad
+      const locationBias = {
+        // Faisalabad center
+        lat: 31.4181,
+        lng: 73.0791,
+        // approx radius in meters
+        radius: 150000,
+      };
+
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
           input
-        )}&key=${API_KEY}&language=en&types=geocode`,
+        )}&key=${API_KEY}&language=en&types=geocode&components=country:pk&location=${
+          locationBias.lat
+        },${locationBias.lng}&radius=${locationBias.radius}`,
         {
           method: "GET",
           headers: {
@@ -121,7 +132,7 @@ const CustomLocationSearch: React.FC<CustomLocationSearchProps> = ({
   const fetchPlaceDetails = async (placeId: string) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=formatted_address,geometry,name&key=${API_KEY}`,
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=formatted_address,geometry,name,address_components&key=${API_KEY}`,
         {
           method: "GET",
           headers: {
@@ -148,6 +159,7 @@ const CustomLocationSearch: React.FC<CustomLocationSearchProps> = ({
           },
           formatted_address: place.formatted_address,
           name: place.name,
+          address_components: place.address_components,
         };
 
         onLocationSelect(
