@@ -103,5 +103,3 @@ const createStyles = (theme: "light" | "dark") =>
   });
 
 export default Wishlist;
-
-

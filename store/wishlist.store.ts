@@ -28,9 +28,7 @@ export const useWishlistStore = create<WishlistState>()(
         const exists = get().wishlistItems.find((w) => w.id === item.id);
         if (exists) {
           set({
-            wishlistItems: get().wishlistItems.filter(
-              (w) => w.id !== item.id
-            ),
+            wishlistItems: get().wishlistItems.filter((w) => w.id !== item.id),
           });
         } else {
           set({
@@ -48,5 +46,3 @@ export const useWishlistStore = create<WishlistState>()(
     }
   )
 );
-
-
