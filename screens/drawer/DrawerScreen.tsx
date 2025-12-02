@@ -144,7 +144,9 @@ const DrawerScreen = () => {
         <TitleWithImage
           Icon={<HeartIcon color={Colors[colorTheme].icon_color} />}
           title="Wishlist"
-          onPress={() => {}}
+          onPress={() => {
+            router.push("/(auth)/wishlist/Wishlist");
+          }}
         />
         <TitleWithImage
           Icon={

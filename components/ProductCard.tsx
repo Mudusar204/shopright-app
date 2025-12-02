@@ -10,6 +10,8 @@ import { useMyCartStore } from "@/store/myCart.store";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { getImageSource } from "@/utils";
 import Feather from "@expo/vector-icons/Feather";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useWishlistStore } from "@/store/wishlist.store";
 
 interface ProductCardProps {
   id: string;
@@ -34,6 +36,8 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = React.memo(
   ({ id, image, title, price, description, relatedItems, tags }) => {
     const { addToCart, cartItems, removeFromCart } = useMyCartStore();
+    const inWishlist = useWishlistStore((state) => state.isInWishlist(id));
+    const toggleWishlist = useWishlistStore((state) => state.toggleWishlist);
 
     const colorTheme = useColorScheme() as "light" | "dark";
     const screenHeight = Dimensions.get("window").height;
@@ -74,19 +78,41 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
       }
     }, [isInCart, removeFromCart, addToCart, id, image, title, price]);
 
+    const handleWishlistToggle = useCallback(() => {
+      toggleWishlist({ id, image, title, price });
+    }, [id, image, title, price, toggleWishlist]);
+
     return (
       <View style={[styles.container, { width: cardWidth }]}>
-        <Feather
-          name="check-circle"
-          size={24}
-          color={Colors[colorTheme].primary_color}
+        <View
           style={{
-            opacity: isInCart ? 1 : 0,
-            textAlign: "right",
-            marginRight: 5,
-            marginTop: 5,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            backgroundColor: "transparent",
+            paddingHorizontal: 5,
+            paddingTop: 5,
           }}
-        />
+        >
+          <Feather
+            name="check-circle"
+            size={20}
+            color={Colors[colorTheme].primary_color}
+            style={{
+              opacity: isInCart ? 1 : 0,
+            }}
+          />
+          <Pressable onPress={handleWishlistToggle}>
+            <AntDesign
+              name={inWishlist ? "heart" : "hearto"}
+              size={20}
+              color={
+                inWishlist
+                  ? Colors[colorTheme].primary_color
+                  : Colors[colorTheme].icon_color
+              }
+            />
+          </Pressable>
+        </View>
         <Pressable style={styles.pressableContainer} onPress={handlePress}>
           {/* Image */}
           <View style={styles.imageContainer}>
