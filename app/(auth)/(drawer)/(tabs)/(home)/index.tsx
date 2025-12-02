@@ -29,6 +29,7 @@ import { useMyCartStore } from "@/store/myCart.store";
 import { useGetProducts } from "@/hooks/queries/products/products.query";
 import { useGetSliderImages } from "@/hooks/queries/categories/sliderImages.query";
 import ImageSlider from "@/components/ImageSlider";
+import { useGetCategories } from "@/hooks/queries/categories/categories.query";
 
 type FilterItem = {
   all?: boolean;
@@ -66,6 +67,16 @@ export default function HomeScreen() {
   const { cartItems } = useMyCartStore();
   const { data, isLoading, isError, refetch } = useGetProducts();
 
+  const {
+    data: categories,
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+  } = useGetCategories();
+
+  const categoriesData = useMemo(() => {
+    return categories?.records || [];
+  }, [categories?.records]);
+  console.log(categoriesData, "categoriesData");
   // Sample banner images for the slider
   const bannerImages = sliderImages?.records?.map((item: any) => ({
     id: item?.id,
@@ -138,6 +149,20 @@ export default function HomeScreen() {
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);
+  // Memoize the render category item function for FlatList
+
+  const renderCategoryItem = useCallback(
+    ({ item }: { item: any }) => (
+      <View>
+        <Image
+          source={{ uri: item.image_1920 }}
+          style={{ width: 100, height: 100 }}
+        />
+        <Text>{item.name}</Text>
+      </View>
+    ),
+    []
+  );
 
   // Memoize the render item function for FlatList
   const renderProductItem = useCallback(
@@ -229,7 +254,7 @@ export default function HomeScreen() {
           </View>
         </Pressable>
 
-        <View style={styles.filterContainer}>
+        {/* <View style={styles.filterContainer}>
           <Pressable onPress={handleFilterPress}>
             <FilterHandler />
           </Pressable>
@@ -240,7 +265,8 @@ export default function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
           />
-        </View>
+        </View> */}
+
         <View style={styles.productContainer}>
           {isLoading ? (
             <View
@@ -272,7 +298,7 @@ export default function HomeScreen() {
               renderItem={renderProductItem}
               keyExtractor={keyExtractor}
               showsVerticalScrollIndicator={false}
-              numColumns={3}
+              numColumns={2}
               contentContainerStyle={{
                 marginHorizontal: 10,
                 paddingBottom: 80,
@@ -290,6 +316,20 @@ export default function HomeScreen() {
                     autoPlay={true}
                     autoPlayInterval={4000}
                   />
+                  <View style={{ marginTop: 10 }}>
+                    <Text>Categories</Text>
+                    <FlatList
+                      data={categoriesData}
+                      renderItem={renderCategoryItem}
+                      keyExtractor={(item, index) => index.toString()}
+                      contentContainerStyle={{
+                        gap: 10,
+                        paddingHorizontal: 10,
+                      }}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                    />
+                  </View>
                 </View>
               }
               ListEmptyComponent={
@@ -409,7 +449,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
       // flex: 1,
       marginTop: 10,
       marginHorizontal: 10,
-      borderRadius: 20,
+      // borderRadius: 20,
       overflow: "hidden",
     },
     productContainer: {

@@ -69,9 +69,9 @@ const ProductDetails = () => {
         {/* Title and Location */}
 
         <View style={styles.titleRow}>
-          <View style={styles.phoneRow}>
-            <Text style={styles.title}>{title}</Text>
-            {/* <Button
+          {/* <View style={styles.phoneRow}> */}
+          <Text style={styles.title}>{title}</Text>
+          {/* <Button
               style={{
                 paddingHorizontal: 2,
                 paddingVertical: 5,
@@ -82,8 +82,8 @@ const ProductDetails = () => {
               size="small"
               onPress={() => {}}
             /> */}
-          </View>
           <Text style={styles.price}>{`Rs.${price}`}</Text>
+          {/* </View> */}
         </View>
 
         <Text style={styles.sectionTitle}>Description</Text>
@@ -154,10 +154,11 @@ const createStyles = (colorTheme: "light" | "dark") =>
     titleRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "center",
+      // alignItems: "center",
       marginTop: 10,
     },
     title: {
+      flex: 3,
       fontSize: 22,
       fontWeight: "medium",
       marginRight: 10,
@@ -175,6 +176,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
     price: {
       fontSize: 22,
       fontWeight: "medium",
+      flex: 1,
     },
     phoneRow: {
       flexDirection: "row",

@@ -2,13 +2,15 @@ import React, { useCallback, useMemo } from "react";
 import { StyleSheet, Image, Dimensions, Pressable } from "react-native";
 import { useColorScheme } from "./useColorScheme";
 import Colors from "@/constants/Colors";
-import { View, Text } from "@/components/Themed";
+import { View, Text, Button } from "@/components/Themed";
 import { router } from "expo-router";
 import LocationIcon from "@/assets/images/svgs/Location";
 import PhoneIcon from "@/assets/images/svgs/Phone";
 import { useMyCartStore } from "@/store/myCart.store";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { getImageSource } from "@/utils";
+import Feather from "@expo/vector-icons/Feather";
+
 interface ProductCardProps {
   id: string;
   image: string;
@@ -39,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     const { width } = Dimensions.get("window");
 
     // Memoize the card width
-    const cardWidth = useMemo(() => width / 3 - 16, [width]);
+    const cardWidth = useMemo(() => width / 2 - 20, [width]);
 
     // Memoize cart item check
     const isInCart = useMemo(
@@ -74,6 +76,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 
     return (
       <View style={[styles.container, { width: cardWidth }]}>
+        <Feather
+          name="check-circle"
+          size={24}
+          color={Colors[colorTheme].primary_color}
+          style={{
+            opacity: isInCart ? 1 : 0,
+            textAlign: "right",
+            marginRight: 5,
+            marginTop: 5,
+          }}
+        />
         <Pressable style={styles.pressableContainer} onPress={handlePress}>
           {/* Image */}
           <View style={styles.imageContainer}>
@@ -115,14 +128,28 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
               <Text style={styles.title}></Text>
               <Text style={styles.title}>Rs.{price}</Text>
             </View>
-
+            {/* <Button
+              variant="primary"
+              size="small"
+              style={{}}
+              title={
+                cartItems.find((item) => item.id === id)
+                  ? "Remove Item"
+                  : "Add To Cart"
+              }
+              icon={<Feather name="shopping-cart" size={18} color="white" />}
+              onPress={handleCartAction}
+            /> */}
             <Pressable
               style={styles.addToCartButton}
               onPress={handleCartAction}
             >
               <Text style={styles.addToCart}>
-                {isInCart ? "Remove Item" : "Add To Cart"}
+                {isInCart ? "Remove Item" : "Add To Cart  "}
               </Text>
+              {!isInCart && (
+                <Feather name="shopping-cart" size={18} color="white" />
+              )}
             </Pressable>
           </View>
         </Pressable>
@@ -140,13 +167,19 @@ const createStyles = (colorTheme: "light" | "dark", height: number) =>
       borderRadius: 5,
       overflow: "hidden",
       // borderWidth: 1,
-      borderColor: Colors[colorTheme].border,
+      // borderColor: Colors[colorTheme].border,
       margin: 5,
-      backgroundColor: Colors[colorTheme].background_light,
+      // backgroundColor: Colors[colorTheme].background_light,
+      shadowColor: Colors[colorTheme].text,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 10,
     },
     pressableContainer: {
       flex: 1,
-      backgroundColor: Colors[colorTheme].background_light, // Add background color here too
+      // backgroundColor: Colors[colorTheme].background_light, // Add background color here too
+      backgroundColor: "transparent", // Add background color here too
     },
     imageContainer: {
       width: "100%",
@@ -157,8 +190,8 @@ const createStyles = (colorTheme: "light" | "dark", height: number) =>
       height: "100%",
     },
     content: {
-      padding: 1,
-      backgroundColor: "red",
+      // padding: 1,
+      // backgroundColor: "red",
       flex: 1,
       justifyContent: "space-between",
     },
@@ -188,29 +221,24 @@ const createStyles = (colorTheme: "light" | "dark", height: number) =>
     priceContainer: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      // justifyContent: "space-between",
       backgroundColor: "transparent",
     },
 
     addToCartButton: {
       marginTop: 5,
-      color: Colors[colorTheme].primary_color,
-      fontSize: 10,
-      textAlign: "center",
-      backgroundColor: "transparent",
-      padding: 5,
-
-      marginBottom: 0,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: Colors[colorTheme].primary_color,
       borderRadius: 5,
-      borderWidth: 1,
-
-      borderColor: Colors[colorTheme].primary_color,
+      padding: 8,
     },
     addToCart: {
       fontWeight: "bold",
       fontSize: 12,
       textAlign: "center",
-      color: Colors[colorTheme].primary_color,
+      color: Colors[colorTheme].text_white,
     },
   });
 
