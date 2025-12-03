@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
     const { width } = Dimensions.get("window");
 
     // Memoize the card width
-    const cardWidth = useMemo(() => width / 2 - 20, [width]);
+    const cardWidth = useMemo(() => width / 2 - 30, [width]);
 
     // Memoize cart item check
     const isInCart = useMemo(
@@ -144,7 +144,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
             <Text
               style={[
                 styles.title,
-                // { flex: 1, flexWrap: "wrap", textAlign: "center" },
+                { flex: 1, flexWrap: "wrap", textAlign: "center" },
               ]}
               numberOfLines={2}
             >
@@ -192,15 +192,15 @@ const createStyles = (colorTheme: "light" | "dark", height: number) =>
       marginBottom: 10,
       borderRadius: 5,
       overflow: "hidden",
-      // borderWidth: 1,
-      // borderColor: Colors[colorTheme].border,
-      margin: 5,
+      borderWidth: colorTheme === "dark" ? 1 : 0,
+      borderColor: Colors[colorTheme].border,
+      margin: 10,
       // backgroundColor: Colors[colorTheme].background_light,
-      shadowColor: Colors[colorTheme].text,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
+      shadowColor: Colors[colorTheme].text_light,
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.5,
       shadowRadius: 3.84,
-      elevation: 10,
+      elevation: 20,
     },
     pressableContainer: {
       flex: 1,
@@ -214,6 +214,7 @@ const createStyles = (colorTheme: "light" | "dark", height: number) =>
     image: {
       width: "100%",
       height: "100%",
+      paddingBottom: 10,
     },
     content: {
       // padding: 1,
@@ -223,9 +224,10 @@ const createStyles = (colorTheme: "light" | "dark", height: number) =>
     },
     title: {
       fontWeight: "bold",
-      fontSize: 10,
+      fontSize: 14,
       marginBottom: 4,
-      marginTop: 4,
+      marginLeft: 4,
+      marginTop: 10,
     },
     locationRow: {
       flexDirection: "row",
