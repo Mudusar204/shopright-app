@@ -30,6 +30,7 @@ import { useGetProducts } from "@/hooks/queries/products/products.query";
 import { useGetSliderImages } from "@/hooks/queries/categories/sliderImages.query";
 import ImageSlider from "@/components/ImageSlider";
 import { useGetCategories } from "@/hooks/queries/categories/categories.query";
+import { getImageSource } from "@/utils";
 
 type FilterItem = {
   all?: boolean;
@@ -155,7 +156,7 @@ export default function HomeScreen() {
     ({ item }: { item: any }) => (
       <View>
         <Image
-          source={{ uri: item.image_1920 }}
+          source={getImageSource(item?.category_image_url)}
           style={{ width: 100, height: 100 }}
         />
         <Text>{item.name}</Text>
