@@ -77,7 +77,7 @@ export default function HomeScreen() {
   const categoriesData = useMemo(() => {
     return categories?.records || [];
   }, [categories?.records]);
-  // console.log(categoriesData, "categoriesData");
+  console.log(categoriesData, "categoriesData");
   // Sample banner images for the slider
   const bannerImages = sliderImages?.records?.map((item: any) => ({
     id: item?.id,
@@ -94,9 +94,10 @@ export default function HomeScreen() {
 
       // Filter by category
       if (filter[1].category !== null) {
-        // Check if the product's category ID matches the selected category
-        const productCategoryIds = item?.public_categ_ids || [];
-        if (!productCategoryIds.includes(filter[1]?.category?.id)) {
+        // Match on primary categ_id instead of public_categ_ids
+        // const primaryCategoryId = item?.categ_id?.id ?? item?.categ_id?.[0]?.id;
+        const primaryCategoryId = item?.public_categ_ids?.[0];
+        if (primaryCategoryId !== filter[1]?.category?.id) {
           return false;
         }
       }
@@ -146,23 +147,46 @@ export default function HomeScreen() {
 
     return filteredItems;
   }, [data?.records, filter, searchQuery]);
-
+  console.log(filteredData, "filteredData");
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);
   // Memoize the render category item function for FlatList
 
+  const selectedCategoryId = filter[1]?.category?.id ?? null;
+
   const renderCategoryItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View>
-        <Image
-          source={getImageSource(item?.category_image_url)}
-          style={{ width: 100, height: 100 }}
-        />
-        <Text>{item.name}</Text>
-      </View>
-    ),
-    []
+    ({ item }: { item: any }) => {
+      const isSelected = selectedCategoryId === item?.id;
+      return (
+        <Pressable
+          onPress={() =>
+            setFilter((prev) => {
+              const next = [...prev];
+              next[0] = { all: false };
+              next[1] = { category: item };
+              return next;
+            })
+          }
+          style={{
+            alignItems: "center",
+            padding: 6,
+            borderRadius: 10,
+            borderWidth: isSelected ? 1 : 0,
+            borderColor: isSelected
+              ? Colors[colorScheme].primary_color
+              : "transparent",
+          }}
+        >
+          <Image
+            source={getImageSource(item?.category_image_url)}
+            style={{ width: 100, height: 100, borderRadius: 10 }}
+          />
+          <Text style={{ marginTop: 6 }}>{item.name}</Text>
+        </Pressable>
+      );
+    },
+    [selectedCategoryId, colorScheme]
   );
 
   // Memoize the render item function for FlatList
