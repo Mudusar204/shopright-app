@@ -10,7 +10,7 @@ const odooApiClient = axios.create({
 odooApiClient.interceptors.request.use(
   (config) => {
     const odooUserAuth = useAuthStore.getState().odooUserAuth;
-    console.log("odooUserAuth", odooUserAuth);
+    // console.log("odooUserAuth", odooUserAuth);
     if (odooUserAuth) {
       config.headers["api-key"] = odooUserAuth.api_key;
       config.headers["login"] = odooUserAuth.login;

@@ -57,7 +57,7 @@ export default function HomeScreen() {
     isError: sliderImagesError,
     refetch: sliderImagesRefetch,
   } = useGetSliderImages();
-  console.log(sliderImages, "sliderImages");
+  // console.log(sliderImages, "sliderImages");
   const [filter, setFilter] = useState<FilterItem[]>([
     { all: true },
     { category: null },
@@ -77,7 +77,7 @@ export default function HomeScreen() {
   const categoriesData = useMemo(() => {
     return categories?.records || [];
   }, [categories?.records]);
-  console.log(categoriesData, "categoriesData");
+  // console.log(categoriesData, "categoriesData");
   // Sample banner images for the slider
   const bannerImages = sliderImages?.records?.map((item: any) => ({
     id: item?.id,

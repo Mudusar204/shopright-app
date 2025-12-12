@@ -7,7 +7,7 @@ export const getCategories = async () => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth");
+  // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=product.public.category&fields=id,name,category_image_url`,
@@ -34,7 +34,7 @@ export const getBrands = async () => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth");
+  // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=dr.product.brand`,
@@ -61,7 +61,7 @@ export const getSliderImages = async () => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth");
+  // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=slider.image&fields=id,img_url`,

@@ -79,13 +79,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
     isLoading: categoriesLoading,
     isError: categoriesError,
   } = useGetCategories();
-  console.log(categories?.records?.[0], "categories");
+  // console.log(categories?.records?.[0], "categories");
   const {
     data: brands,
     isLoading: brandsLoading,
     isError: brandsError,
   } = useGetBrands();
-  console.log(brands?.records, "brands");
+  // console.log(brands?.records, "brands");
 
   // Memoize categories data to prevent unnecessary re-renders
   const categoriesData = useMemo(() => {

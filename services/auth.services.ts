@@ -27,7 +27,7 @@ export const getOdooUser = async () => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth");
+  // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&id=${odooUserAuth?.id}&fields=name,login,phone`,
@@ -57,7 +57,7 @@ export const deleteOdooUser = async () => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth");
+  // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.delete(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&Id=${odooUserAuth?.id}`,
@@ -117,7 +117,7 @@ export const register = async (data: any) => {
 export const addUserAddress = async (data: any) => {
   const odooAdmin = useAuthStore.getState().odooAdmin;
   const user = useAuthStore.getState().odooUserAuth;
-  console.log(data, "data in addUserAddress", user?.partner_id);
+  // console.log(data, "data in addUserAddress", user?.partner_id);
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
@@ -170,7 +170,7 @@ export const addUserAddress = async (data: any) => {
 export const getUserAddresses = async () => {
   const odooAdmin = useAuthStore.getState().odooAdmin;
   const user = useAuthStore.getState().odooUserAuth;
-  console.log(user, "user in getUserAddresses");
+  // console.log(user, "user in getUserAddresses");
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
@@ -190,7 +190,7 @@ export const getUserAddresses = async () => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response.data, "getUserAddresses response");
+    // console.log(response.data, "getUserAddresses response");
     return response.data;
   } catch (error) {
     console.log(error, "error in getOdooUser");

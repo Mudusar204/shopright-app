@@ -12,7 +12,7 @@ export const createOrder = async (data: any) => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth", user, "user");
+  // console.log(odooAdmin, "odooUserAuth", user, "user");
   try {
     const orderLine = data.items.map((item: any) => [
       0,
@@ -58,7 +58,7 @@ export const getMyOrders = async () => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth");
+  // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&partner_id=${user?.partner_id}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,
@@ -87,7 +87,7 @@ export const getOrderById = async (orderId: number) => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAuth");
+  // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&Id=${orderId}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,

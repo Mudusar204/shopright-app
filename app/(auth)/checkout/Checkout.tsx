@@ -20,6 +20,7 @@ import { useGetUserAddresses } from "@/hooks/queries/auth/auth.query";
 import AddAddressBottomSheet from "@/app/(auth)/addAddress/AddAddress";
 import { BottomSheetScrollHandle } from "@/components/BottomSheets/BottomSheet";
 import { useCreateOrder } from "@/hooks/mutations/orders/orders.mutation";
+import { useCreateJazzCashTransaction } from "@/hooks/mutations/payments/payments.mutation";
 import Toast from "react-native-toast-message";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { socketService } from "@/services/socket.service";
@@ -28,14 +29,38 @@ import { useAuthStore } from "@/store/auth.store";
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, odooUserAuth } = useAuthStore();
   const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
   const { data: userAddresses } = useGetUserAddresses();
-  console.log(userAddresses, "userAddresses");
-  const { mutate: createOrder, isPending, isSuccess } = useCreateOrder();
+  // console.log(userAddresses, "userAddresses");
+  const { mutate: createOrder, isPending } = useCreateOrder();
+  const { mutate: createTransaction, isPending: isCreatingTransaction } =
+    useCreateJazzCashTransaction();
   const [selectedPayment, setSelectedPayment] = useState("cash");
   const bottomSheetRef = useRef<BottomSheetScrollHandle>(null);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
+
+  function generateSOTimestamp() {
+    const now = new Date();
+
+    // Convert to PKT (UTC+5)
+    const pktOffset = 5 * 60; // minutes
+    const localOffset = now.getTimezoneOffset(); // minutes
+    const pktDate = new Date(now.getTime() + (pktOffset + localOffset) * 60000);
+
+    // Format timestamp
+    const year = pktDate.getFullYear();
+    const month = String(pktDate.getMonth() + 1).padStart(2, "0");
+    const day = String(pktDate.getDate()).padStart(2, "0");
+    const hours = String(pktDate.getHours()).padStart(2, "0");
+    const minutes = String(pktDate.getMinutes()).padStart(2, "0");
+    const seconds = String(pktDate.getSeconds()).padStart(2, "0");
+
+    const random = Math.floor(100 + Math.random() * 900); // 3-digit random
+
+    return `SO-${year}${month}${day}${hours}${minutes}${seconds}${random}`;
+  }
+
   const handleCheckout = () => {
     // if (!selectedAddress) {
     //   Toast.show({
@@ -81,36 +106,89 @@ const Checkout = () => {
       {
         onSuccess: (response) => {
           console.log(response, "response in checkout");
-          clearCart();
-          router.push("/(auth)/order-success");
-          Toast.show({
-            type: "success",
-            text1: "Order placed successfully",
-          });
+          const createdOrder = response["New resource"]?.[0] || {};
+          // const reference =
+          //   createdOrder?.name ||
+          //   createdOrder?.reference ||
+          //   (createdOrder?.id ? `SO-${createdOrder.id}` : undefined);
+          const reference = generateSOTimestamp();
+          const invoiceIds =
+            Array.isArray(createdOrder?.order_line) &&
+            createdOrder.order_line.length > 0
+              ? createdOrder.order_line
+              : [];
 
-          // Emit socket event for order placed
-          socketService.emit("order-placed", {
-            orderId: response["New resource"][0]?.id || "new-order",
-            userId: "user-id", // You can get this from your auth store
-            details: {
-              items: cartItems.map((item) => ({
-                productId: item.id,
-                quantity: item.quantity,
-                title: item.title,
-                price: item.price,
-              })),
-              totalAmount: getTotalPrice(),
-              paymentMethod: selectedPayment,
-              address: selectedAddress,
-              customerNote: selectedAddress?.instructions,
-            },
-          });
-          socketService.subscribeToOrderStatus(
-            response["New resource"][0]?.id,
-            (data: any) => {
+          const emitOrderPlaced = (orderId: any) => {
+            socketService.emit("order-placed", {
+              orderId: orderId || "new-order",
+              userId: odooUserAuth?.id || "user-id",
+              details: {
+                items: cartItems.map((item) => ({
+                  productId: item.id,
+                  quantity: item.quantity,
+                  title: item.title,
+                  price: item.price,
+                })),
+                totalAmount: getTotalPrice(),
+                paymentMethod: selectedPayment,
+                address: selectedAddress,
+                customerNote: selectedAddress?.instructions,
+              },
+            });
+            socketService.subscribeToOrderStatus(orderId, (data: any) => {
               console.log("order-status-update", data);
-            }
-          );
+            });
+          };
+
+          if (selectedPayment === "card") {
+            createTransaction(
+              {
+                amount: getTotalPrice(),
+                currency_id: 103,
+
+                partnerId: odooUserAuth?.partner_id,
+                providerId: 19,
+                reference: reference,
+                invoiceId: [10],
+                providerCode: "jazzcash",
+              },
+              {
+                onSuccess: (txnResponse: any) => {
+                  console.log(txnResponse, "txnResponse in createTransaction");
+                  const result = txnResponse?.result || {};
+                  clearCart();
+                  emitOrderPlaced(createdOrder?.id);
+                  Toast.show({
+                    type: "success",
+                    text1: "Transaction created",
+                  });
+                  router.push({
+                    pathname: "/(auth)/create-payment",
+                    params: {
+                      reference: result.reference || reference || "",
+                      transactionId: result.transaction_id?.toString?.() || "",
+                      amount: getTotalPrice().toString(),
+                    },
+                  });
+                },
+                onError: (error: any) => {
+                  console.log(error, "error in createTransaction");
+                  Toast.show({
+                    type: "error",
+                    text1: error?.message || "Failed to create transaction",
+                  });
+                },
+              }
+            );
+          } else {
+            clearCart();
+            router.push("/(auth)/order-success");
+            Toast.show({
+              type: "success",
+              text1: "Order placed successfully",
+            });
+            emitOrderPlaced(createdOrder?.id);
+          }
         },
         onError: (error) => {
           Toast.show({
@@ -161,7 +239,6 @@ const Checkout = () => {
               styles.paymentOption,
               selectedPayment === "card" && styles.selectedPayment,
             ]}
-            disabled={true}
             onPress={() => setSelectedPayment("card")}
           >
             <Ionicons
@@ -297,9 +374,13 @@ const Checkout = () => {
           <Button
             variant="primary"
             size="large"
-            title={isPending ? "Placing Order..." : "Place Order"}
+            title={
+              isPending || isCreatingTransaction
+                ? "Placing Order..."
+                : "Place Order"
+            }
             onPress={handleCheckout}
-            disabled={isPending}
+            disabled={isPending || isCreatingTransaction}
           />
         ) : (
           <Button
