@@ -238,11 +238,11 @@ const createStyles = (colorTheme: "light" | "dark") =>
       position: "relative",
     },
     cartCount: {
+      fontSize: 12,
       height: 20,
       width: 20,
+      textAlign: "center",
       position: "absolute",
-      paddingLeft: 5,
-      paddingTop: 1,
       top: -10,
       right: -10,
       color: "white",
