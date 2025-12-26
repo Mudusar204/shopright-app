@@ -77,7 +77,7 @@ export default function HomeScreen() {
   const categoriesData = useMemo(() => {
     return categories?.records || [];
   }, [categories?.records]);
-  console.log(categoriesData, "categoriesData");
+  console.log(categoriesData.length, "categoriesData");
   // Sample banner images for the slider
   const bannerImages = sliderImages?.records?.map((item: any) => ({
     id: item?.id,
@@ -147,7 +147,7 @@ export default function HomeScreen() {
 
     return filteredItems;
   }, [data?.records, filter, searchQuery]);
-  console.log(filteredData, "filteredData");
+  console.log(filteredData.length, "filteredData");
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);

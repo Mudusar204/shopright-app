@@ -56,3 +56,6 @@ export const stripHtmlTags = (htmlString: string): string => {
   // Remove HTML tags using regex
   return htmlString.replace(/<[^>]*>/g, "").trim();
 };
+
+// Export cache utilities
+export { productsCache } from "./cache";
