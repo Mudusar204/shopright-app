@@ -92,17 +92,24 @@ const Login = () => {
           />
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              {" "}
               <Link style={styles.footerLink} href="/signup">
                 Create an account
               </Link>
             </Text>
             <Text style={styles.footerText}>
               <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
-                Continue as Guest
+                Forgot Password
               </Link>
             </Text>
           </View>
+          <Button
+            textColor={Colors[colorScheme].text_white}
+            style={[styles.button]}
+            variant="primary"
+            size="large"
+            title={"Continue as Guest"}
+            onPress={() => router.push("/(auth)/(drawer)/(tabs)")}
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -25,10 +25,10 @@ export const useWishlistStore = create<WishlistState>()(
     (set, get) => ({
       ...initialState,
       toggleWishlist: (item) => {
-        const exists = get().wishlistItems.find((w) => w.id === item.id);
+        const exists = get().wishlistItems.find((w) => w.id == item.id);
         if (exists) {
           set({
-            wishlistItems: get().wishlistItems.filter((w) => w.id !== item.id),
+            wishlistItems: get().wishlistItems.filter((w) => w.id != item.id),
           });
         } else {
           set({
@@ -37,7 +37,7 @@ export const useWishlistStore = create<WishlistState>()(
         }
       },
       isInWishlist: (id) =>
-        !!get().wishlistItems.find((w) => String(w.id) === String(id)),
+        !!get().wishlistItems.find((w) => String(w.id) == String(id)),
       clearWishlist: () => set(initialState),
     }),
     {
