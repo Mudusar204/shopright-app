@@ -39,6 +39,7 @@ const ProductDetails = () => {
   const colorTheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorTheme);
   const { addToCart, cartItems, removeFromCart } = useMyCartStore();
+  console.log(cartItems, "cartItems");
   const handleAddToCart = () => {
     if (cartItems.find((item) => item.id === id)) {
       removeFromCart(id as string);
@@ -104,7 +105,7 @@ const ProductDetails = () => {
           variant="primary"
           size="large"
           title={
-            cartItems.find((item) => item.id === id)
+            cartItems.find((item) => item.id == id)
               ? "Remove From Cart"
               : "Add To Cart"
           }

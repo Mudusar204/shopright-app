@@ -1,5 +1,12 @@
-import { StyleSheet, Text, View, Image } from "react-native";
-import React from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  BackHandler,
+  Platform,
+} from "react-native";
+import React, { useEffect } from "react";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import { Button } from "@/components/Themed";
@@ -9,6 +16,23 @@ import { Ionicons } from "@expo/vector-icons";
 const OrderSuccess = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
+
+  // Prevent back button navigation on Android
+  // Note: iOS swipe back is disabled via gestureEnabled: false in _layout.tsx
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          // Return true to prevent default back action
+          return true;
+        }
+      );
+
+      // Cleanup: remove the event listener when component unmounts
+      return () => backHandler.remove();
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
