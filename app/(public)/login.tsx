@@ -2,6 +2,7 @@ import {
   Alert,
   Image,
   KeyboardAvoidingView,
+  Modal,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -17,9 +18,11 @@ import InputHandler from "@/components/InputHandler";
 import Lock2Icon from "@/assets/images/svgs/Lock2";
 import useLoginScreen from "@/customHooks/auth/useLoginScreen";
 import Feather from "@expo/vector-icons/Feather";
+import { WebView } from "react-native-webview";
 const Login = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
+  const [showWebView, setShowWebView] = useState(false);
   const {
     identifier,
     setIdentifier,
@@ -97,10 +100,14 @@ const Login = () => {
               </Link>
             </Text>
             <Text style={styles.footerText}>
-              <Link style={styles.footerLink} href="/(auth)/(drawer)/(tabs)">
+              <Link style={styles.footerLink} href="/forgetPassword">
                 Forgot Password
               </Link>
             </Text>
+            {/* <TouchableOpacity onPress={() => setShowWebView(true)}>
+            
+              <Text style={styles.footerText}>Forgot Password</Text>
+            </TouchableOpacity> */}
           </View>
           <Button
             textColor={Colors[colorScheme].text_white}
@@ -112,6 +119,11 @@ const Login = () => {
           />
         </View>
       </ScrollView>
+      {/* <Modal visible={showWebView} animationType="slide">
+        <WebView
+          source={{ uri: "https://shopright.club/web/reset_password" }}
+        />
+      </Modal> */}
     </KeyboardAvoidingView>
   );
 };

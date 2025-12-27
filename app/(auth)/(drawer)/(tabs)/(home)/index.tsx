@@ -1,10 +1,18 @@
-import React, { useCallback, useRef, useState, useMemo } from "react";
+import React, {
+  useCallback,
+  useRef,
+  useState,
+  useMemo,
+  useEffect,
+} from "react";
 import {
   ActivityIndicator,
+  BackHandler,
   Button,
   Dimensions,
   FlatList,
   Image,
+  Platform,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -228,6 +236,20 @@ export default function HomeScreen() {
     [handleFilterPress]
   );
 
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          // Return true to prevent default back action
+          return true;
+        }
+      );
+
+      // Cleanup: remove the event listener when component unmounts
+      return () => backHandler.remove();
+    }
+  }, []);
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.container}>

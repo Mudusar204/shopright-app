@@ -114,6 +114,33 @@ export const register = async (data: any) => {
   }
 };
 
+export const resetPassword = async (data: any) => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(data, "data");
+  const response = await axios.post(
+    `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users`,
+    {
+      // params: {
+      login: data.login,
+      // },
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": odooAdmin.api_key,
+        login: odooAdmin.login,
+        password: odooAdmin.password,
+        db: odooAdmin.db,
+      },
+    }
+  );
+  console.log(response, "reponse");
+  return response.data;
+};
+
 export const addUserAddress = async (data: any) => {
   const odooAdmin = useAuthStore.getState().odooAdmin;
   const user = useAuthStore.getState().odooUserAuth;
@@ -202,6 +229,23 @@ export const logout = async (data: any) => {
     params: {
       userId: data.user_id, // Pass user_id as a query parameter
     },
+  });
+
+  return response.data;
+};
+
+export const verifyOtp = async (data: any) => {
+  const response = await apiClient.post(API_ROUTES.AUTH["OTP_VERIFICATION"], {
+    otp: data.otp,
+    email: data.email,
+  });
+
+  return response.data;
+};
+
+export const resendOtp = async (data: any) => {
+  const response = await apiClient.post(API_ROUTES.AUTH["RESEND_OTP"], {
+    email: data.email,
   });
 
   return response.data;

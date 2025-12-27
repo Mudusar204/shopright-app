@@ -1,27 +1,19 @@
-import { StyleSheet, Alert } from "react-native";
+import { StyleSheet } from "react-native";
 import { Button, Text, View } from "@/components/Themed";
-import React, { useState } from "react";
+import React from "react";
 import Header from "@/components/Header";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import InputHandler from "@/components/InputHandler";
 import { router } from "expo-router";
 import SmsIcon from "@/assets/images/svgs/Sms";
-import useOtpScreen from "@/customHooks/auth/useOtpScreen";
+import useForgotPasswordScreen from "@/customHooks/auth/useForgotPasswordScreen";
 
 const ForgetPassword = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const {
-    otp,
-    setOtp,
-    handleOtpVerification,
-    isLoading,
-    email,
-    setEmail,
-    handleResendCode,
-    isLoadingResendOtp,
-  } = useOtpScreen();
+  const { email, setEmail, handleResetPassword, isLoading } =
+    useForgotPasswordScreen();
 
   return (
     <View style={styles.container}>
@@ -40,11 +32,11 @@ const ForgetPassword = () => {
       <Button
         textColor={Colors[colorScheme].text_white}
         style={styles.button}
-        variant={isLoadingResendOtp || !email ? "primary" : "primary"}
+        variant={isLoading || !email ? "primary" : "primary"}
         size="large"
-        title={isLoadingResendOtp ? "Sending..." : "Reset password"}
-        onPress={handleResendCode}
-        disabled={isLoadingResendOtp || !email}
+        title={isLoading ? "Sending..." : "Reset password"}
+        onPress={handleResetPassword}
+        disabled={isLoading || !email}
       />
 
       <Button

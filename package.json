@@ -37,6 +37,7 @@
     "expo-router": "~5.1.1",
     "expo-splash-screen": "~0.30.9",
     "expo-status-bar": "~2.2.3",
+    "expo-updates": "~0.28.17",
     "i18n-js": "^4.5.1",
     "lottie-react-native": "^7.3.2",
     "react": "19.0.0",
@@ -50,14 +51,15 @@
     "react-native-screens": "~4.11.1",
     "react-native-svg": "15.11.2",
     "react-native-toast-message": "^2.3.0",
+    "react-native-webview": "13.13.5",
     "socket.io-client": "^4.8.1",
-    "zustand": "^5.0.2",
-    "expo-updates": "~0.28.17"
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@types/mapbox__polyline": "^1.0.5",
     "@types/react": "~19.0.10",
+    "@types/react-native": "^0.73.0",
     "typescript": "~5.8.3"
   },
   "expo": {
