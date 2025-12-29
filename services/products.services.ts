@@ -11,11 +11,11 @@ export const getProducts = async () => {
     throw new Error("Odoo user auth not found");
   }
   console.log(odooAdmin, "admin credentials in getProducts");
-  
+
   try {
     // Try to fetch from API first
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=product.product&is_published=True&fields=id,description_ecommerce,display_name,list_price,barcode,categ_id,currency_id,image_1920,public_categ_ids`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=product.product&is_published=True&fields=id,description_ecommerce,display_name,list_price,barcode,categ_id,currency_id,image_1920,public_categ_ids,alternative_product_ids`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -35,14 +35,14 @@ export const getProducts = async () => {
     return response.data;
   } catch (error) {
     console.log(error, "error in getProducts");
-    
+
     // If API fails, try to load from cache
     const cachedData = await productsCache.get();
     if (cachedData) {
       console.log("Using cached products data due to API error");
       return cachedData;
     }
-    
+
     // If no cache available, re-throw the error
     throw error;
   }

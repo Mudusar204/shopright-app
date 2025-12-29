@@ -155,7 +155,8 @@ export default function HomeScreen() {
 
     return filteredItems;
   }, [data?.records, filter, searchQuery]);
-  console.log(filteredData.length, "filteredData");
+
+  console.log(filteredData[0], "filteredData");
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);
@@ -207,6 +208,7 @@ export default function HomeScreen() {
         price={item?.list_price}
         description={item?.description_ecommerce}
         tags={item?.categ_id}
+        relatedItems={item?.alternative_product_ids}
       />
     ),
     []
@@ -236,20 +238,20 @@ export default function HomeScreen() {
     [handleFilterPress]
   );
 
-  useEffect(() => {
-    if (Platform.OS === "android") {
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        () => {
-          // Return true to prevent default back action
-          return true;
-        }
-      );
+  // useEffect(() => {
+  //   if (Platform.OS === "android") {
+  //     const backHandler = BackHandler.addEventListener(
+  //       "hardwareBackPress",
+  //       () => {
+  //         // Return true to prevent default back action
+  //         return true;
+  //       }
+  //     );
 
-      // Cleanup: remove the event listener when component unmounts
-      return () => backHandler.remove();
-    }
-  }, []);
+  //     // Cleanup: remove the event listener when component unmounts
+  //     return () => backHandler.remove();
+  //   }
+  // }, []);
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.container}>

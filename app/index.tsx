@@ -9,7 +9,7 @@ const index = () => {
   const { isLoggedIn, isOnboarded } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
   const { data, isLoading, isError } = useGetProducts();
-  console.log(data, "data products");
+  // console.log(data, "data products");
   useEffect(() => {
     // Ensure the component is mounted and ready before navigation
     const timer = setTimeout(() => {

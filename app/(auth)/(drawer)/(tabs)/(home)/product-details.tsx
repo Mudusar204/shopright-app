@@ -21,10 +21,14 @@ import { getImageSource, stripHtmlTags } from "@/utils";
 import MenuHandler from "@/components/MenuHandler";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useWishlistStore } from "@/store/wishlist.store";
+import { useGetProducts } from "@/hooks/queries/products/products.query";
+import ProductCard from "@/components/ProductCard";
 
 const ProductDetails = () => {
   const params = useLocalSearchParams();
   const colorScheme = useColorScheme() as "light" | "dark";
+  const { data, isLoading, isError, refetch } = useGetProducts();
+  console.log(data.records[0], "data item");
 
   let {
     id,
@@ -37,6 +41,7 @@ const ProductDetails = () => {
     tags,
     relatedItems,
   } = params;
+  console.log(relatedItems, "related items");
   const tagList = params.tags ? JSON.parse(tags as string) : [];
   const relatedItemsList = params.relatedItems
     ? JSON.parse(relatedItems as string)
@@ -71,6 +76,22 @@ const ProductDetails = () => {
       price: price as string,
     });
   };
+
+  const aggregateProductsByIds = (
+    products: any[],
+    productIdGroups: number[][]
+  ) => {
+    // flatten + unique ids
+    const uniqueIds = new Set(productIdGroups.flat());
+
+    // filter products
+    return products.filter((product) => uniqueIds.has(product.id));
+  };
+  const aggregatedProducts = aggregateProductsByIds(
+    data?.records,
+    relatedItemsList
+  );
+  console.log(aggregatedProducts, "aggregated products");
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* <View style={{ paddingHorizontal: 16 }}>
@@ -183,19 +204,21 @@ const ProductDetails = () => {
       </View>
 
       {/* Related Items */}
-      {relatedItemsList.length > 0 && (
+      {aggregatedProducts.length > 0 && (
         <View style={styles.relatedItemsSection}>
           <Text style={styles.sectionTitle}>Related Items</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {relatedItemsList?.map((item: any, index: number) => (
-              <RelatedProductCard
+            {aggregatedProducts?.map((item: any, index: number) => (
+              <ProductCard
                 key={index}
-                image={item.image}
-                title={item.title}
-                price={item.price}
-                location={item.location}
-                phoneNumber={item.phoneNumber}
-                description={item.description}
+                id={item.id}
+                image={item.image_1920}
+                title={item.display_name}
+                price={item.list_price}
+                // location={item.location}
+                // phoneNumber={item.phoneNumber}
+                description={item.description_ecommerce}
+                relatedItems={item?.alternative_product_ids}
               />
             ))}
           </ScrollView>
