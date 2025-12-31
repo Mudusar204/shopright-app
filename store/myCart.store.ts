@@ -29,12 +29,12 @@ export const useMyCartStore = create<CartState>()(
       ...initialState,
       addToCart: (item) => {
         const currentItems = get().cartItems;
-        const existingItem = currentItems.find((i) => i.id === item.id);
+        const existingItem = currentItems.find((i) => i.id == item.id);
 
         if (existingItem) {
           set({
             cartItems: currentItems.map((i) =>
-              i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+              i.id == item.id ? { ...i, quantity: i.quantity + 1 } : i
             ),
           });
         } else {
@@ -45,7 +45,7 @@ export const useMyCartStore = create<CartState>()(
       },
       removeFromCart: (id) => {
         set({
-          cartItems: get().cartItems.filter((item) => item.id !== id),
+          cartItems: get().cartItems.filter((item) => item.id != id),
         });
       },
       updateQuantity: (id, quantity) => {

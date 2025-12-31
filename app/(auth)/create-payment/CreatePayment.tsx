@@ -7,6 +7,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import Toast from "react-native-toast-message";
+import { useMyCartStore } from "@/store/myCart.store";
 
 type SearchParams = {
   reference?: string;
@@ -17,6 +18,8 @@ type SearchParams = {
 const CreatePayment = () => {
   const theme = useColorScheme() as "light" | "dark";
   const styles = createStyles(theme);
+  const { clearCart } = useMyCartStore();
+
   const { reference, transactionId, amount } =
     useLocalSearchParams<SearchParams>();
   const [mobileNumber, setMobileNumber] = useState("");
@@ -56,13 +59,23 @@ const CreatePayment = () => {
       },
       {
         onSuccess: (response: any) => {
-          console.log(response, "response in initiatePayment");
-          Toast.show({
-            type: "success",
-            text1: "Payment initiated",
-            text2: "Please follow JazzCash instructions to complete.",
-          });
-          router.push("/(auth)/order-success");
+          if (response?.result?.pp_ResponseCode === "000") {
+            console.log(response, "response in initiatePayment");
+            clearCart();
+            Toast.show({
+              type: "success",
+              text1: "Payment initiated",
+            });
+            router.push("/(auth)/order-success");
+          } else {
+            console.log(response, "reponse");
+            Toast.show({
+              type: "error",
+              text1:
+                response?.result?.pp_ResponseMessage ||
+                "Payment initiation failed",
+            });
+          }
         },
         onError: (error: any) => {
           Toast.show({

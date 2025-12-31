@@ -56,7 +56,7 @@ const ProductDetails = () => {
   const { addToCart, cartItems, removeFromCart } = useMyCartStore();
   console.log(cartItems, "cartItems");
   const handleAddToCart = () => {
-    if (cartItems.find((item) => item.id === id)) {
+    if (cartItems.find((item) => item.id == id)) {
       removeFromCart(id as string);
     } else {
       addToCart({

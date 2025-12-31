@@ -107,6 +107,15 @@ const Checkout = () => {
         onSuccess: (response) => {
           console.log(response, "response in checkout");
           const createdOrder = response["New resource"]?.[0] || {};
+          const isSuccess =
+            response.status === 200 && response.data?.["New resource"]?.[0]?.id;
+
+          if (!isSuccess) {
+            Toast.show({
+              type: "error",
+              text1: "Something went wrong",
+            });
+          }
           // const reference =
           //   createdOrder?.name ||
           //   createdOrder?.reference ||
@@ -157,7 +166,7 @@ const Checkout = () => {
                   console.log(txnResponse, "txnResponse in createTransaction");
                   const result = txnResponse?.result || {};
                   // if (selectedPayment !== "card") {
-                  clearCart();
+                  // clearCart();
                   // }
                   emitOrderPlaced(createdOrder?.id);
                   Toast.show({
