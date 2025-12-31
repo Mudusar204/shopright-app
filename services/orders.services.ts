@@ -61,7 +61,7 @@ export const getMyOrders = async () => {
   // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&partner_id=${user?.partner_id}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&partner_id=${user?.partner_id}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id,payment_status`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export const getOrderById = async (orderId: number) => {
   // console.log(odooAdmin, "odooUserAuth");
   try {
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&Id=${orderId}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&Id=${orderId}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id,payment_status`,
       {
         headers: {
           "Content-Type": "application/json",

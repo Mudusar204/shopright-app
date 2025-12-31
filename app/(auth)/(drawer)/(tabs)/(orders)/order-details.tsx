@@ -43,10 +43,8 @@ const OrderDetails = () => {
   const date = new Date(order?.records[0]?.date_order);
   date.setHours(date.getHours() + 5);
 
-  const formattedDate = format(date, "MMM dd, yyyy hh:mm a");
-  console.log(riderLastLocation, "riderLastLocation in order-details");
   const { mutate: updateOrderStatus, isPending } = useUpdateOrderStatus();
-  console.log(order, "order in order-details", orderId, isError, error);
+  // console.log(order, "order in order-details", orderId, isError, error);
 
   // Real-time rider tracking
   const riderId = order?.records[0]?.app_rider_id;
@@ -276,7 +274,15 @@ const OrderDetails = () => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Date</Text>
-            <Text style={styles.infoValue}>{formattedDate}</Text>
+            <Text style={styles.infoValue}>
+              {format(
+                new Date(
+                  new Date(order?.records[0]?.date_order).getTime() +
+                    5 * 60 * 60 * 1000
+                ),
+                "MMM dd, yyyy hh:mm a"
+              )}
+            </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Rider</Text>
@@ -299,7 +305,10 @@ const OrderDetails = () => {
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Amount Paid</Text>
             <Text style={styles.infoValue}>
-              Rs. {order?.records[0]?.amount_paid}
+              Rs.{" "}
+              {order?.records[0]?.payment_status == "Paid"
+                ? order?.records[0]?.amount_total
+                : 0}
             </Text>
           </View>
         </View>
