@@ -86,7 +86,13 @@ const Orders = () => {
         <View style={styles.orderInfo}>
           <Text style={styles.orderId}>Order #{item?.id}</Text>
           <Text style={styles.orderDate}>
-            {format(new Date(item?.date_order), "MMM dd, yyyy hh:mm a")}
+            {format(
+              new Date(
+                new Date(item?.date_order).getTime() + 5 * 60 * 60 * 1000
+              ),
+              "MMM dd, yyyy hh:mm a"
+            )}
+            {/* {format(new Date(item?.date_order), "MMM dd, yyyy hh:mm a")} */}
           </Text>
         </View>
         <View

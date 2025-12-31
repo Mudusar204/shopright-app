@@ -39,6 +39,11 @@ const OrderDetails = () => {
   const { data: riderLastLocation } = useGetRiderLocation(
     order?.records[0]?.app_rider_id || ""
   );
+
+  const date = new Date(order?.records[0]?.date_order);
+  date.setHours(date.getHours() + 5);
+
+  const formattedDate = format(date, "MMM dd, yyyy hh:mm a");
   console.log(riderLastLocation, "riderLastLocation in order-details");
   const { mutate: updateOrderStatus, isPending } = useUpdateOrderStatus();
   console.log(order, "order in order-details", orderId, isError, error);
@@ -271,12 +276,7 @@ const OrderDetails = () => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Date</Text>
-            <Text style={styles.infoValue}>
-              {format(
-                new Date(order?.records[0]?.date_order),
-                "MMM dd, yyyy hh:mm a"
-              )}
-            </Text>
+            <Text style={styles.infoValue}>{formattedDate}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Rider</Text>

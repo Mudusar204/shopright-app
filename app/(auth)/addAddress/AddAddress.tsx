@@ -141,7 +141,8 @@ const AddAddress = ({
   const { locationData } = useLocation();
 
   const theme = useColorScheme() as "light" | "dark";
-  const style = styles(theme);
+  const screenHeight = Dimensions.get("window").height;
+  const style = styles(theme, screenHeight);
   const mapRef = useRef<MapView>(null);
 
   // Use useReducer for complex state management
@@ -863,7 +864,7 @@ const AddAddress = ({
 
 export default AddAddress;
 
-const styles = (theme: "light" | "dark") =>
+const styles = (theme: "light" | "dark", screenHeight: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -889,7 +890,7 @@ const styles = (theme: "light" | "dark") =>
       alignItems: "flex-end",
       width: "100%",
       position: "absolute",
-      bottom: 20,
+      bottom: "8%",
       alignSelf: "center",
       backgroundColor: "transparent",
     },

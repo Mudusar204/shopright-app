@@ -29,7 +29,6 @@ const CreatePayment = () => {
     const numeric = Number(amount);
     return Number.isFinite(numeric) ? `Rs.${numeric.toFixed(2)}` : amount;
   }, [amount]);
-
   const handleInitiatePayment = () => {
     if (!reference) {
       Toast.show({

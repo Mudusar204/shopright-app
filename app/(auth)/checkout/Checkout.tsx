@@ -156,7 +156,9 @@ const Checkout = () => {
                 onSuccess: (txnResponse: any) => {
                   console.log(txnResponse, "txnResponse in createTransaction");
                   const result = txnResponse?.result || {};
+                  // if (selectedPayment !== "card") {
                   clearCart();
+                  // }
                   emitOrderPlaced(createdOrder?.id);
                   Toast.show({
                     type: "success",
@@ -234,7 +236,7 @@ const Checkout = () => {
         {/* Payment Method */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment Method</Text>
-          {/* <Pressable
+          <Pressable
             style={[
               styles.paymentOption,
               selectedPayment === "card" && styles.selectedPayment,
@@ -255,7 +257,7 @@ const Checkout = () => {
                 style={styles.checkIcon}
               />
             )}
-          </Pressable> */}
+          </Pressable>
           <Pressable
             style={[
               styles.paymentOption,
