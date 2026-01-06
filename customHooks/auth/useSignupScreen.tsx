@@ -27,6 +27,25 @@ export default function useSignupScreen() {
         return;
       }
 
+      if (
+        password.length < 8 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/[0-9]/.test(password) ||
+        !/[!@#$%^&*(),.?":{}|<>]/.test(password)
+      ) {
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Weak Password",
+          text2:
+            "Password must be at least 8 characters long and include uppercase, lowercase, number & special character",
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+        return;
+      }
+
       const response = await mutateAsync(
         {
           name: name,
