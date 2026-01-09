@@ -72,7 +72,7 @@ const CustomLocationSearch: React.FC<CustomLocationSearchProps> = ({
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
           input
-        )}&key=${API_KEY}&language=en&types=geocode&components=country:pk&location=${
+        )}&key=${API_KEY}&language=en&types=address&components=country:pk&location=${
           locationBias.lat
         },${locationBias.lng}&radius=${locationBias.radius}`,
         {

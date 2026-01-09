@@ -6,7 +6,7 @@ import axios from "axios";
 import { socketService } from "./socket.service";
 
 export const createOrder = async (data: any) => {
-  console.log("create order data", data);
+  console.log("create order data", data.totalAmount);
   const odooAdmin = useAuthStore.getState().odooAdmin;
   const user = useAuthStore.getState().odooUserAuth;
   if (!odooAdmin) {
@@ -14,14 +14,27 @@ export const createOrder = async (data: any) => {
   }
   // console.log(odooAdmin, "odooUserAuth", user, "user");
   try {
-    const orderLine = data.items.map((item: any) => [
-      0,
-      0,
-      {
-        product_id: item.productId,
-        product_uom_qty: item.quantity,
-      },
-    ]);
+    const orderLine =
+      data?.items?.map((item: any) => [
+        0,
+        0,
+        {
+          product_id: item.productId,
+          product_uom_qty: item.quantity,
+        },
+      ]) || [];
+
+    // condition
+    if (data.totalAmount < data?.freeDeliveryAt) {
+      orderLine.push([
+        0,
+        0,
+        {
+          product_id: 14939,
+          product_uom_qty: 1,
+        },
+      ]);
+    }
     console.log("orderLine", orderLine);
     const response = await axios.post(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order`,
@@ -91,6 +104,33 @@ export const getOrderById = async (orderId: number) => {
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order&Id=${orderId}&fields=id,name,order_line,date_order,state,order_status,amount_paid,amount_total,partner_shipping_id,app_rider_id,payment_status`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+
+    // const response = await odooApiClient.get(`/send_request?model=res.users`);
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in getOrderById");
+  }
+};
+
+export const getStandardDeliveryCharges = async () => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  // console.log(odooAdmin, "odooUserAuth");
+  try {
+    const response = await axios.get(
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=delivery.carrier&is_published=true&fields=free_over,fixed_price,name,amount`,
       {
         headers: {
           "Content-Type": "application/json",

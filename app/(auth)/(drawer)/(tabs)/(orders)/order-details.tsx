@@ -36,6 +36,7 @@ const OrderDetails = () => {
     error,
     refetch,
   } = useGetOrderById(Number(orderId));
+
   const { data: riderLastLocation } = useGetRiderLocation(
     order?.records[0]?.app_rider_id || ""
   );
@@ -49,7 +50,7 @@ const OrderDetails = () => {
   // Real-time rider tracking
   const riderId = order?.records[0]?.app_rider_id;
   console.log("riderId extracted from order:", riderId);
-  console.log("Full order data:", order?.records[0]);
+  console.log("Full order data:", order?.records[0].order_line.length);
 
   const { riderLocation, socketConnected, isTracking } = useRealTimeRider({
     riderId,
@@ -293,7 +294,20 @@ const OrderDetails = () => {
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Items</Text>
             <Text style={styles.infoValue}>
-              {order?.records[0]?.order_line?.length} items
+              {
+                order?.records[0]?.order_line.filter(
+                  (item: any) => item.product_id[0] != 14939
+                ).length
+              }{" "}
+              items
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Delivery Charges</Text>
+            <Text style={styles.infoValue}>
+              {order?.records[0]?.order_line?.find(
+                (item: any) => item.product_id[0] === 14939
+              )?.price_unit || 0}
             </Text>
           </View>
           <View style={styles.infoRow}>
@@ -318,38 +332,40 @@ const OrderDetails = () => {
           order?.records[0]?.order_line.length > 0 && (
             <View style={styles.itemsContainer}>
               <Text style={styles.sectionTitle}>Order Items</Text>
-              {order?.records[0]?.order_line.map((item: any, index: number) => (
-                <View key={item.id || index} style={styles.itemContainer}>
-                  <View style={styles.itemImageContainer}>
-                    {item?.product_image_url ? (
-                      <Image
-                        source={getImageSource(item?.product_image_url)}
-                        style={styles.itemImage}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <View style={styles.itemImagePlaceholder}>
-                        <Ionicons
-                          name="image-outline"
-                          size={24}
-                          color={Colors[colorScheme].text_secondary}
+              {order?.records[0]?.order_line
+                .filter((item: any) => item.product_id[0] != 14939)
+                .map((item: any, index: number) => (
+                  <View key={item.id || index} style={styles.itemContainer}>
+                    <View style={styles.itemImageContainer}>
+                      {item?.product_image_url ? (
+                        <Image
+                          source={getImageSource(item?.product_image_url)}
+                          style={styles.itemImage}
+                          resizeMode="cover"
                         />
-                      </View>
-                    )}
+                      ) : (
+                        <View style={styles.itemImagePlaceholder}>
+                          <Ionicons
+                            name="image-outline"
+                            size={24}
+                            color={Colors[colorScheme].text_secondary}
+                          />
+                        </View>
+                      )}
+                    </View>
+                    <View style={styles.itemDetails}>
+                      <Text style={styles.itemName} numberOfLines={2}>
+                        {item?.name}
+                      </Text>
+                      <Text style={styles.itemPrice}>
+                        Rs. {item?.price_unit} x {item?.product_uom_qty}
+                      </Text>
+                      <Text style={styles.itemTotal}>
+                        Total: Rs. {item?.price_total}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.itemDetails}>
-                    <Text style={styles.itemName} numberOfLines={2}>
-                      {item?.name}
-                    </Text>
-                    <Text style={styles.itemPrice}>
-                      Rs. {item?.price_unit} x {item?.product_uom_qty}
-                    </Text>
-                    <Text style={styles.itemTotal}>
-                      Total: Rs. {item?.price_total}
-                    </Text>
-                  </View>
-                </View>
-              ))}
+                ))}
             </View>
           )}
 

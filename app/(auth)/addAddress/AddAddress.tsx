@@ -560,7 +560,13 @@ const AddAddress = ({
                 placeholder="Search location"
                 onLocationSelect={handleLocationSelect}
               />
-              <Text style={{ textAlign: "center", marginTop: 10 }}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginTop: 10,
+                  color: Colors[theme].text_white,
+                }}
+              >
                 You can simply tap on the map to select location after search or
                 zoom in to the desired location.
               </Text>

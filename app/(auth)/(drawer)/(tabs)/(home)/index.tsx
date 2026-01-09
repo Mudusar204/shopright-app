@@ -39,6 +39,7 @@ import { useGetSliderImages } from "@/hooks/queries/categories/sliderImages.quer
 import ImageSlider from "@/components/ImageSlider";
 import { useGetCategories } from "@/hooks/queries/categories/categories.query";
 import { getImageSource } from "@/utils";
+import SaleAlert from "@/components/SaleAlert";
 
 type FilterItem = {
   all?: boolean;
@@ -156,7 +157,9 @@ export default function HomeScreen() {
     return filteredItems;
   }, [data?.records, filter, searchQuery]);
 
-  console.log(filteredData[0], "filteredData");
+  const filtering = filteredData.filter((item: any) => item.id == 14948);
+
+  console.log(filtering, "filteredData");
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);
@@ -286,6 +289,9 @@ export default function HomeScreen() {
             />
           </Pressable>
         </View>
+        <View>
+          <SaleAlert />
+        </View>
         <Pressable>
           <View style={styles.locationContainer}>
             <AntDesign
@@ -298,7 +304,7 @@ export default function HomeScreen() {
               placeholder="What you are looking for?"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              style={{ backgroundColor: "transparent" }}
+              style={{ backgroundColor: "transparent", width: "100%" }}
             />
           </View>
         </Pressable>

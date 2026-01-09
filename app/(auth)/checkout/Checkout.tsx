@@ -25,14 +25,17 @@ import Toast from "react-native-toast-message";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { socketService } from "@/services/socket.service";
 import { useAuthStore } from "@/store/auth.store";
+import { useGetDeliveryCharges } from "@/hooks/queries/orders/orders.query";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const { isLoggedIn, odooUserAuth } = useAuthStore();
   const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
+
   const { data: userAddresses } = useGetUserAddresses();
-  // console.log(userAddresses, "userAddresses");
+  const { data: deliveryCharges } = useGetDeliveryCharges();
+  console.log(deliveryCharges, "deliveryCharges");
   const { mutate: createOrder, isPending } = useCreateOrder();
   const { mutate: createTransaction, isPending: isCreatingTransaction } =
     useCreateJazzCashTransaction();
@@ -98,6 +101,7 @@ const Checkout = () => {
         paymentMethod: selectedPayment,
         customerNote: selectedAddress?.instructions,
         totalAmount: getTotalPrice(),
+        freeDeliveryAt: deliveryCharges?.records[0]?.amount,
         items: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
@@ -235,6 +239,14 @@ const Checkout = () => {
             </View>
           ))}
           <View style={styles.totalContainer}>
+            <Text style={styles.totalLabel}>Deliver Charges</Text>
+            <Text style={styles.totalPrice}>
+              {getTotalPrice().toFixed(2) > deliveryCharges?.records[0]?.amount
+                ? 0
+                : deliveryCharges?.records[0]?.fixed_price}
+            </Text>
+          </View>
+          <View style={styles.totalContainer}>
             <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalPrice}>
               Rs.{getTotalPrice().toFixed(2)}
@@ -245,7 +257,7 @@ const Checkout = () => {
         {/* Payment Method */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment Method</Text>
-          <Pressable
+          {/* <Pressable
             style={[
               styles.paymentOption,
               selectedPayment === "card" && styles.selectedPayment,
@@ -266,7 +278,7 @@ const Checkout = () => {
                 style={styles.checkIcon}
               />
             )}
-          </Pressable>
+          </Pressable> */}
           <Pressable
             style={[
               styles.paymentOption,
