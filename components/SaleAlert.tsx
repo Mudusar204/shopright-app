@@ -15,6 +15,7 @@ export default function SaleAlert() {
 
   const ALERTS = [
     `🚚 Enjoy FREE Delivery! Orders above Rs.${deliveryCharges?.records[0]?.amount}`,
+    "         🕒 Order before 10:00 PM & get same-day delivery!",
   ];
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export default function SaleAlert() {
 
     Animated.loop(
       Animated.timing(translateX, {
-        toValue: -width,
+        toValue: -width * 1.8,
         duration: 12000,
         useNativeDriver: true,
       })
