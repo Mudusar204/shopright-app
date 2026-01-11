@@ -26,6 +26,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { socketService } from "@/services/socket.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useGetDeliveryCharges } from "@/hooks/queries/orders/orders.query";
+import MapView, { Marker, Callout } from "react-native-maps";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
@@ -389,6 +390,30 @@ const Checkout = () => {
             style={[styles.input, { height: 100, textAlignVertical: "top" }]}
           />
         </View> */}
+        <Text style={styles.sectionTitle}>Shopright Location</Text>
+
+        <View
+          style={{
+            height: 200,
+            borderRadius: 10,
+            overflow: "hidden",
+            marginBottom: 30,
+          }}
+        >
+          <MapView
+            style={{ flex: 1 }}
+            initialRegion={{
+              latitude: 31.429093,
+              longitude: 73.149204,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          >
+            <Marker coordinate={{ latitude: 31.429093, longitude: 73.149204 }}>
+              <Callout tooltip></Callout>
+            </Marker>
+          </MapView>
+        </View>
       </ScrollView>
 
       {/* Checkout Button */}
