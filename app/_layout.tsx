@@ -18,6 +18,7 @@ import { useFonts } from "expo-font";
 import { useAuthStore } from "@/store/auth.store";
 import { NavigationContainer } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import NetworkStatusBar from "@/components/NetworkStatusBar";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -81,6 +82,7 @@ export default function Layout() {
                   : ("dark-content" as StatusBarStyle)
               }
             />
+            <NetworkStatusBar />
             <Stack
               initialRouteName="index"
               screenOptions={{ headerShown: false }}
