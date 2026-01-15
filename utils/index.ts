@@ -59,3 +59,15 @@ export const stripHtmlTags = (htmlString: string): string => {
 
 // Export cache utilities
 export { productsCache } from "./cache";
+
+export const extractErrorFromHtml = (html: string) => {
+  console.log(typeof html, html, "html in extractErrorFromHtml");
+  if (typeof html !== "string") return "Something went wrong";
+
+  // Try to extract <p> content first
+  const match = html.match(/<p>(.*?)<\/p>/i);
+  if (match && match[1]) return match[1].trim();
+
+  // Fallback: remove all HTML tags
+  return html.replace(/<[^>]*>/g, "").trim();
+};

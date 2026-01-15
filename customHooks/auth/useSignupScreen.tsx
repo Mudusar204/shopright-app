@@ -5,6 +5,7 @@ import Toast from "react-native-toast-message";
 import axios from "axios";
 import { useAuthStore } from "@/store/auth.store";
 import { useRegister } from "@/hooks/mutations/user/user.mutation";
+import { extractErrorFromHtml, stripHtmlTags } from "@/utils";
 
 export default function useSignupScreen() {
   const [name, setName] = useState("");
@@ -26,7 +27,7 @@ export default function useSignupScreen() {
         });
         return;
       }
-
+      console.log(password.length, "password in useSignupScreen");
       if (
         password.length < 8 ||
         !/[A-Z]/.test(password) ||
@@ -46,39 +47,35 @@ export default function useSignupScreen() {
         return;
       }
 
-      const response = await mutateAsync(
-        {
-          name: name,
-          phone: phone,
-          login: email,
-          password: password,
-        },
-        {
-          onSuccess: (data) => {
-            console.log(data, "data in useSignupScreen");
-            Toast.show({
-              type: "success",
-              position: "top",
-              text1: "User created successfully",
-              text2: "Please login to continue",
-              visibilityTime: 3000,
-              autoHide: true,
-            });
-            router.push("/(public)/login");
-          },
-          onError: (error) => {
-            console.log(error, "error in useSignupScreen");
-            Toast.show({
-              type: "error",
-              position: "top",
-              text1: response?.message || "Login failed. Please try again.",
-              visibilityTime: 3000,
-              autoHide: true,
-            });
-          },
-        }
-      );
+      const response = await mutateAsync({
+        name: name,
+        phone: phone,
+        login: email,
+        password: password,
+      });
+      const keys = Object.keys(response);
 
+      const isSuccess = response?.["New resource"]?.[0]?.id;
+
+      if (isSuccess) {
+        Toast.show({
+          type: "success",
+          position: "top",
+          text1: "User created successfully",
+          text2: "Please login to continue",
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+        router.push("/(public)/login");
+      } else {
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "User creation failed",
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+      }
       // router.push("/(public)/confirmSignup");
     } catch (err: any) {
       console.log(err.response.data, "error in useLoginScreen");
@@ -87,8 +84,9 @@ export default function useSignupScreen() {
         type: "error",
         position: "top",
         text1:
-          err.response.data.message ||
-          err.response.data.error ||
+          extractErrorFromHtml(err?.response?.data) ||
+          extractErrorFromHtml(err?.response.data?.message) ||
+          extractErrorFromHtml(err?.response.data?.error) ||
           "An error occurred",
         visibilityTime: 3000,
         autoHide: true,

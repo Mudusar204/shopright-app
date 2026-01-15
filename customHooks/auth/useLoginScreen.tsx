@@ -12,6 +12,12 @@ export default function useLoginScreen() {
   const { setIsLoggedIn, setOdooUser, setOdooUserAuth, setOdooAdmin } =
     useAuthStore();
   // const { refetch, loading } = useLocation();
+  const extractHtmlText = (html: string) => {
+    return html
+      ?.replace(/<[^>]*>/g, "") // remove HTML tags
+      ?.trim();
+  };
+
   const handleLogin = async () => {
     try {
       if (
@@ -41,10 +47,15 @@ export default function useLoginScreen() {
 
       if (!response?.User) {
         setIsLoading(false);
+        const errorText =
+          typeof response === "string"
+            ? extractHtmlText(response)
+            : response?.message || "Login failed. Please try again.";
+
         Toast.show({
           type: "error",
           position: "top",
-          text1: response?.message || "Login failed. Please try again.",
+          text1: errorText || "Login failed. Please try again.",
           visibilityTime: 3000,
           autoHide: true,
         });

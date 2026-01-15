@@ -107,10 +107,11 @@ export const register = async (data: any) => {
     );
 
     // const response = await odooApiClient.get(`/send_request?model=res.users`);
-    console.log(response, "getOdooUser response");
+    console.log(response, "response in register");
     return response.data;
   } catch (error) {
-    console.log(error, "error in getOdooUser");
+    console.log(error, "error in register");
+    throw error;
   }
 };
 
