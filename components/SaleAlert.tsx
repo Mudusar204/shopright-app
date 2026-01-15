@@ -34,7 +34,7 @@ export default function SaleAlert() {
     <View style={styles.container}>
       <Animated.View style={[styles.marquee, { transform: [{ translateX }] }]}>
         {ALERTS.map((item, index) => (
-          <Text key={index} style={styles.text}>
+          <Text key={index} style={styles.text} numberOfLines={1}>
             {item}
           </Text>
         ))}

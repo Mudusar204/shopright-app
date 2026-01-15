@@ -84,6 +84,7 @@ export default function HomeScreen() {
   } = useGetCategories();
 
   const categoriesData = useMemo(() => {
+    console.log(categories?.records[0], "categoriesData");
     return categories?.records || [];
   }, [categories?.records]);
   console.log(categoriesData.length, "categoriesData");
@@ -172,14 +173,31 @@ export default function HomeScreen() {
       const isSelected = selectedCategoryId === item?.id;
       return (
         <Pressable
-          onPress={() =>
+          onPress={() => {
             setFilter((prev) => {
-              const next = [...prev];
-              next[0] = { all: false };
-              next[1] = { category: item };
-              return next;
-            })
-          }
+              const currentCategory = prev[1].category;
+
+              // If tapped category is already selected, deselect it
+              if (currentCategory === item) {
+                return [
+                  { all: true }, // reset "all"
+                  { category: null }, // deselect category
+                  prev[2], // keep brand
+                  prev[3], // keep priceRange
+                  prev[4], // keep sort
+                ];
+              }
+
+              // Otherwise, select new category
+              return [
+                { all: false }, // not all
+                { category: item }, // set new category
+                prev[2], // keep brand
+                prev[3], // keep priceRange
+                prev[4], // keep sort
+              ];
+            });
+          }}
           style={{
             alignItems: "center",
             padding: 6,
