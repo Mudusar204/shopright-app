@@ -7,8 +7,8 @@ import {
   BackHandler,
   TouchableOpacity,
 } from "react-native";
-import { Button, Text, View } from "@/components/Themed";
-import React, { useState } from "react";
+import { Button, Text, TextInput, View } from "@/components/Themed";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
@@ -22,25 +22,91 @@ import {
   useGetOdooUser,
   useGetUserAddresses,
 } from "@/hooks/queries/auth/auth.query";
+import { useUpdateProfile } from "@/hooks/mutations/auth/auth.mutation";
+import Toast from "react-native-toast-message";
 const Profile = () => {
   const width = Dimensions.get("window").width;
   const colorScheme = useColorScheme() as "light" | "dark";
   const { data: userAddresses } = useGetUserAddresses();
   const { data: odooUser } = useGetOdooUser();
   const isLoggedIn = useAuthStore().isLoggedIn;
+  const { mutateAsync: updateProfile, isPending } = useUpdateProfile();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
   console.log(odooUser, "odooUser found");
   console.log(userAddresses, "userAddresses", odooUser);
   const styles = createStyles(colorScheme, width);
   const [selectedImage, setSelectedImage] = useState<ImagePickerAsset>();
+
+  // Initialize email and phone from odooUser data
+  useEffect(() => {
+    if (typeof odooUser === "object" && odooUser?.records?.[0]) {
+      setEmail(odooUser.records[0].login || "");
+      setPhone(odooUser.records[0].phone || "");
+    }
+  }, [odooUser]);
+
+  const handleSaveProfile = async () => {
+    try {
+      if (!email.trim()) {
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Email is required",
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+        return;
+      }
+
+      await updateProfile({
+        email: email.trim(),
+        phone: phone.trim(),
+      });
+
+      Toast.show({
+        type: "success",
+        position: "top",
+        text1: "Profile updated successfully",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+
+      setIsEditMode(false);
+    } catch (error: any) {
+      console.log(error, "error in handleSaveProfile");
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: error?.message || "Failed to update profile",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    // Reset to original values
+    if (typeof odooUser === "object" && odooUser?.records?.[0]) {
+      setEmail(odooUser.records[0].login || "");
+      setPhone(odooUser.records[0].phone || "");
+    }
+    setIsEditMode(false);
+  };
+
   const links = [
     {
       title: "Email",
       value: typeof odooUser === "object" ? odooUser?.records[0]?.login : "N/A",
+      editable: true,
     },
 
     {
       title: "Phone",
       value: typeof odooUser === "object" ? odooUser?.records[0]?.phone : "N/A",
+      editable: true,
     },
     {
       title: "Address",
@@ -50,11 +116,26 @@ const Profile = () => {
         userAddresses?.records[0]?.state ||
         userAddresses?.records[0]?.country ||
         "N/A",
+      editable: false,
     },
   ];
   return (
     <View style={styles.container}>
-      <Header title="Profile" />
+      <View style={styles.headerWrapper}>
+        <Header title="Profile" />
+        {isLoggedIn && !isEditMode && (
+          <TouchableOpacity
+            onPress={() => setIsEditMode(true)}
+            style={styles.editButton}
+          >
+            <Ionicons
+              name="create-outline"
+              size={24}
+              color={Colors[colorScheme].text}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
       <View style={styles.profileImageContainer}>
         <AntDesign name="user" size={80} color={Colors[colorScheme].text} />
         {/* <Image
@@ -72,15 +153,54 @@ const Profile = () => {
         </View>
       </View>
 
-      {links.map((link, index) => (
-        <View key={index} style={{ marginTop: 15 }}>
-          <Text style={styles.linkText}>{link.title}</Text>
-          <View style={styles.linkContainer}>
-            <Text style={styles.linkText}>{link.value}</Text>
-            <View style={styles.linkIconContainer}></View>
+      {links.map((link, index) => {
+        const isEditableField = isEditMode && link.editable;
+        const isEmail = link.title === "Email";
+        const isPhone = link.title === "Phone";
+
+        return (
+          <View key={index} style={{ marginTop: 15 }}>
+            <Text style={styles.linkText}>{link.title}</Text>
+            <View style={styles.linkContainer}>
+              {isEditableField ? (
+                <TextInput
+                  style={styles.editInput}
+                  value={isEmail ? email : phone}
+                  onChangeText={isEmail ? setEmail : setPhone}
+                  placeholder={`Enter ${link.title.toLowerCase()}`}
+                  keyboardType={isPhone ? "phone-pad" : "email-address"}
+                  autoCapitalize={isEmail ? "none" : "none"}
+                />
+              ) : (
+                <Text style={styles.linkText}>{link.value}</Text>
+              )}
+              <View style={styles.linkIconContainer}></View>
+            </View>
           </View>
+        );
+      })}
+
+      {isEditMode && isLoggedIn && (
+        <View style={styles.editActions}>
+          <Button
+            variant="outline"
+            size="large"
+            title="Cancel"
+            onPress={handleCancelEdit}
+            style={{ flex: 1, marginRight: 10 }}
+            disabled={isPending}
+          />
+          <Button
+            variant="primary"
+            size="large"
+            title={isPending ? "Saving..." : "Save"}
+            onPress={handleSaveProfile}
+            style={{ flex: 1 }}
+            disabled={isPending}
+          />
         </View>
-      ))}
+      )}
+
       {!isLoggedIn && (
         <Button
           variant="primary"
@@ -122,6 +242,16 @@ const createStyles = (theme: "light" | "dark", width: number) =>
       flex: 1,
       backgroundColor: Colors[theme].background,
       paddingHorizontal: 15,
+    },
+    headerWrapper: {
+      position: "relative",
+    },
+    editButton: {
+      position: "absolute",
+      right: 0,
+      top: 0,
+      padding: 8,
+      zIndex: 1,
     },
 
     profileImageContainer: {
@@ -175,5 +305,15 @@ const createStyles = (theme: "light" | "dark", width: number) =>
     },
     linkText: {
       fontSize: 16,
+    },
+    editInput: {
+      flex: 1,
+      fontSize: 16,
+      backgroundColor: "transparent",
+    },
+    editActions: {
+      flexDirection: "row",
+      marginTop: 30,
+      gap: 10,
     },
   });

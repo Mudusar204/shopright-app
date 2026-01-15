@@ -8,7 +8,9 @@ import {
   verifyOtp,
   resendOtp,
   resetPassword,
+  updateProfile,
 } from "@/services/auth.services";
+import { useAuthStore } from "@/store/auth.store";
 
 const useLogin = () => {
   const queryClient = useQueryClient();
@@ -113,6 +115,32 @@ const useResetPassword = () => {
   });
 };
 
+const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  const { odooUserAuth, setOdooUserAuth } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: any) => {
+      return updateProfile(payload);
+    },
+    onSuccess: async (data, variables) => {
+      // Update odooUserAuth in store with new email (login)
+      if (odooUserAuth && variables.email) {
+        setOdooUserAuth({
+          ...odooUserAuth,
+          login: variables.email,
+        });
+      }
+      await queryClient.invalidateQueries({
+        queryKey: ["getOdooUser"],
+      });
+    },
+    onError(error) {
+      console.error("updateProfile", error);
+    },
+  });
+};
+
 export {
   useLogin,
   useLogout,
@@ -120,4 +148,5 @@ export {
   useOtpVerification,
   useResendOtp,
   useResetPassword,
+  useUpdateProfile,
 };

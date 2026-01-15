@@ -134,7 +134,7 @@ const Orders = () => {
             color={Colors[colorScheme].text}
           />
           <Text style={styles.detailText}>
-            {item?.order_line?.length} items
+            {item?.order_line?.length - 1} items
           </Text>
         </View>
         <View style={styles.detailRow}>

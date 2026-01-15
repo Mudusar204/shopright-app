@@ -195,6 +195,42 @@ export const addUserAddress = async (data: any) => {
     console.log(error, "error in addUserAddress");
   }
 };
+
+export const updateProfile = async (data: any) => {
+  const odooAdmin = useAuthStore.getState().odooAdmin;
+  const user = useAuthStore.getState().odooUserAuth;
+  if (!odooAdmin) {
+    throw new Error("Odoo user auth not found");
+  }
+  console.log(odooAdmin, "odooAdmin in updateProfile");
+  try {
+    const response = await axios.put(
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.users&Id=${user?.id}`,
+      {
+        fields: ["login", "phone"],
+        values: {
+          login: data.email,
+          phone: data.phone,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": odooAdmin.api_key,
+          login: odooAdmin.login,
+          password: odooAdmin.password,
+          db: odooAdmin.db,
+        },
+      }
+    );
+
+    console.log(response, "updateProfile response");
+    return response.data;
+  } catch (error) {
+    console.log(error, "error in updateProfile");
+    throw error;
+  }
+};
 export const getUserAddresses = async () => {
   const odooAdmin = useAuthStore.getState().odooAdmin;
   const user = useAuthStore.getState().odooUserAuth;
