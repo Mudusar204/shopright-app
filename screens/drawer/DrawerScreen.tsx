@@ -177,7 +177,9 @@ const DrawerScreen = () => {
         <TitleWithImage
           Icon={<InfoIcon color={Colors[colorTheme].icon_color} />}
           title="FAQs"
-          onPress={() => {}}
+          onPress={() => {
+            router.push("/(auth)/faqs");
+          }}
         />
 
         <View style={{}}>
