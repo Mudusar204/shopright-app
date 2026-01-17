@@ -104,7 +104,7 @@ const Checkout = () => {
         totalAmount: getTotalPrice(),
         freeDeliveryAt: deliveryCharges?.records[0]?.amount,
         items: cartItems.map((item) => ({
-          productId: item.id,
+          productId: +item.id,
           quantity: item.quantity,
         })),
       },

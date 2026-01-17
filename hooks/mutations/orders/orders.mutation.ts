@@ -8,7 +8,7 @@ const useCreateOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: any) => {
-      console.warn(payload, "payload");
+      console.warn(payload, "payload for createOrder");
       return createOrder(payload);
     },
     onSuccess: async (data) => {

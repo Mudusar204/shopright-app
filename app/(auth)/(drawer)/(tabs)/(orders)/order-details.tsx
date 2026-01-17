@@ -31,7 +31,8 @@ import { useGetProducts } from "@/hooks/queries/products/products.query";
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const { addToCart, cartItems, removeFromCart } = useMyCartStore();
+  const { addToCart, cartItems, removeFromCart, updateQuantity, clearCart } =
+    useMyCartStore();
 
   const { orderId } = useLocalSearchParams();
   const {
@@ -66,6 +67,83 @@ const OrderDetails = () => {
       Toast.show({
         type: "success",
         text1: "Check you cart for order",
+      });
+    }
+  };
+
+  const handleOrderAgain = async () => {
+    if (!order?.records[0]?.order_line || !products?.records) {
+      Toast.show({
+        type: "error",
+        text1: "Unable to reorder",
+      });
+      return;
+    }
+    await clearCart();
+    // Get all order items excluding delivery charge (product_id 14939)
+    const orderItems = order.records[0].order_line.filter(
+      (item: any) => item.product_id[0] !== 14939
+    );
+
+    if (orderItems.length === 0) {
+      Toast.show({
+        type: "error",
+        text1: "No items to reorder",
+      });
+      return;
+    }
+
+    // Add each item to cart with its original quantity
+    let itemsAdded = 0;
+    orderItems.forEach((item: any) => {
+      const product = products.records.find(
+        (p: any) =>
+          p.display_name === item.name && p.list_price === item.price_unit
+      );
+
+      if (product) {
+        const cartItemId = product.id.toString();
+        const existingCartItem = cartItems.find((ci) => ci.id === cartItemId);
+        const desiredQuantity = item.product_uom_qty;
+
+        if (existingCartItem) {
+          // If item exists, add the order quantity to existing quantity
+          updateQuantity(
+            cartItemId,
+            existingCartItem.quantity + desiredQuantity
+          );
+        } else {
+          // Add item to cart (this adds with quantity 1)
+          addToCart({
+            id: cartItemId,
+            image: item.product_image_url || "",
+            title: item.name as string,
+            price: item.price_unit as string,
+          });
+          // Update to the correct quantity after state update
+          // Use a small timeout to ensure addToCart state update completes
+          setTimeout(() => {
+            updateQuantity(cartItemId, desiredQuantity);
+          }, 10);
+        }
+        itemsAdded++;
+      }
+    });
+
+    if (itemsAdded > 0) {
+      Toast.show({
+        type: "success",
+        text1: "Items added to cart",
+        text2: "Redirecting to checkout...",
+      });
+      // Navigate to checkout after a short delay to allow state updates
+      setTimeout(() => {
+        router.push("/(auth)/checkout/Checkout");
+      }, 500);
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Could not add items to cart",
       });
     }
   };
@@ -457,74 +535,76 @@ const OrderDetails = () => {
         )}
 
         {/* Real-time Rider Tracking */}
-        {order?.records[0]?.app_rider_id && (
-          // order?.records[0]?.order_status === OrderStatus.InTransit &&
-          <View style={styles.mapContainer}>
-            <Text style={styles.sectionTitle}>Delivery and Rider Location</Text>
-            <View style={styles.riderInfoContainer}>
-              <View style={styles.riderInfo}>
-                <Ionicons
-                  name="bicycle"
-                  size={20}
-                  color={Colors[colorScheme].primary_color}
-                />
-                <Text style={styles.riderName}>
-                  {order?.records[0]?.app_rider_id || "Rider"}
-                </Text>
-                <View
-                  style={[
-                    styles.trackingStatus,
-                    {
-                      backgroundColor: socketConnected
-                        ? Colors[colorScheme].success
-                        : Colors[colorScheme].error,
-                    },
-                  ]}
-                >
-                  <Text style={styles.trackingStatusText}>
-                    {socketConnected ? "Live" : "Offline"}
+        {order?.records[0]?.app_rider_id &&
+          order?.records[0]?.order_status === OrderStatus.InTransit && (
+            <View style={styles.mapContainer}>
+              <Text style={styles.sectionTitle}>
+                Delivery and Rider Location
+              </Text>
+              <View style={styles.riderInfoContainer}>
+                <View style={styles.riderInfo}>
+                  <Ionicons
+                    name="bicycle"
+                    size={20}
+                    color={Colors[colorScheme].primary_color}
+                  />
+                  <Text style={styles.riderName}>
+                    {order?.records[0]?.app_rider_id || "Rider"}
                   </Text>
+                  <View
+                    style={[
+                      styles.trackingStatus,
+                      {
+                        backgroundColor: socketConnected
+                          ? Colors[colorScheme].success
+                          : Colors[colorScheme].error,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.trackingStatusText}>
+                      {socketConnected ? "Live" : "Offline"}
+                    </Text>
+                  </View>
                 </View>
               </View>
+              <RiderTrackingMap
+                riderLocation={
+                  riderLocation
+                    ? {
+                        latitude: riderLocation?.latitude,
+                        longitude: riderLocation?.longitude,
+                      }
+                    : {
+                        latitude: riderLastLocation?.latitude || 0,
+                        longitude: riderLastLocation?.longitude || 0,
+                      }
+                }
+                deliveryLocation={{
+                  latitude:
+                    order?.records[0]?.partner_shipping_id?.partner_latitude ||
+                    23.723081,
+                  longitude:
+                    order?.records[0]?.partner_shipping_id?.partner_longitude ||
+                    90.4087,
+                }}
+                riderName={order?.records[0]?.app_rider_id || "Rider"}
+                isConnected={socketConnected}
+                height={250}
+              />
+              {!socketConnected && (
+                <View style={styles.offlineMessage}>
+                  <Ionicons
+                    name="wifi-outline"
+                    size={16}
+                    color={Colors[colorScheme].text_secondary}
+                  />
+                  <Text style={styles.offlineMessageText}>
+                    Rider tracking is currently offline
+                  </Text>
+                </View>
+              )}
             </View>
-            <RiderTrackingMap
-              riderLocation={
-                riderLocation
-                  ? {
-                      latitude: riderLocation?.latitude,
-                      longitude: riderLocation?.longitude,
-                    }
-                  : {
-                      latitude: riderLastLocation?.latitude || 0,
-                      longitude: riderLastLocation?.longitude || 0,
-                    }
-              }
-              deliveryLocation={{
-                latitude:
-                  order?.records[0]?.partner_shipping_id?.partner_latitude ||
-                  23.723081,
-                longitude:
-                  order?.records[0]?.partner_shipping_id?.partner_longitude ||
-                  90.4087,
-              }}
-              riderName={order?.records[0]?.app_rider_id || "Rider"}
-              isConnected={socketConnected}
-              height={250}
-            />
-            {!socketConnected && (
-              <View style={styles.offlineMessage}>
-                <Ionicons
-                  name="wifi-outline"
-                  size={16}
-                  color={Colors[colorScheme].text_secondary}
-                />
-                <Text style={styles.offlineMessageText}>
-                  Rider tracking is currently offline
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
+          )}
 
         {/* Action Buttons */}
         {order?.records[0]?.order_status === OrderStatus.Pending && (
@@ -543,14 +623,17 @@ const OrderDetails = () => {
                 {isPending ? "Cancelling..." : "Cancel Order"}
               </Text>
             </Pressable>
-            {/* <Pressable
-              style={[styles.button, styles.supportButton]}
-              onPress={() => {
-                // Handle contact support
-              }}
+          </View>
+        )}
+
+        {order?.records[0]?.order_status === OrderStatus.Delivered && (
+          <View style={styles.actionButtons}>
+            <Pressable
+              style={[styles.button, styles.orderAgainButton]}
+              onPress={handleOrderAgain}
             >
-              <Text style={styles.buttonText}>Contact Support</Text>
-            </Pressable> */}
+              <Text style={styles.buttonText}>Order Again</Text>
+            </Pressable>
           </View>
         )}
       </ScrollView>
@@ -762,6 +845,9 @@ const createStyles = (theme: "light" | "dark") =>
     },
     cancelButton: {
       backgroundColor: Colors[theme].error,
+    },
+    orderAgainButton: {
+      backgroundColor: Colors[theme].primary_color,
     },
     supportButton: {
       backgroundColor: Colors[theme].primary_color,

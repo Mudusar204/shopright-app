@@ -2,7 +2,9 @@ import {
   Alert,
   Image,
   KeyboardAvoidingView,
+  Linking,
   Modal,
+  Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -99,11 +101,29 @@ const Login = () => {
                 Create an account
               </Link>
             </Text>
-            <Text style={styles.footerText}>
-              <Link style={styles.footerLink} href="/forgetPassword">
+            <Pressable
+              onPress={async () => {
+                const url = "https://shopright.club/web/reset_password";
+                const supported = await Linking.canOpenURL(url);
+
+                if (supported) {
+                  await Linking.openURL(url);
+                } else {
+                  console.warn("Cannot open URL:", url);
+                }
+              }}
+            >
+              <Text
+                style={[
+                  styles.footerText,
+                  { color: Colors[colorScheme].primary_color },
+                ]}
+              >
+                {/* <Link style={styles.footerLink} href="/forgetPassword"> */}
                 Forgot Password
-              </Link>
-            </Text>
+                {/* </Link> */}
+              </Text>
+            </Pressable>
             {/* <TouchableOpacity onPress={() => setShowWebView(true)}>
             
               <Text style={styles.footerText}>Forgot Password</Text>
