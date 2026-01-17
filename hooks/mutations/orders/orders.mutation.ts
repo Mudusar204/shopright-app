@@ -40,6 +40,11 @@ const useUpdateOrderStatus = () => {
       await queryClient.invalidateQueries({
         queryKey: ["my-orders"],
       });
+
+      // 🔄 Invalidate order detail query
+      await queryClient.invalidateQueries({
+        queryKey: ["order"],
+      });
       return data;
     },
   });

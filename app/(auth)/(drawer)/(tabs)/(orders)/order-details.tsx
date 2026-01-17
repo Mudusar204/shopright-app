@@ -7,7 +7,7 @@ import {
   Image,
   RefreshControl,
 } from "react-native";
-import { View, Text } from "@/components/Themed";
+import { View, Text, Button } from "@/components/Themed";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import { useLocalSearchParams, router } from "expo-router";
@@ -24,10 +24,15 @@ import { OrderStatus } from "@/constants/enums";
 import { useUpdateOrderStatus } from "@/hooks/mutations/orders/orders.mutation";
 import { useGetRiderLocation } from "@/hooks/queries/auth/auth.query";
 import { getImageSource } from "@/utils";
+import { useMyCartStore } from "@/store/myCart.store";
+import Toast from "react-native-toast-message";
+import { useGetProducts } from "@/hooks/queries/products/products.query";
 
 const OrderDetails = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
+  const { addToCart, cartItems, removeFromCart } = useMyCartStore();
+
   const { orderId } = useLocalSearchParams();
   const {
     data: order,
@@ -36,7 +41,34 @@ const OrderDetails = () => {
     error,
     refetch,
   } = useGetOrderById(Number(orderId));
+  console.log(order, "order details");
+  const { data: products } = useGetProducts();
 
+  const handleAddToCart = (product: any) => {
+    if (cartItems.find((item) => item.title == product.name)) {
+      Toast.show({
+        type: "error",
+        text1: "Item already added",
+      });
+      return;
+      // removeFromCart(product.id as string);
+    } else {
+      addToCart({
+        id: products.records.find(
+          (item: any) =>
+            item.display_name == product.name &&
+            item.list_price == product.price_unit
+        ).id,
+        image: product.product_image_url,
+        title: product.name as string,
+        price: product.price_unit as string,
+      });
+      Toast.show({
+        type: "success",
+        text1: "Check you cart for order",
+      });
+    }
+  };
   const { data: riderLastLocation } = useGetRiderLocation(
     order?.records[0]?.app_rider_id || ""
   );
@@ -360,9 +392,28 @@ const OrderDetails = () => {
                       <Text style={styles.itemPrice}>
                         Rs. {item?.price_unit} x {item?.product_uom_qty}
                       </Text>
-                      <Text style={styles.itemTotal}>
-                        Total: Rs. {item?.price_total}
-                      </Text>
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          backgroundColor: "transparent",
+                        }}
+                      >
+                        <Text style={styles.itemTotal}>
+                          Total: Rs. {item?.price_total}
+                        </Text>
+                        <Pressable
+                          style={{
+                            backgroundColor: Colors[colorScheme].primary_color,
+                            padding: 5,
+                            borderRadius: 5,
+                          }}
+                          onPress={() => handleAddToCart(item)}
+                        >
+                          <Text>Buy Again</Text>
+                        </Pressable>
+                      </View>
                     </View>
                   </View>
                 ))}
