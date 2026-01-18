@@ -39,11 +39,12 @@ export const createOrder = async (data: any) => {
     const response = await axios.post(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=sale.order`,
       {
-        fields: ["partner_id", "state", "order_line"],
+        fields: ["partner_id", "state", "order_line", "note"],
         values: {
           partner_id: user?.partner_id,
           state: "sale",
           order_line: orderLine,
+          note: data?.note,
         },
       },
       {

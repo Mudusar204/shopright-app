@@ -43,6 +43,7 @@ const Checkout = () => {
   const [selectedPayment, setSelectedPayment] = useState("cash");
   const bottomSheetRef = useRef<BottomSheetScrollHandle>(null);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
+  const [specialNote, setSpecialNote] = useState("");
 
   function generateSOTimestamp() {
     const now = new Date();
@@ -100,7 +101,7 @@ const Checkout = () => {
       {
         addressId: selectedAddress?.id,
         paymentMethod: selectedPayment,
-        customerNote: selectedAddress?.instructions,
+        note: specialNote,
         totalAmount: getTotalPrice(),
         freeDeliveryAt: deliveryCharges?.records[0]?.amount,
         items: cartItems.map((item) => ({
@@ -376,7 +377,7 @@ const Checkout = () => {
             }
           /> */}
         </View>
-        {/* <View style={styles.section}>
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Special Instructions</Text>
           <TextInput
             multiline
@@ -384,12 +385,10 @@ const Checkout = () => {
             placeholder="Enter your instructions"
             placeholderTextColor={Colors[colorScheme].text_secondary}
             value={selectedAddress?.instructions}
-            onChangeText={(text) =>
-              setSelectedAddress({ ...selectedAddress, instructions: text })
-            }
+            onChangeText={(text) => setSpecialNote(text)}
             style={[styles.input, { height: 100, textAlignVertical: "top" }]}
           />
-        </View> */}
+        </View>
         <Text style={styles.sectionTitle}>Shopright Location</Text>
 
         <View
