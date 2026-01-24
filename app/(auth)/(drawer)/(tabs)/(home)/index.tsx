@@ -40,7 +40,7 @@ import ImageSlider from "@/components/ImageSlider";
 import { useGetCategories } from "@/hooks/queries/categories/categories.query";
 import { getImageSource } from "@/utils";
 import SaleAlert from "@/components/SaleAlert";
-
+import InAppUpdateScreen from "@/components/UpdateCheck";
 type FilterItem = {
   all?: boolean;
   category?: any | null;
@@ -58,6 +58,7 @@ export default function HomeScreen() {
   const styles = createStyles(colorScheme);
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
+  const [showUpdatePrompt, setShowUpdatePrompt] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const {
@@ -66,6 +67,7 @@ export default function HomeScreen() {
     isError: sliderImagesError,
     refetch: sliderImagesRefetch,
   } = useGetSliderImages();
+
   // console.log(sliderImages, "sliderImages");
   const [filter, setFilter] = useState<FilterItem[]>([
     { all: true },
@@ -273,8 +275,16 @@ export default function HomeScreen() {
   //     return () => backHandler.remove();
   //   }
   // }, []);
+
+  const onUpdateNotRequired = useCallback(() => {
+    setShowUpdatePrompt(false);
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeAreaView}>
+      {showUpdatePrompt && (
+        <InAppUpdateScreen onContinue={onUpdateNotRequired} force />
+      )}
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>

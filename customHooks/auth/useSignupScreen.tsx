@@ -29,24 +29,31 @@ export default function useSignupScreen() {
       }
       console.log(password.length, "password in useSignupScreen");
       if (
-        password.length < 8 ||
-        !/[A-Z]/.test(password) ||
-        !/[a-z]/.test(password) ||
-        !/[0-9]/.test(password) ||
-        !/[!@#$%^&*(),.?":{}|<>]/.test(password)
+        password.length < 8
+        // !/[A-Z]/.test(password) ||
+        // !/[a-z]/.test(password) ||
+        // !/[0-9]/.test(password) ||
+        // !/[!@#$%^&*(),.?":{}|<>]/.test(password)
       ) {
         Toast.show({
           type: "error",
           position: "top",
-          text1: "Weak Password",
-          text2:
-            "Password must be at least 8 characters long and include uppercase, lowercase, number & special character",
+          text2: "Password must be at least 8 character",
           visibilityTime: 3000,
           autoHide: true,
         });
         return;
       }
-
+      if (phone.length < 11) {
+        Toast.show({
+          type: "error",
+          position: "top",
+          text1: "Please enter valid phone number",
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+        return;
+      }
       const response = await mutateAsync({
         name: name,
         phone: phone,

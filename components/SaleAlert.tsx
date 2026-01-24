@@ -16,6 +16,7 @@ export default function SaleAlert() {
   const ALERTS = [
     `🚚 Enjoy FREE Delivery! Orders above Rs.${deliveryCharges?.records[0]?.amount}`,
     "     🕒 Order before 10:00 PM & get same-day delivery!",
+    "Cooked meals prepared within 24 hours",
   ];
 
   useEffect(() => {
@@ -23,8 +24,8 @@ export default function SaleAlert() {
 
     Animated.loop(
       Animated.timing(translateX, {
-        toValue: -width * 1.8,
-        duration: 12000,
+        toValue: -width * 2.6,
+        duration: 18000,
         useNativeDriver: true,
       })
     ).start();
