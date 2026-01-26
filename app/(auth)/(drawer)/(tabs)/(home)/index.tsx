@@ -170,6 +170,10 @@ export default function HomeScreen() {
 
   const selectedCategoryId = filter[1]?.category?.id ?? null;
 
+  // Check if filters are active
+  const hasActiveFilters =
+    searchQuery?.trim().length > 0 || selectedCategoryId !== null;
+
   const renderCategoryItem = useCallback(
     ({ item }: { item: any }) => {
       const isSelected = selectedCategoryId === item?.id;
@@ -281,6 +285,17 @@ export default function HomeScreen() {
     setShowUpdatePrompt(false);
   }, []);
 
+  const handleClearFilters = useCallback(() => {
+    setSearchQuery("");
+    setFilter((prev) => [
+      { all: true }, // reset "all"
+      { category: null }, // clear category
+      prev[2], // keep brand
+      prev[3], // keep priceRange
+      prev[4], // keep sort
+    ]);
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeAreaView}>
       {showUpdatePrompt && (
@@ -321,7 +336,7 @@ export default function HomeScreen() {
         <View>
           <SaleAlert />
         </View>
-        <Pressable>
+        <View style={styles.searchContainer}>
           <View style={styles.locationContainer}>
             <AntDesign
               style={{ marginRight: 10 }}
@@ -333,10 +348,15 @@ export default function HomeScreen() {
               placeholder="What you are looking for?"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              style={{ backgroundColor: "transparent", width: "100%" }}
+              style={styles.searchInput}
             />
           </View>
-        </Pressable>
+          {hasActiveFilters && (
+            <Pressable style={styles.clearButton} onPress={handleClearFilters}>
+              <Ionicons name="flag" size={20} color="white" />
+            </Pressable>
+          )}
+        </View>
 
         {/* <View style={styles.filterContainer}>
           <Pressable onPress={handleFilterPress}>
@@ -497,18 +517,35 @@ const createStyles = (colorTheme: "light" | "dark") =>
       fontSize: 17,
       fontWeight: "normal",
     },
-    locationContainer: {
-      height: 42,
+    searchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
       marginTop: 25,
       marginHorizontal: 20,
+      gap: 10,
+    },
+    locationContainer: {
+      flex: 1,
+      height: 42,
       paddingHorizontal: 15,
       flexDirection: "row",
-      justifyContent: "flex-start",
       alignItems: "center",
       backgroundColor: Colors[colorTheme].background_light,
       borderRadius: 10,
       borderWidth: 1,
       borderColor: Colors[colorTheme].border,
+    },
+    searchInput: {
+      flex: 1,
+      backgroundColor: "transparent",
+    },
+    clearButton: {
+      width: 42,
+      height: 42,
+      borderRadius: 10,
+      backgroundColor: "#FF3B30",
+      justifyContent: "center",
+      alignItems: "center",
     },
     locationText: {
       fontSize: 12,
