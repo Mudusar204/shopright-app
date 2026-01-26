@@ -8,7 +8,7 @@ export const getRiderLocation = async (riderId: string) => {
   const response = await apiClient.get(
     API_ROUTES.RIDER.GET_RIDER_LOCATION(riderId)
   );
-  console.log(response.data, "getRider response");
+  console.log(response, "getRider response ");
 
   return response.data;
 };

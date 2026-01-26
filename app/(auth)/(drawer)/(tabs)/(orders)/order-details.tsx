@@ -147,7 +147,7 @@ const OrderDetails = () => {
       });
     }
   };
-  const { data: riderLastLocation } = useGetRiderLocation(
+  const { data: riderData } = useGetRiderLocation(
     order?.records[0]?.app_rider_id || ""
   );
 
@@ -538,9 +538,7 @@ const OrderDetails = () => {
         {order?.records[0]?.app_rider_id &&
           order?.records[0]?.order_status === OrderStatus.InTransit && (
             <View style={styles.mapContainer}>
-              <Text style={styles.sectionTitle}>
-                Delivery and Rider Location
-              </Text>
+              <Text style={styles.sectionTitle}>Rider Location</Text>
               <View style={styles.riderInfoContainer}>
                 <View style={styles.riderInfo}>
                   <Ionicons
@@ -551,6 +549,7 @@ const OrderDetails = () => {
                   <Text style={styles.riderName}>
                     {order?.records[0]?.app_rider_id || "Rider"}
                   </Text>
+
                   <View
                     style={[
                       styles.trackingStatus,
@@ -566,6 +565,12 @@ const OrderDetails = () => {
                     </Text>
                   </View>
                 </View>
+                <Text style={styles.riderName}>
+                  Name: {riderData?.firstName || "Rider"}
+                </Text>
+                <Text style={styles.riderName}>
+                  PhoneNumber: {riderData?.phoneNumber || "03.."}
+                </Text>
               </View>
               <RiderTrackingMap
                 riderLocation={
@@ -575,8 +580,8 @@ const OrderDetails = () => {
                         longitude: riderLocation?.longitude,
                       }
                     : {
-                        latitude: riderLastLocation?.latitude || 0,
-                        longitude: riderLastLocation?.longitude || 0,
+                        latitude: riderData?.latitude || 0,
+                        longitude: riderData?.longitude || 0,
                       }
                 }
                 deliveryLocation={{
