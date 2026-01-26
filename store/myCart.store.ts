@@ -17,6 +17,7 @@ interface CartState {
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
+  syncCartPrices: (products: Array<{ id: number | string; list_price: number }>) => void;
 }
 
 const initialState = {
@@ -67,6 +68,37 @@ export const useMyCartStore = create<CartState>()(
           (total, item) => total + parseFloat(item.price) * item.quantity,
           0
         );
+      },
+      syncCartPrices: (products) => {
+        const currentItems = get().cartItems;
+        const updatedItems = currentItems
+          .map((cartItem) => {
+            // Find matching product by ID
+            const product = products.find(
+              (p) => String(p.id) === String(cartItem.id)
+            );
+
+            if (product) {
+              // Update price with current product price
+              const newPrice = String(product.list_price);
+              // Only update if price has changed
+              if (cartItem.price !== newPrice) {
+                return { ...cartItem, price: newPrice };
+              }
+              return cartItem;
+            }
+            // If product not found, keep the item (or remove it if you prefer)
+            // For now, we'll keep it with old price
+            return cartItem;
+          })
+          .filter((item) => {
+            // Optional: Remove items if product no longer exists
+            // Uncomment the line below if you want to remove unavailable products
+            // return products.some((p) => String(p.id) === String(item.id));
+            return true; // Keep all items for now
+          });
+
+        set({ cartItems: updatedItems });
       },
     }),
     {

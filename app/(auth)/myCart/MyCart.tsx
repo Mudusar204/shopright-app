@@ -1,5 +1,5 @@
 import { StyleSheet, ScrollView, FlatList } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "@/components/Header";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
@@ -7,11 +7,21 @@ import { Button, Text, View } from "@/components/Themed";
 import { router } from "expo-router";
 import CartItem from "@/components/CartItem";
 import { useMyCartStore } from "@/store/myCart.store";
+import { useGetProducts } from "@/hooks/queries/products/products.query";
 
 const MyCart = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
-  const { cartItems, getTotalPrice } = useMyCartStore();
+  const { cartItems, getTotalPrice, syncCartPrices } = useMyCartStore();
+  const { data: products } = useGetProducts();
+
+  // Sync cart prices when products are loaded
+  useEffect(() => {
+    if (products?.records && cartItems.length > 0) {
+      syncCartPrices(products.records);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products?.records]);
 
   const handleCheckout = () => {
     router.push("/(auth)/checkout");

@@ -8,7 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import Checkbox from "expo-checkbox";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import { Button } from "@/components/Themed";
@@ -27,15 +27,26 @@ import { socketService } from "@/services/socket.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useGetDeliveryCharges } from "@/hooks/queries/orders/orders.query";
 import MapView, { Marker, Callout } from "react-native-maps";
+import { useGetProducts } from "@/hooks/queries/products/products.query";
 
 const Checkout = () => {
   const colorScheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorScheme);
   const { isLoggedIn, odooUserAuth } = useAuthStore();
-  const { cartItems, getTotalPrice, clearCart } = useMyCartStore();
+  const { cartItems, getTotalPrice, clearCart, syncCartPrices } =
+    useMyCartStore();
 
   const { data: userAddresses } = useGetUserAddresses();
   const { data: deliveryCharges } = useGetDeliveryCharges();
+  const { data: products } = useGetProducts();
+
+  // Sync cart prices when products are loaded
+  useEffect(() => {
+    if (products?.records && cartItems.length > 0) {
+      syncCartPrices(products.records);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products?.records]);
   console.log(deliveryCharges, "deliveryCharges");
   const { mutate: createOrder, isPending } = useCreateOrder();
   const { mutate: createTransaction, isPending: isCreatingTransaction } =
@@ -67,6 +78,11 @@ const Checkout = () => {
   }
 
   const handleCheckout = () => {
+    // Sync prices one more time before checkout to ensure latest prices
+    if (products?.records && cartItems.length > 0) {
+      syncCartPrices(products.records);
+    }
+
     // if (!selectedAddress) {
     //   Toast.show({
     //     type: "error",
@@ -251,7 +267,12 @@ const Checkout = () => {
           <View style={styles.totalContainer}>
             <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalPrice}>
-              Rs.{getTotalPrice().toFixed(2)}
+              {/* Rs.{getTotalPrice().toFixed(2) } */}
+              Rs.{" "}
+              {getTotalPrice().toFixed(2) > deliveryCharges?.records[0]?.amount
+                ? getTotalPrice().toFixed(2)
+                : +getTotalPrice().toFixed(2) +
+                  +deliveryCharges?.records[0]?.fixed_price}
             </Text>
           </View>
         </View>
