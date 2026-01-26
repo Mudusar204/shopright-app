@@ -162,7 +162,7 @@ export default function HomeScreen() {
 
   const filtering = filteredData.filter((item: any) => item.id == 14948);
 
-  console.log(filtering, "filteredData");
+  console.log(filteredData[2], "filteredData qty_available");
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);
@@ -232,6 +232,7 @@ export default function HomeScreen() {
         description={item?.description_ecommerce}
         tags={item?.categ_id}
         relatedItems={item?.alternative_product_ids}
+        qtyAvailable={item?.qty_available}
       />
     ),
     []

@@ -15,7 +15,7 @@ export const getProducts = async () => {
   try {
     // Try to fetch from API first
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=product.product&is_published=True&fields=id,description_ecommerce,display_name,list_price,barcode,categ_id,currency_id,image_1920,public_categ_ids,alternative_product_ids`,
+      `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=product.product&is_published=True&fields=id,description_ecommerce,display_name,list_price,barcode,categ_id,currency_id,image_1920,public_categ_ids,alternative_product_ids,qty_available`,
       {
         headers: {
           "Content-Type": "application/json",

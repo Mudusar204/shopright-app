@@ -31,10 +31,20 @@ interface ProductCardProps {
     | any
   >;
   tags?: Array<string>;
+  qtyAvailable?: any;
 }
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(
-  ({ id, image, title, price, description, relatedItems, tags }) => {
+  ({
+    id,
+    image,
+    title,
+    price,
+    description,
+    relatedItems,
+    tags,
+    qtyAvailable,
+  }) => {
     const { addToCart, cartItems, removeFromCart } = useMyCartStore();
     const inWishlist = useWishlistStore((state) => state.isInWishlist(id));
     const toggleWishlist = useWishlistStore((state) => state.toggleWishlist);
@@ -65,6 +75,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
           description,
           tags: JSON.stringify(tags),
           relatedItems: JSON.stringify(relatedItems),
+          qtyAvailable,
         },
       });
     }, [id, image, title, price, description, tags, relatedItems]);
@@ -167,13 +178,26 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
               onPress={handleCartAction}
             /> */}
             <Pressable
-              style={styles.addToCartButton}
+              style={[
+                styles.addToCartButton,
+                {
+                  backgroundColor:
+                    qtyAvailable > 0
+                      ? Colors[colorTheme].primary_color
+                      : Colors[colorTheme].secondary_color,
+                },
+              ]}
               onPress={handleCartAction}
+              disabled={qtyAvailable < 1}
             >
-              <Text style={styles.addToCart}>
-                {isInCart ? "Remove Item" : "Add To Cart  "}
+              <Text style={[styles.addToCart]}>
+                {qtyAvailable < 1
+                  ? "Out of Stock"
+                  : isInCart
+                  ? "Remove Item"
+                  : "Add To Cart  "}
               </Text>
-              {!isInCart && (
+              {!isInCart && qtyAvailable > 0 && (
                 <Feather name="shopping-cart" size={18} color="white" />
               )}
             </Pressable>
@@ -258,7 +282,6 @@ const createStyles = (colorTheme: "light" | "dark", height: number) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: Colors[colorTheme].primary_color,
       borderRadius: 5,
       padding: 8,
     },

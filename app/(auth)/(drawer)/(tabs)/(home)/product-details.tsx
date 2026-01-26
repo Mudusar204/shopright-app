@@ -40,6 +40,7 @@ const ProductDetails = () => {
     description,
     tags,
     relatedItems,
+    qtyAvailable,
   } = params;
   console.log(relatedItems, "related items");
   const tagList = params.tags ? JSON.parse(tags as string) : [];
@@ -191,15 +192,18 @@ const ProductDetails = () => {
       </View>
       <View style={{ marginHorizontal: 15 }}>
         <Button
-          variant="primary"
+          variant={+qtyAvailable > 0 ? "primary" : "secondary"}
           size="large"
           title={
-            cartItems.find((item) => item.id == id)
+            +qtyAvailable < 1
+              ? "Out of Stock"
+              : cartItems.find((item) => item.id == id)
               ? "Remove From Cart"
               : "Add To Cart"
           }
           icon={<Feather name="shopping-cart" size={24} color="white" />}
           onPress={handleAddToCart}
+          disabled={+qtyAvailable < 1}
         />
       </View>
 
