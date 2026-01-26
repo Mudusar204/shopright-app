@@ -25,19 +25,30 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   const colorTheme = useColorScheme() as "light" | "dark";
   const styles = createStyles(colorTheme);
   const { registerToken, unregisterToken } = useNotifications();
-  const { odooUserAuth, expoPushToken, setExpoPushToken } = useAuthStore();
+  const { odooUserAuth, expoPushToken, setExpoPushToken, notificationsEnabled, setNotificationsEnabled } = useAuthStore();
 
   const [isEnabled, setIsEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [userDisabled, setUserDisabled] = useState(false);
 
-  // Initialize: Check if token exists to determine enabled state
+  // Initialize: Check if token exists and user preference to determine enabled state
   useEffect(() => {
     const initializeToken = async () => {
       try {
-        // If token exists, assume notifications are enabled
-        // If no token, notifications are disabled
-        setIsEnabled(!!expoPushToken);
+        // If user explicitly disabled, respect that
+        if (notificationsEnabled === false) {
+          setIsEnabled(false);
+          setUserDisabled(true);
+        } else if (expoPushToken) {
+          // Token exists, assume notifications are enabled
+          setIsEnabled(true);
+          setUserDisabled(false);
+        } else {
+          // No token and no explicit preference
+          setIsEnabled(false);
+          setUserDisabled(false);
+        }
       } catch (error) {
         console.error("Error initializing token:", error);
         setIsEnabled(false);
@@ -47,7 +58,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     };
 
     initializeToken();
-  }, [expoPushToken]);
+  }, [expoPushToken, notificationsEnabled]);
 
   const handleToggle = async (value: boolean) => {
     if (isLoading) return;
@@ -77,6 +88,8 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
         const success = await registerToken();
         if (success) {
           setIsEnabled(true);
+          setUserDisabled(false);
+          setNotificationsEnabled(true);
           Alert.alert("Success", "Notifications enabled successfully");
         } else {
           Alert.alert(
@@ -84,6 +97,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
             "Failed to enable notifications. Please try again."
           );
           setIsEnabled(false);
+          setNotificationsEnabled(null);
         }
       } else {
         // Disable notifications
@@ -95,8 +109,10 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
 
         const success = await unregisterToken();
         if (success) {
-          // unregisterToken sets expoPushToken to null, so state will update via useEffect
+          // Mark that user explicitly disabled
+          setUserDisabled(true);
           setIsEnabled(false);
+          setNotificationsEnabled(false); // Store user preference
           Alert.alert("Success", "Notifications disabled successfully");
         } else {
           Alert.alert(
@@ -104,6 +120,8 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
             "Failed to disable notifications. Please try again."
           );
           setIsEnabled(true);
+          setUserDisabled(false);
+          setNotificationsEnabled(null);
         }
       }
     } catch (error) {

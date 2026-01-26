@@ -17,6 +17,7 @@ const initialState: AuthStoreState = {
   expoPushToken: null,
   userLocations: [],
   odooUserAuth: null,
+  notificationsEnabled: null, // null means not set yet
   odooAdmin: {
     api_key: "c7a9d323-7149-4ebd-997f-4923787e3609",
     login: "app@gmail.com",
@@ -47,6 +48,8 @@ export const useAuthStore = create(
       setOnboarded: (isOnboarded: boolean) => set({ isOnboarded }),
       setExpoPushToken: (expoPushToken: string | null) =>
         set({ expoPushToken }),
+      setNotificationsEnabled: (notificationsEnabled: boolean | null) =>
+        set({ notificationsEnabled }),
 
       clear: () => {
         set({

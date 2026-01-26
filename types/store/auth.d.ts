@@ -7,6 +7,7 @@ interface AuthStoreState {
   odooAdmin?: OdooAdmin | null;
   odooUserAuth?: OdooUserAuth | null;
   isOnboarded: boolean;
+  notificationsEnabled?: boolean | null; // null = not set, true = enabled, false = user disabled
 }
 
 interface AuthStoreActions {
@@ -17,6 +18,7 @@ interface AuthStoreActions {
   setExpoPushToken: (expoPushToken: string | null) => void;
   setIsLoading: (isLoading: boolean) => void;
   setOnboarded: (isOnboarded: boolean) => void;
+  setNotificationsEnabled: (enabled: boolean | null) => void;
   clear: () => void;
 }
 

@@ -15,9 +15,10 @@ export const useNotifications = () => {
   const notificationListener = useRef<Notifications.Subscription | null>(null);
 
   const responseListener = useRef<Notifications.Subscription | null>(null);
-  const { odooUserAuth, expoPushToken, setExpoPushToken } = useAuthStore();
+  const { odooUserAuth, expoPushToken, setExpoPushToken, notificationsEnabled } = useAuthStore();
   useEffect(() => {
-    if (expoPushToken === null) {
+    // Only auto-initialize if token is null AND user hasn't explicitly disabled notifications
+    if (expoPushToken === null && notificationsEnabled !== false) {
       const initializeNotifications = async () => {
         if (odooUserAuth?.id) {
           const token: any = await notificationService.initialize(
@@ -57,7 +58,7 @@ export const useNotifications = () => {
         }
       };
     }
-  }, [odooUserAuth?.id, expoPushToken]);
+  }, [odooUserAuth?.id, expoPushToken, notificationsEnabled]);
 
   const handleNotificationResponse = (
     response: Notifications.NotificationResponse
