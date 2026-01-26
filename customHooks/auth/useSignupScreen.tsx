@@ -15,6 +15,9 @@ export default function useSignupScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const { mutateAsync, error, isPending, isSuccess } = useRegister();
   const { odooUser, setOdooUser, setOdooUserAuth } = useAuthStore();
+  const isValidEmail = (email: string) => {
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+  };
   const handleRegister = async () => {
     try {
       if (password !== confirmPassword) {
@@ -42,6 +45,14 @@ export default function useSignupScreen() {
           visibilityTime: 3000,
           autoHide: true,
         });
+        return;
+      }
+      if (name.length < 3) {
+        Toast.show({ type: "error", text2: "Invalid name " });
+        return;
+      }
+      if (!isValidEmail(email)) {
+        Toast.show({ type: "error", text2: "Invalid email format" });
         return;
       }
       if (phone.length < 11) {

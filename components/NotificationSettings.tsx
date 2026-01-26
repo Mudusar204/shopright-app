@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Switch,
-  TouchableOpacity,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useAuthStore } from "@/store/auth.store";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
 import notificationService from "@/services/notification.service";
+import Header from "./Header";
 
 interface NotificationSettingsProps {
   onClose?: () => void;
@@ -26,131 +27,155 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   const { registerToken, unregisterToken } = useNotifications();
   const { odooUserAuth, expoPushToken, setExpoPushToken } = useAuthStore();
 
-  const [settings, setSettings] = useState({
-    orderNotifications: true,
-    paymentNotifications: true,
-    promotionalNotifications: false,
-    soundEnabled: true,
-    vibrationEnabled: true,
-  });
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  const handleSettingChange = (key: keyof typeof settings, value: boolean) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleRegisterToken = async () => {
-    if (!expoPushToken) {
-      Alert.alert("Error", "Push token not available ");
-      return;
-    }
-
-    try {
-      const success = await registerToken();
-      console.log(success, "final response");
-      if (success) {
-        Alert.alert("Success", "Notifications enabled successfully");
-      } else {
-        Alert.alert("Error", "Failed to enable notifications");
+  // Initialize: Check if token exists to determine enabled state
+  useEffect(() => {
+    const initializeToken = async () => {
+      try {
+        // If token exists, assume notifications are enabled
+        // If no token, notifications are disabled
+        setIsEnabled(!!expoPushToken);
+      } catch (error) {
+        console.error("Error initializing token:", error);
+        setIsEnabled(false);
+      } finally {
+        setIsInitializing(false);
       }
-    } catch (error) {
-      Alert.alert("Error", "Failed to enable notifications");
-    }
-  };
+    };
 
-  const getPushToken = async () => {
-    const token = await notificationService.getExpoPushToken();
-    setExpoPushToken(token);
-    console.log("token", token);
-  };
+    initializeToken();
+  }, [expoPushToken]);
 
-  const handleUnregisterToken = async () => {
-    if (!expoPushToken) {
-      Alert.alert("Error", "Push token not available");
-      return;
-    }
+  const handleToggle = async (value: boolean) => {
+    if (isLoading) return;
 
+    setIsLoading(true);
     try {
-      const success = await unregisterToken();
-      if (success) {
-        Alert.alert("Success", "Notifications disabled successfully");
-      } else {
-        Alert.alert("Error", "Failed to disable notifications");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to disable notifications");
-    }
-  };
+      if (value) {
+        // Enable notifications
+        let token = expoPushToken;
 
-  const renderSettingItem = (
-    title: string,
-    description: string,
-    key: keyof typeof settings,
-    value: boolean
-  ) => (
-    <View style={styles.settingItem}>
-      <View style={styles.settingInfo}>
-        <Text style={styles.settingTitle}>{title}</Text>
-        <Text style={styles.settingDescription}>{description}</Text>
-      </View>
-      <Switch
-        value={value}
-        onValueChange={(newValue) => handleSettingChange(key, newValue)}
-        trackColor={{
-          false: Colors[colorTheme].border,
-          true: Colors[colorTheme].primary_color,
-        }}
-        thumbColor={
-          value ? Colors[colorTheme].text_white : Colors[colorTheme].text
+        // Get token if it doesn't exist
+        if (!token) {
+          token = await notificationService.getExpoPushToken();
+          if (token) {
+            setExpoPushToken(token);
+          } else {
+            Alert.alert(
+              "Permission Required",
+              "Please allow notifications in your device settings to enable this feature."
+            );
+            setIsLoading(false);
+            return;
+          }
         }
-      />
-    </View>
-  );
+
+        // Register token
+        const success = await registerToken();
+        if (success) {
+          setIsEnabled(true);
+          Alert.alert("Success", "Notifications enabled successfully");
+        } else {
+          Alert.alert(
+            "Error",
+            "Failed to enable notifications. Please try again."
+          );
+          setIsEnabled(false);
+        }
+      } else {
+        // Disable notifications
+        if (!expoPushToken) {
+          setIsEnabled(false);
+          setIsLoading(false);
+          return;
+        }
+
+        const success = await unregisterToken();
+        if (success) {
+          // unregisterToken sets expoPushToken to null, so state will update via useEffect
+          setIsEnabled(false);
+          Alert.alert("Success", "Notifications disabled successfully");
+        } else {
+          Alert.alert(
+            "Error",
+            "Failed to disable notifications. Please try again."
+          );
+          setIsEnabled(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling notifications:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+      setIsEnabled(!value); // Revert to previous state
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isInitializing) {
+    return (
+      <View style={styles.container}>
+        <Header title={"Notification Settings"} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            size="large"
+            color={Colors[colorTheme].primary_color}
+          />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notification Settings</Text>
-        {onClose && (
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
+      <Header title={"Notification Settings"} />
       <ScrollView style={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Device Settings</Text>
-
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingTitle}>Push Token</Text>
+              <Text style={styles.settingTitle}>Push Notifications</Text>
               <Text style={styles.settingDescription}>
-                {expoPushToken ? "Token registered" : "Token not available"}
+                {isEnabled
+                  ? "Receive notifications about your orders and updates"
+                  : "Enable to receive notifications about your orders and updates"}
               </Text>
             </View>
+            {isLoading ? (
+              <ActivityIndicator
+                size="small"
+                color={Colors[colorTheme].primary_color}
+              />
+            ) : (
+              <Switch
+                value={isEnabled}
+                onValueChange={handleToggle}
+                disabled={isLoading}
+                trackColor={{
+                  false: Colors[colorTheme].border,
+                  true: Colors[colorTheme].primary_color,
+                }}
+                thumbColor={
+                  isEnabled
+                    ? Colors[colorTheme].text_white
+                    : Colors[colorTheme].text
+                }
+              />
+            )}
           </View>
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.button, styles.enableButton]}
-              onPress={handleRegisterToken}
-            >
-              <Text style={styles.buttonText}>Enable Notifications</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, styles.enableButton]}
-              onPress={getPushToken}
-            >
-              <Text style={styles.buttonText}>Get Push Token</Text>
-            </TouchableOpacity>
-
-            {/* <TouchableOpacity
-              style={[styles.button, styles.disableButton]}
-              onPress={handleUnregisterToken}
-            >
-              <Text style={styles.buttonText}>Disable Notifications</Text>
-            </TouchableOpacity> */}
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoText}>
+              Status: {isEnabled ? "Enabled" : "Disabled"}
+            </Text>
+            {!expoPushToken && !isEnabled && (
+              <Text style={[styles.infoText, { marginTop: 4 }]}>
+                Tap the switch above to enable notifications
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -163,6 +188,7 @@ const createStyles = (colorTheme: "light" | "dark") =>
     container: {
       flex: 1,
       backgroundColor: Colors[colorTheme].background,
+      paddingHorizontal: 16,
     },
     header: {
       flexDirection: "row",
@@ -217,27 +243,28 @@ const createStyles = (colorTheme: "light" | "dark") =>
     settingDescription: {
       fontSize: 14,
       color: Colors[colorTheme].text_secondary,
+      marginTop: 4,
     },
-    buttonContainer: {
-      marginTop: 16,
-      gap: 12,
-    },
-    button: {
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      borderRadius: 8,
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
       alignItems: "center",
+      paddingVertical: 40,
     },
-    enableButton: {
-      backgroundColor: Colors[colorTheme].primary_color,
+    loadingText: {
+      marginTop: 12,
+      fontSize: 14,
+      color: Colors[colorTheme].text_secondary,
     },
-    disableButton: {
-      backgroundColor: "#FF3B30",
+    infoContainer: {
+      marginTop: 16,
+      padding: 12,
+      backgroundColor: Colors[colorTheme].background_light,
+      borderRadius: 8,
     },
-    buttonText: {
-      color: Colors[colorTheme].text_white,
-      fontSize: 16,
-      fontWeight: "600",
+    infoText: {
+      fontSize: 14,
+      color: Colors[colorTheme].text_secondary,
     },
   });
 
