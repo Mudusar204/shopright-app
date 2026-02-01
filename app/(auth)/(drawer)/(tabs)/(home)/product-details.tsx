@@ -148,9 +148,7 @@ const ProductDetails = () => {
 
         <View style={styles.titleRow}>
           {/* <View style={styles.phoneRow}> */}
-          <Text style={styles.title}>
-            {(title as string)?.substring(1, (title as string)?.length)}
-          </Text>
+          <Text style={styles.title}>{(title as string).trim()}</Text>
           {/* <Button
               style={{
                 paddingHorizontal: 2,

@@ -24,6 +24,8 @@ const IOS_BUNDLE_ID = "com.shopright.club";
 // App Store URL - will be extracted from API response, fallback to known URL
 const IOS_APPSTORE_URL_FALLBACK =
   "https://apps.apple.com/pk/app/shopright-club/id6751136785";
+const ANDROID_PLAYSTORE_URL_FALLBACK =
+  "https://play.google.com/store/apps/details?id=com.shopright.club";
 
 type Props = {
   /**
@@ -37,7 +39,7 @@ type Props = {
   force?: boolean;
 };
 
-const InAppUpdateScreen = ({ onContinue, force = true }: Props) => {
+const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateType, setUpdateType] = useState<"immediate" | "flexible" | null>(
     null
@@ -129,23 +131,26 @@ const InAppUpdateScreen = ({ onContinue, force = true }: Props) => {
    */
   const startUpdate = () => {
     if (Platform.OS === "android") {
-      if (updateType === "immediate") {
-        showUpdatePopup("immediate");
-      } else {
-        startFlexibleUpdateWithProgress();
-      }
+      // if (updateType === "immediate") {
+      //   showUpdatePopup("immediate");
+      // } else {
+      //   startFlexibleUpdateWithProgress();
+      // }
+      Linking.openURL(ANDROID_PLAYSTORE_URL_FALLBACK);
     } else {
-      Alert.alert(
-        "Update Available",
-        "A new version is available on the App Store",
-        [
-          {
-            text: "Update",
-            onPress: () => Linking.openURL(appStoreUrl),
-          },
-        ],
-        { cancelable: false }
-      );
+      Linking.openURL(appStoreUrl);
+
+      // Alert.alert(
+      //   "Update Available",
+      //   "A new version is available on the App Store",
+      //   [
+      //     {
+      //       text: "Update",
+      //       onPress: () => Linking.openURL(appStoreUrl),
+      //     },
+      //   ],
+      //   { cancelable: false }
+      // );
     }
   };
 

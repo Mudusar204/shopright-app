@@ -238,7 +238,6 @@ export const getUserAddresses = async () => {
   if (!odooAdmin) {
     throw new Error("Odoo user auth not found");
   }
-  console.log(odooAdmin, "odooUserAddresses");
   try {
     const response = await axios.get(
       `${process.env.EXPO_PUBLIC_ODOO_API_URL}/send_request?model=res.partner&Id=${user?.partner_id}&fields=name,email,zip,street,street2,city,state,country,parent_id,type,partner_latitude,partner_longitude`,

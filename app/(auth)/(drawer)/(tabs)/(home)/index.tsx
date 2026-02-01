@@ -162,7 +162,7 @@ export default function HomeScreen() {
 
   const filtering = filteredData.filter((item: any) => item.id == 14948);
 
-  console.log(filteredData[2], "filteredData qty_available");
+  // console.log(filteredData[2], "filteredData qty_available");
   const handleFilterPress = useCallback(() => {
     setIsFilterVisible(true);
   }, []);
@@ -299,7 +299,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeAreaView}>
       {showUpdatePrompt && (
-        <InAppUpdateScreen onContinue={onUpdateNotRequired} force />
+        <InAppUpdateScreen onContinue={onUpdateNotRequired} />
       )}
       <View style={styles.container}>
         <View style={styles.header}>
@@ -353,7 +353,7 @@ export default function HomeScreen() {
           </View>
           {hasActiveFilters && (
             <Pressable style={styles.clearButton} onPress={handleClearFilters}>
-              <Ionicons name="flag" size={20} color="white" />
+              <Ionicons name="close" size={20} color="white" />
             </Pressable>
           )}
         </View>
