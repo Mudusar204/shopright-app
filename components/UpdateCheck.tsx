@@ -6,65 +6,66 @@ import {
   StyleSheet,
   Platform,
   Linking,
-  Alert,
   Modal,
   Pressable,
 } from "react-native";
 
-import {
-  showUpdatePopup,
-  getUpdateInfo,
-  startFlexibleUpdateWithProgress,
-  subscribeToUpdateProgress,
-} from "react-native-rn-in-app-update";
-
 import DeviceInfo from "react-native-device-info";
 
 const IOS_BUNDLE_ID = "com.shopright.club";
-// App Store URL - will be extracted from API response, fallback to known URL
 const IOS_APPSTORE_URL_FALLBACK =
   "https://apps.apple.com/pk/app/shopright-club/id6751136785";
 const ANDROID_PLAYSTORE_URL_FALLBACK =
   "https://play.google.com/store/apps/details?id=com.shopright.club";
 
+const ANDROID_CHECK_API_BASE = "https://api.shopright.club/admin/check";
+
+type UpdateCheckResponse = {
+  updateRequired: boolean;
+  forceUpdate: boolean;
+  latestVersion: string;
+  message: string;
+  storeUrl: string;
+};
+
 type Props = {
-  /**
-   * Called when no update is available (or update check fails),
-   * so the parent can hide this UI.
-   */
   onContinue?: () => void;
-  /**
-   * If true, user can't dismiss the prompt when update is available.
-   */
   force?: boolean;
 };
 
 const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [updateType, setUpdateType] = useState<"immediate" | "flexible" | null>(
-    null
-  );
-  const [progress, setProgress] = useState(0);
   const [checked, setChecked] = useState(false);
   const [appStoreUrl, setAppStoreUrl] = useState(IOS_APPSTORE_URL_FALLBACK);
+  const [androidStoreUrl, setAndroidStoreUrl] = useState(
+    ANDROID_PLAYSTORE_URL_FALLBACK
+  );
+  const [forceUpdateFromApi, setForceUpdateFromApi] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState<string | null>(
+    "A newer version of ShopRight is available. Please update to continue."
+  );
 
   /**
    * ======================
-   * ANDROID UPDATE CHECK
+   * ANDROID UPDATE CHECK (Backend API)
    * ======================
    */
   const checkAndroidUpdate = async () => {
     try {
-      const info = await getUpdateInfo();
+      const currentVersion = DeviceInfo.getVersion();
+      console.log("currentVersion", currentVersion);
+      const url = `${ANDROID_CHECK_API_BASE}?platform=android&version=${encodeURIComponent(
+        currentVersion
+      )}`;
+      const res = await fetch(url);
 
-      if (info?.updateAvailability) {
+      const data: UpdateCheckResponse = await res.json();
+
+      if (data?.updateRequired) {
         setUpdateAvailable(true);
-
-        if (info.immediateAllowed) {
-          setUpdateType("immediate");
-        } else if (info.flexibleAllowed) {
-          setUpdateType("flexible");
-        }
+        setForceUpdateFromApi(Boolean(data.forceUpdate));
+        // setAndroidStoreUrl(ANDROID_PLAYSTORE_URL_FALLBACK);
+        // if (data.message?.trim()) setUpdateMessage(data.message.trim());
       } else {
         setUpdateAvailable(false);
       }
@@ -76,7 +77,7 @@ const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
 
   /**
    * ======================
-   * IOS UPDATE CHECK
+   * IOS UPDATE CHECK (existing flow – iTunes)
    * ======================
    */
   const checkIosUpdate = async () => {
@@ -92,7 +93,6 @@ const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
         const appInfo = json.results[0];
         const storeVersion = appInfo.version;
 
-        // Extract App Store URL from response, fallback to known URL
         const trackViewUrl = appInfo.trackViewUrl || IOS_APPSTORE_URL_FALLBACK;
         setAppStoreUrl(trackViewUrl);
 
@@ -108,11 +108,6 @@ const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
     }
   };
 
-  /**
-   * ======================
-   * VERSION COMPARE
-   * ======================
-   */
   const isVersionGreater = (store: string, current: string) => {
     const s = store.split(".").map(Number);
     const c = current.split(".").map(Number);
@@ -124,61 +119,14 @@ const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
     return false;
   };
 
-  /**
-   * ======================
-   * START UPDATE
-   * ======================
-   */
   const startUpdate = () => {
     if (Platform.OS === "android") {
-      // if (updateType === "immediate") {
-      //   showUpdatePopup("immediate");
-      // } else {
-      //   startFlexibleUpdateWithProgress();
-      // }
-      Linking.openURL(ANDROID_PLAYSTORE_URL_FALLBACK);
+      Linking.openURL(androidStoreUrl);
     } else {
       Linking.openURL(appStoreUrl);
-
-      // Alert.alert(
-      //   "Update Available",
-      //   "A new version is available on the App Store",
-      //   [
-      //     {
-      //       text: "Update",
-      //       onPress: () => Linking.openURL(appStoreUrl),
-      //     },
-      //   ],
-      //   { cancelable: false }
-      // );
     }
   };
 
-  /**
-   * ======================
-   * FLEXIBLE UPDATE PROGRESS
-   * ======================
-   */
-  useEffect(() => {
-    if (Platform.OS !== "android") return;
-
-    const unsubscribe = subscribeToUpdateProgress(
-      ({ bytesDownloaded, totalBytesToDownload }) => {
-        if (totalBytesToDownload > 0) {
-          const percent = (bytesDownloaded / totalBytesToDownload) * 100;
-          setProgress(Math.floor(percent));
-        }
-      }
-    );
-
-    return () => unsubscribe();
-  }, []);
-
-  /**
-   * ======================
-   * INIT
-   * ======================
-   */
   useEffect(() => {
     if (Platform.OS === "android") {
       checkAndroidUpdate().finally(() => setChecked(true));
@@ -187,13 +135,15 @@ const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
     }
   }, []);
 
-  // If we've checked and there's no update, let parent continue and render nothing.
   useEffect(() => {
     if (!checked) return;
     if (!updateAvailable) onContinue?.();
   }, [checked, updateAvailable, onContinue]);
 
-  const canDismiss = useMemo(() => !force, [force]);
+  const canDismiss = useMemo(
+    () => !force && !forceUpdateFromApi,
+    [force, forceUpdateFromApi]
+  );
 
   if (!checked) return null;
   if (!updateAvailable) return null;
@@ -204,19 +154,9 @@ const InAppUpdateScreen = ({ onContinue, force = false }: Props) => {
         <View style={styles.card}>
           <Text style={styles.title}>Update available</Text>
           <Text style={styles.text}>
-            A newer version of ShopRight is available. Please update to
-            continue.
+            {updateMessage ??
+              "A newer version of ShopRight is available. Please update to continue."}
           </Text>
-
-          {Platform.OS === "android" && updateType && (
-            <Text style={styles.text}>Update type: {updateType}</Text>
-          )}
-
-          {Platform.OS === "android" &&
-            updateType === "flexible" &&
-            progress > 0 && (
-              <Text style={styles.progress}>Downloading: {progress}%</Text>
-            )}
 
           <View style={styles.actions}>
             {canDismiss && (
@@ -259,12 +199,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  progress: {
-    fontSize: 16,
-    fontWeight: "600",
     marginBottom: 10,
     textAlign: "center",
   },
