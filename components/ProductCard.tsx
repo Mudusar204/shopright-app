@@ -182,22 +182,25 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
                 styles.addToCartButton,
                 {
                   backgroundColor:
-                    qtyAvailable > 0
+                    // qtyAvailable > 0
+                    true
                       ? Colors[colorTheme].primary_color
                       : Colors[colorTheme].secondary_color,
                 },
               ]}
               onPress={handleCartAction}
-              disabled={qtyAvailable < 1}
+              // disabled={qtyAvailable < 1}
             >
               <Text style={[styles.addToCart]}>
-                {qtyAvailable < 1
+                {/* {qtyAvailable < 1 */}
+                {false
                   ? "Out of Stock"
                   : isInCart
                   ? "Remove Item"
                   : "Add To Cart  "}
               </Text>
-              {!isInCart && qtyAvailable > 0 && (
+              {!isInCart && (
+                //  && qtyAvailable > 0
                 <Feather name="shopping-cart" size={18} color="white" />
               )}
             </Pressable>

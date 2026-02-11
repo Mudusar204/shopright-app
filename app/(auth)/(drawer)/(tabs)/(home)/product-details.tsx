@@ -190,10 +190,14 @@ const ProductDetails = () => {
       </View>
       <View style={{ marginHorizontal: 15 }}>
         <Button
-          variant={+qtyAvailable > 0 ? "primary" : "secondary"}
+          variant={
+            // +qtyAvailable > 0
+            true ? "primary" : "secondary"
+          }
           size="large"
           title={
-            +qtyAvailable < 1
+            // +qtyAvailable < 1
+            false
               ? "Out of Stock"
               : cartItems.find((item) => item.id == id)
               ? "Remove From Cart"
@@ -201,7 +205,7 @@ const ProductDetails = () => {
           }
           icon={<Feather name="shopping-cart" size={24} color="white" />}
           onPress={handleAddToCart}
-          disabled={+qtyAvailable < 1}
+          // disabled={+qtyAvailable < 1}
         />
       </View>
 
